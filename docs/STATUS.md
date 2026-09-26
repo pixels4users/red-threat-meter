@@ -1,6 +1,14 @@
-# Stan realizacji — 25.09.2026
+# Stan realizacji — 26.09.2026
 
 Etapy 0–2 mają działającą pierwszą wersję. Proces został uruchomiony na rzeczywistych źródłach i zakończony raportem z jawnym brakiem odczytu RTB. To fundament pilotażu, bez kompletnego pokrycia regionu i bez autonomicznego monitoringu.
+
+## GitHub i Supabase — połączenie zweryfikowane 26.09.2026
+
+Repozytorium [pixels4users/red-threat-meter](https://github.com/pixels4users/red-threat-meter/tree/main) ma gałąź `main`. Pierwsze opublikowane wydanie kodu `8a6ec9e` obejmuje 153 pliki, których drzewo Git porównano z przetestowanym stanem lokalnym; przed publikacją przeszło 140 testów. To weryfikacja istniejącego pilotażu, nie implementacja obliczeń v0.3. Wcześniejsza historia pozostaje lokalnie na `codex/foundation-pipeline` i `archive/local-main-before-github`; dane robocze oraz sekrety nie trafiły do GitHub.
+
+Po zalogowaniu przez użytkownika sprawdzono panel Supabase: projekt `dubhsimiblpfcaudbvjb` (`red-threat-meter`) ma status **Healthy**, a integracja jest już połączona z właściwym repozytorium. Katalog roboczy to `.`, **Deploy to production** i **Automatic branching** są wyłączone. Pole gałęzi GitHub dla wdrożeń jest puste i nieaktywne; docelowe `main` ustawimy przy późniejszym uruchamianiu wdrożeń. W tym przeglądzie odczytano stan bez zmiany ustawień chmury, uprawnień ani planu.
+
+Logowanie do panelu nie stanowi uwierzytelnienia lokalnego CLI ani testu połączenia PostgreSQL. Nie wykonano migracji, zapisu wyników do Supabase ani wdrożenia strony. Do zaprojektowania pozostają model udostępnianych danych, uprawnienia, publikowanie wyników z procesu Python oraz dashboard. Szczegóły i dalsza kolejność: [stan integracji Supabase](../supabase/README.md).
 
 ## Metodologia v0.3 — zaakceptowana specyfikacja
 

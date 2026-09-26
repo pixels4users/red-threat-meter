@@ -1,14 +1,18 @@
-# Supabase — przygotowanie integracji
+# Supabase — stan integracji
 
-Stan na 26.09.2026: konfiguracja lokalna wygenerowana przez Supabase CLI 2.117.0. Nie wykonano logowania, połączenia z bazą, migracji ani wdrożenia funkcji. Dostęp do projektu wymaga zalogowania przez właściciela; sam identyfikator nie potwierdza jego stanu.
+Stan zweryfikowany w zalogowanym panelu 26.09.2026: projekt `red-threat-meter` (`dubhsimiblpfcaudbvjb`) ma status **Healthy**, a integracja GitHub wskazuje `pixels4users/red-threat-meter` i katalog roboczy `.`. Połączenie było już zapisane przez użytkownika. **Deploy to production** i **Automatic branching** są wyłączone. Nie wykonano migracji, wdrożenia funkcji ani zapisu danych projektu przez tę integrację.
+
+Konfigurację lokalną wygenerowano przez Supabase CLI 2.117.0. Sesja panelu WWW nie loguje automatycznie CLI; lokalny proces nadal korzysta z SQLite. Nie wykonano testu bezpośredniego połączenia PostgreSQL. Widok „No migrations” nie jest dowodem pustej bazy — przed pierwszym wdrożeniem trzeba odczytać rzeczywisty schemat.
 
 | Ustawienie | Wartość |
 |---|---|
 | Repozytorium | [pixels4users/red-threat-meter](https://github.com/pixels4users/red-threat-meter) |
-| Docelowa gałąź produkcyjna | `main` |
+| Docelowa gałąź GitHub dla wdrożeń | `main`; pole **Production branch name** jest obecnie puste i nieaktywne przy wyłączonym wdrażaniu |
 | Projekt chmurowy wskazany przez użytkownika | `dubhsimiblpfcaudbvjb` |
 | Panel projektu | [Supabase Dashboard](https://supabase.com/dashboard/project/dubhsimiblpfcaudbvjb) |
 | Katalog roboczy integracji GitHub | `.` — ten katalog zawiera `supabase/` |
+| Automatyczne wdrożenia | Wyłączone |
+| Automatyczne gałęzie podglądu | Wyłączone; bieżący panel planu Free wymaga zmiany planu do ich włączenia |
 | `project_id` w `config.toml` | `red-threat-meter` — nazwa lokalnego środowiska, nie potwierdzenie połączenia z projektem chmurowym |
 
 ## Rola poszczególnych elementów
@@ -18,14 +22,14 @@ Stan na 26.09.2026: konfiguracja lokalna wygenerowana przez Supabase CLI 2.117.0
 - Kolektory i analiza Python potrzebują własnego wykonawcy. Połączenie gałęzi GitHub z Supabase nie uruchamia istniejących skryptów.
 - Frontend wymaga osobnego zbudowania i hostingu. Aktualizacja jego kodu oraz aktualizacja danych to osobne procesy.
 
-## Połączenie GitHub
+## Połączenie GitHub i późniejsze wdrożenia
 
 Według [dokumentacji integracji Supabase](https://supabase.com/docs/guides/deployment/branching/github-integration), sprawdzonej 26.09.2026:
 
-1. Po publikacji kodu zaloguj się do wskazanego projektu i otwórz **Project Settings → Integrations → GitHub**.
-2. Wybierz `pixels4users/red-threat-meter`, gałąź produkcyjną `main` i katalog roboczy `.`. Nazwy opcji mogą zależeć od wersji panelu.
-3. Przed włączeniem **Deploy to production** porównaj rzeczywisty schemat projektu z zatwierdzonymi migracjami w repozytorium. Jeśli projekt ma już tabele, najpierw zachowaj jego schemat jako punkt wyjścia.
-4. Wdrażanie automatycznych gałęzi pozostaje opcjonalne; nie uruchamiaj go tylko po to, aby połączyć repozytorium. Ten etap nie zamawia dodatkowych środowisk.
+1. Zapisane połączenie można sprawdzić w **Project Settings → Integrations → GitHub**. Repozytorium i katalog `.` są już ustawione; nie twórz drugiej integracji.
+2. Przed włączeniem **Deploy to production** porównaj rzeczywisty schemat projektu z zatwierdzonymi migracjami w repozytorium. Jeśli projekt ma już tabele, najpierw zachowaj jego schemat jako punkt wyjścia.
+3. Przy późniejszym uruchamianiu wdrożeń ustaw **Production branch name** na `main`. Widoczna w nagłówku panelu gałąź Supabase „main / Production” nie potwierdza ustawienia tej opcji GitHub.
+4. Wdrażanie automatycznych gałęzi pozostaje opcjonalne; nie uruchamiaj go tylko po to, aby połączyć repozytorium. Ten etap nie zamawia dodatkowych środowisk ani zmiany planu.
 
 Na tym etapie w `supabase/` nie ma migracji, zdefiniowanych funkcji ani bucketów. Katalog `migrations/` w głównym katalogu projektu zawiera migracje **SQLite** istniejącego pilotażu; nie należy kopiować ich do `supabase/migrations/` ani wykonywać w PostgreSQL.
 
