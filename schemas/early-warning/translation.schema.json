@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "ew-translation-1"
+    },
+    "translator": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "agent",
+            "human"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ]
+    },
+    "translations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "observation_id": {
+            "type": "string",
+            "pattern": "^ewo_[0-9a-f]{24}$"
+          },
+          "previous_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source_title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source_text_hash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "title_pl": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 1000
+          },
+          "summary_pl": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 5000
+          },
+          "basis_quotes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 10,
+              "maxLength": 1000
+            },
+            "minItems": 1,
+            "maxItems": 8
+          },
+          "uncertainties_pl": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "observation_id",
+          "previous_revision",
+          "source_title",
+          "source_text_hash",
+          "title_pl",
+          "summary_pl",
+          "basis_quotes",
+          "uncertainties_pl"
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "translator",
+    "translations"
+  ]
+}

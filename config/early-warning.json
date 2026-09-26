@@ -1,0 +1,39 @@
+{
+  "version": "early-warning-1",
+  "role": "observations_only",
+  "history_days": 30,
+  "refresh_days": 3,
+  "check_max_age_hours": 36,
+  "region": {
+    "id": "cee-baltic-box-v1",
+    "label": "Europa Środkowo-Wschodnia i Bałtyk — prostokąt badawczy",
+    "bbox": [14.0, 49.0, 29.0, 60.0],
+    "selection": "h3_cell_center_in_bbox",
+    "h3_resolution": 4,
+    "min_cell_sample": 5
+  },
+  "sources": [
+    {
+      "id": "gpsjam",
+      "adapter": "gpsjam_manifest_csv_v1",
+      "publisher": "GPSJAM / John Wiseman",
+      "url": "https://gpsjam.org/data/manifest.csv",
+      "allowed_hosts": ["gpsjam.org"],
+      "path_prefix": "/data/",
+      "enabled": true,
+      "access": "public_map_files_local_pilot",
+      "redistribution": "not_assessed"
+    },
+    {
+      "id": "belzhd_public",
+      "adapter": "belzhd_rss_content_v1",
+      "publisher": "Сообщество железнодорожников Беларуси / belzhd.info",
+      "url": "https://belzhd.info/feed/",
+      "allowed_hosts": ["belzhd.info"],
+      "path_prefix": "/",
+      "enabled": true,
+      "access": "publisher_public_rss_local_pilot",
+      "redistribution": "not_assessed"
+    }
+  ]
+}

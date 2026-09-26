@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "language", "run_id", "as_of", "mode", "code_hash", "config_hash", "region", "source", "quality_rules", "counts", "latest", "latest_age_seconds", "latest_is_current", "series", "gaps_seconds", "history_hours", "receiver_coverage", "rtb_effect", "limitations"],
+  "properties": {
+    "schema_version": {"const": "aviation-snapshot-1"}, "language": {"const": "pl"},
+    "run_id": {"type": "string", "pattern": "^av-[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{6}Z-[0-9a-f]{8}$"},
+    "as_of": {"type": "string", "format": "date-time"}, "mode": {"enum": ["live", "fixture"]},
+    "code_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}, "config_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "region": {"type": "object"}, "source": {"type": "object"}, "quality_rules": {"type": "object"}, "counts": {"type": "object"},
+    "latest": {"type": ["object", "null"]}, "latest_age_seconds": {"type": ["number", "null"], "minimum": 0},
+    "latest_is_current": {"type": "boolean"}, "series": {"type": "array", "items": {"type": "object"}},
+    "gaps_seconds": {"type": "array", "items": {"type": "number", "minimum": 0}}, "history_hours": {"type": "integer", "minimum": 1},
+    "receiver_coverage": {"const": "unknown"}, "rtb_effect": {"const": "none"},
+    "limitations": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+  }
+}

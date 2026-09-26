@@ -1,0 +1,12 @@
+{
+  "version": "sources-pilot-2",
+  "description": "Aktywne kolektory bieżących publikacji o bezpieczeństwie Polski i wschodniej flanki NATO. Kontekst doktrynalny jest w doctrine-sources.json, kandydaci do rozbudowy w source-candidates.json.",
+  "policy": "Jedyną listą automatycznie pobieranych źródeł są poniższe wpisy enabled=true. Strony referencyjne i doktryna nie stają się incydentami. Pierwotne pochodzenie należy ustalić dla konkretnego twierdzenia, nie tylko wydawcy.",
+  "sources": [
+    {"id":"rcb","publisher":"Rządowe Centrum Bezpieczeństwa","kind":"primary","enabled":true,"required":true,"adapter":"govpl","url":"https://www.gov.pl/web/rcb/komunikaty","allowed_hosts":["www.gov.pl"],"path_prefix":"/web/rcb/","max_pages":3,"max_items":30,"fetch_articles":true,"notes":"Komunikaty i odwołania ostrzeżeń; ćwiczenia to osobny rodzaj informacji."},
+    {"id":"mon","publisher":"Ministerstwo Obrony Narodowej","kind":"primary","enabled":true,"required":true,"adapter":"govpl","url":"https://www.gov.pl/web/obrona-narodowa/aktualnosci5","allowed_hosts":["www.gov.pl"],"path_prefix":"/web/obrona-narodowa/","max_pages":3,"max_items":30,"fetch_articles":true,"notes":"Aktualności ministerstwa; nie stanowią pełnego rejestru incydentów ani osobnego źródła dla każdego cytowanego organu."},
+    {"id":"osw","publisher":"Ośrodek Studiów Wschodnich","kind":"analysis","enabled":true,"required":true,"adapter":"rss","url":"https://www.osw.waw.pl/pl/rss.xml","allowed_hosts":["www.osw.waw.pl"],"path_prefix":"/pl/","max_pages":1,"max_items":30,"fetch_articles":false,"notes":"Analizy regionalne. Na tym etapie przechowujemy treść kanału, nie deklarujemy pobrania pełnych artykułów."},
+    {"id":"naval_news","publisher":"Naval News","kind":"secondary","enabled":true,"required":false,"adapter":"rss","url":"https://www.navalnews.com/feed/","allowed_hosts":["www.navalnews.com"],"path_prefix":"/","max_pages":1,"max_items":20,"fetch_articles":false,"notes":"Kontekst morski; globalny zakres, często poza zakresem RTB."},
+    {"id":"cert_pl","publisher":"CERT Polska","kind":"primary","enabled":false,"required":false,"adapter":"rss","url":"https://cert.pl/posts/","allowed_hosts":["cert.pl"],"path_prefix":"/","max_pages":1,"max_items":20,"fetch_articles":false,"notes":"Wyłączone: próba dostępu 22.09.2026 zwróciła HTTP 403. Adres kanału i dostęp wymagają osobnej weryfikacji."}
+  ]
+}

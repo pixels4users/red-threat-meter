@@ -1,0 +1,182 @@
+# Stan realizacji — 25.09.2026
+
+Etapy 0–2 mają działającą pierwszą wersję. Proces został uruchomiony na rzeczywistych źródłach i zakończony raportem z jawnym brakiem odczytu RTB. To fundament pilotażu, bez kompletnego pokrycia regionu i bez autonomicznego monitoringu.
+
+## Metodologia v0.3 — zaakceptowana specyfikacja
+
+25.09.2026 użytkownik zaakceptował rozszerzenie o źródła pierwotne i aktualizację metodologii. [Metodologia v0.3](methodology.md) zastępuje dotychczasową specyfikację: określa wygaszanie, propagację 40% / 16%, korelację, efekt fali oraz dodatkowe warunki czerwonego priorytetu. Parametry pozostają eksperymentalne i nieskalibrowane. Ujednolicono instrukcje projektu, opis źródeł i procedury operacyjne.
+
+**Pochodzenie danych:** bezpośrednio PAŻP, wydawcy ukraińscy, RSO/RCB oraz media i siły zbrojne państw bałtyckich. Strażnik jest odniesieniem architektonicznym, bez integracji jego agregatów lub interfejsu. ADS-B pozostaje w istniejącym strumieniu ADSB.lol; RCB rozszerza dotychczasowy kolektor. Rejestr `source-candidates-8` zapisuje akceptację 12 pozycji jako `accepted_for_integration` i datę decyzji, niezależnie od niezmienionej daty oceny dostępu. Pozostałych 26 pozycji zachowano bez zmian.
+
+**Stan wdrożenia:** działający silnik, konfiguracja `config/scoring-v0.json` i instrukcje przeglądu w `agents/` nadal wykonują v0.2. Nowe kolektory, kontrakty i obliczenia v0.3 wymagają implementacji oraz walidacji. Dzienne GPSJAM nie spełnia wymogu korelacji w oknie 30 minut. Nie utworzono odczytu oznaczonego jako v0.3. Dokładną poprzednią metodologię i parametry zachowano w `docs/archive/methodology-v0.2.md` i `config/archive/scoring-v0.2.json` z kodu `2bccbb2`.
+
+Weryfikacja tej aktualizacji: poprawny JSON, unikalne identyfikatory, lokalne odnośniki i kotwice oraz diff bez błędów formatowania. Archiwum v0.2 odpowiada oryginałowi bajt po bajcie. Raport RTB `2026-09-22T234233Z-c41c5e05` odtworzono identycznie bez sieci, z zachowaniem `RTB=null`. To sprawdzenie ciągłości istniejącego procesu; nie test nowego silnika. Zachowano wcześniejsze zmiany użytkownika w `aviation-access.md` i dostarczone skills. Zmiany pozostają lokalne, bez nowego commita.
+
+**Następny uzgodniony krok:** osobno zaprojektować dashboard i sposób zasilania frontendu danymi. W tej aktualizacji nie rozpoczęto UI ani eksportu dla przeglądarki. Przed implementacją interfejsu pozostaje wybór spośród dwóch kierunków wizualnych; prezentowane wersje modelu, źródła i braki muszą odpowiadać rzeczywistym wydaniom danych.
+
+## Historia lotnicza — bieżący wynik z 24.09.2026
+
+Wydanie: **`ah-20260924T173557Z-a782c71a`**, stan analizy **24.09.2026, 19:35 czasu Warszawy**. [Raport lokalny](../data/aviation_history/snapshots/ah-20260924T173557Z-a782c71a/report.md). Kod odtworzenia: **`524e033`**. [Metoda, dostęp i obsługa](aviation-history.md).
+
+Dodano `scripts/aviation_history.py`, konfigurację `config/aviation-history.json`, walidację binarnego formatu, raport po polsku, agregaty GeoJSON i odtwarzanie bez sieci. Dane są w osobnym `data/aviation_history/`; pobranie ma stały plan najwyżej trzech półgodzinnych plików i limit 96 MB, bez automatycznych ponowień. Zapisano oryginalne treści, czasy, nagłówki, statusy HTTP oraz sumy kontrolne. Przegląd faktycznie serwowanego kodu mapy i kodu producenta ustalił znaczenie pól; kopie dowodów są w `data/research/aviation-history-2026-09-24/`.
+
+Rzeczywiste pobranie trwało od **17:20:44 do 17:20:52 UTC**. Zebrano okna **16:30–17:00 UTC z 22, 23 i 24.09.2026**, dla regionu `[14,49,29,60]`. Wszystkie trzy odpowiedzi miały HTTP 200. To **78 108 013 bajtów treści (78,1 MB)** i **88 119 536 bajtów po rozpakowaniu**. Nie pobierano wielogigabajtowych archiwów dziennych.
+
+| Dzień | Przedziały po 10 s | Min / mediana / max identyfikatorów na przedział | Unikalne identyfikatory w 30 minutach | Pola z obserwacją |
+|---|---:|---:|---:|---:|
+| 22.09 | 180/180 | 125 / 160 / 193 | 418 | 117/165 |
+| 23.09 | 180/180 | 108 / 196,5 / 226 | 480 | 124/165 |
+| 24.09 | 180/180 | 141 / 162 / 181 | 429 | 123/165 |
+
+Odczytano **540/540 przedziałów**, bez luk na osi czasu. W pliku 23.09 odrzucono jeden rekord z niedopuszczalną ujemną prędkością (poza naszym regionem); okno ma stan częściowy, pozostałe dwa — poprawny. JSON zachowuje indeks rekordu, przedział i przyczynę odrzucenia. Obserwacje w każdym z trzech okien występowały w 107 polach, a w co najmniej jednym — w 135. **Nie jest to pomiar zasięgu odbiorników ani kompletności wszystkich lotów.**
+
+Porównanie z trzema zachowanymi próbkami API wybiera ostatni pełny przedział historii zakończony przed rozpoczęciem danego pobrania API. Odstęp wynosił 2,7–4,8 sekundy. Liczniki API / historia / wspólne identyfikatory to kolejno **231 / 168 / 167**, **223 / 163 / 162** i **225 / 161 / 159**. Historia ma odmienne reguły doboru pozycji; nie zawiera dokładnego czasu każdej pozycji, kodów typu samolotu ani flag wojskowych. Oba produkty pochodzą z tej samej grupy ADSB.lol, bez niezależnej prawdy referencyjnej.
+
+**Decyzja: zachowujemy dwie osobne serie.** Łączenie ich liczników mogłoby wywołać pozorną anomalię wynikającą z formatu. Z trzech krótkich okien nie wyznaczamy normalnego poziomu, alarmu ani aktywności RU/BY lub NATO. Dzisiejsze etykiety nie uzupełniają historycznej klasyfikacji. Dane pozyskane wieczorem nie udają wiedzy dostępnej w chwili wcześniejszych pomiarów; pierwotna dostępność u dostawcy pozostaje nieustalona.
+
+Weryfikacja: **140 testów poprawnych, w tym 16 nowych przypadków historii**. Sprawdzono strukturę gzip i indeksów, jednostki i znaczniki, duplikaty i konflikty, odróżnienie braków od zer, błędy i limity transportu, chronologię porównania, odtwarzanie i wykrywanie zmiany dowodów. Replay raportu jest identyczny i nie używa sieci. Dotychczasowe wydania API, GNSS/logistyki i RTB v0.2 także nadal odtwarzają się identycznie; **RTB pozostaje `null`**.
+
+Pełna kopia danych i kodu: `data/aviation_history/backups/backup-20260924T174126Z/`. Zweryfikowano **14 plików manifestu**, odtworzono dane i całe archiwum kodu do osobnego katalogu tymczasowego. Raport odtworzono identycznie z zablokowaną siecią i bez katalogu bieżących danych API. Potwierdzenie: `data/research/aviation-history-2026-09-24/restore-verification.json`. Instrukcja kopii uwzględnia również parser RSS importowany przez wspólny moduł procesu. To lokalna kopia, bez drugiego nośnika.
+
+Rejestr ma wersję `source-candidates-6`. Nie dodano harmonogramu, opłat, alertów ani UI. Kolejna walidacja danych obejmie różne pory i dni, stabilność źródła i rejestr klas obiektów z datami obowiązywania. Można ją prowadzić obok następnego etapu produktu: wyboru spośród dwóch kierunków dashboardu, który pokaże osobno rodziny danych i ich aktualność.
+
+## Pilotaż jakości ADSB.lol — wcześniejszy wynik z 24.09.2026
+
+Wydanie: **`av-2026-09-24T164929Z-d612456c`**, stan wiedzy **24.09.2026, 18:49 czasu Warszawy**. [Raport lokalny](../data/aviation/snapshots/av-2026-09-24T164929Z-d612456c/report.md). Kod odtworzenia wszystkich trzech wydań lotniczych: **`60851cb`**. [Instrukcja obsługi i metodologii](aviation-runbook.md).
+
+Wdrożono osobny kolektor `scripts/aviation.py` i uruchamianie przez `Zbierz dane lotnicze.command`. Konfiguracja `config/aviation.json` wyznacza bbox `[14,49,29,60]`, cztery koła po 250 NM i limity zapytań. Dane trafiają do `data/aviation/`, z archiwum odpowiedzi, bazą SQLite, polskim raportem, JSON i agregatami siatki GeoJSON. Prawidłowy adres specyfikacji to `/api/openapi.json`; wcześniejszy 404 dotyczył innej ścieżki.
+
+Przeprowadzono **trzy ręczne próby**, od 16:45:04 do 16:49:29 UTC. **12/12 zapytań HTTP 200**, bez niezgodnych wierszy; 0 prób częściowych i niedostępnych. To krótki test dostępu i jakości formatu, bez dowodu niezawodności całodobowej.
+
+| Koniec próby UTC | Wiersze przed usunięciem powtórzeń | Usunięte powtórzenia | Świeże identyfikatory w regionie | Pola siatki z obserwacją | Mediana / P95 wieku pozycji |
+|---|---:|---:|---:|---:|---:|
+| 16:45:15 | 507 | 105 | 231 | 73/165 | 9,104 / 26,326 s |
+| 16:46:59 | 514 | 108 | 223 | 76/165 | 6,967 / 26,080 s |
+| 16:49:29 | 520 | 111 | 225 | 78/165 | 5,655 / 16,718 s |
+
+Pozostałe identyfikatory ostatniej próby (184) miały najnowszą pozycję poza prostokątem. **87/165 pól nie miało świeżej obserwacji**, choć zapytania obejmowały ich obszar; nie uznajemy ich za przestrzeń bez ruchu. Zasięg odbiorników pozostaje nieustalony. Przerwy pomiędzy końcem a początkiem prób wyniosły 97,083 i 143,489 sekundy — nie były okresem monitorowanym. Najmniejszy zmierzony odstęp między początkiem żądań wyniósł 2,003 sekundy.
+
+W ostatniej próbie 42 identyfikatory miały oznaczenie naziemne, a 183 liczbową wysokość barometryczną. Źródło zawiera też kody `TWR` i `GND`; **225 identyfikatorów nie oznacza 225 lotów ani samolotów**. Dostawca ustawił flagę wojskową dla 4 identyfikatorów; dla 6 bit był nieustawiony, w 215 rekordach brak pola flag. Nie potwierdzono niezależnie operatorów ani zadań. Zmiana między trzema próbkami nie jest skalibrowaną anomalią.
+
+Archiwum: **3 próbki, 3 wydania, 12 surowych odpowiedzi, 934 677 bajtów odpowiedzi**. Każdy odczyt zachowuje czasy, źródło, status i hash. Osobny wstępny odczyt jednego koła oraz kopia specyfikacji znajdują się w `data/research/aviation-pilot-2026-09-24/`; nie dodają czwartej regionalnej próby do bazy. Nie pobierano wielogigabajtowej historii.
+
+Weryfikacja: **124 testy poprawne, w tym 25 nowych przypadków lotniczych**. Sprawdzono duplikaty, jednostki, nieaktualne i przyszłe dane, brak pozycji, niezgodne wiersze, puste odpowiedzi, częściową awarię, limit 429/Retry-After, przekierowania, zbyt dużą odpowiedź, zmianę konfiguracji, granicę czasu, niezmienność archiwum, atomowy eksport i oddzielenie danych testowych. `doctor` potwierdził integralność bazy i 12 plików. Bieżący replay jest identyczny bez sieci.
+
+Pełną kopię zapisano w `data/aviation/backups/backup-2026-09-24T165036Z/`, używając SQLite backup pod blokadą. Sprawdzono 31 plików manifestu; kopię odtworzono do osobnego katalogu tymczasowego. Liczniki i integralność są zgodne, **wszystkie trzy raporty odtworzono identycznie bez sieci**. Potwierdzenie: `data/research/aviation-pilot-2026-09-24/restore-verification.json`. To kopia lokalna, nie kopia na drugim nośniku.
+
+Dotychczasowe raporty GNSS/logistyki (`ew-2026-09-23T133506Z-41e96c7e`) oraz RTB v0.2 (`2026-09-22T234233Z-c41c5e05`) nadal dają identyczny replay; **RTB pozostaje `null`**. Nie zmieniono ich baz, ocen ani dat pozyskania. Rejestr integracji ma wersję `source-candidates-5`.
+
+Kolektor działa po ręcznym uruchomieniu, bez harmonogramu, nowych opłat, modelu klasyfikującego misje i alertów. Sprawdzono polecenia Python i składnię `.command`; nie testowano dwukliku w Finderze. Nie zmieniono UI. Zapowiedziany wówczas dobór ograniczonej historii wykonano w opisanym wyżej audycie; przygotowanie dashboardu pozostaje osobnym etapem z dwoma kierunkami wizualnymi do wyboru.
+
+## Polskie treści, porównanie GNSS i ocena lotnictwa — wynik z 23.09.2026
+
+Wydanie: `ew-2026-09-23T133506Z-41e96c7e`, stan wiedzy **23.09.2026, 15:35 czasu Warszawy**. Raport: `data/early_warning/snapshots/ew-2026-09-23T133506Z-41e96c7e/report.md`. Kod odtworzenia: **`4137138`**. Nie pobierano ponownie GPSJAM ani RSS; źródła zachowują rzeczywiste czasy kontroli około 14:15.
+
+- **10/10 publikacji ma polski tytuł i streszczenie**, 0 oczekujących tłumaczeń. Oryginały i cytaty pozostają nienaruszone. Opisy są przypisane do konkretnych wersji i zachowują osobne rewizje; nowa treść wymaga nowego tłumaczenia. Brak automatycznego API tłumaczącego — kolejka jest obsługiwana w przeglądzie agenta.
+- Przejrzano wstępnie pozostałe pięć publikacji. Łącznie **11 ocen agenta**: 10 publikacji i najnowsza doba GNSS. Nie jest to niezależne potwierdzenie wszystkich twierdzeń ani weryfikacja wszystkich tabel i załączników.
+- **Działa opisowe porównanie GNSS** na wspólnych komórkach. Przy minimum próby 5: 491 komórek, 26 wcześniejszych dób, 13,85% wobec mediany 18,33%, różnica −4,48 pkt proc. Raport pokazuje też warianty minimum 1, 10 i 20. Odniesienie nie jest skalibrowanym poziomem normalnym; brak automatycznego progu alarmowego. [Metoda](gnss-reference-methodology.md).
+- [Ocena danych lotniczych](aviation-access.md): jednorazowy odczyt OpenSky HTTP 200, 303 rekordy stanu; wymóg osobnej umowy dla stałego użycia operacyjnego. Sprawdzono dokumentację ADSB.lol i metadane dziennego archiwum oraz ograniczenia oferty ADS-B Exchange i OpenAPI WorldMonitor. ADSB.lol jest proponowanym źródłem następnego małego pilotażu, po ustaleniu kontraktu odpowiedzi i pomiarze jakości. Brak kolektora lotniczego i nowych opłat.
+
+Stan bazy obserwacji: **40 wersji, 53 odczyty, 4 kontrole źródeł, 11 ocen, 10 tłumaczeń, 5 wydań**. Migracja do wersji 2 dodała tłumaczenia; przed migracją wykonano kopię SQLite. Porównano wszystkie wcześniejsze wiersze obserwacji, pobrań, kontroli i ocen z kopią — pozostały identyczne. Surowe archiwum nadal zawiera 32 sprawdzone pliki.
+
+Weryfikacja: **99 testów poprawnych**, w tym 16 nowych przypadków tłumaczeń i porównania GNSS. Sprawdzono odrzucanie niezgodnego dowodu i wersji, atomowy import, rewizje, granicę czasu, migrację, zmianę pokrycia i dostawcy, brak najnowszej doby oraz flagi jakości. Bieżący raport nie zawiera nieprzetłumaczonej cyrylicy; źródła dowodowe ją zachowują. Replay nowego wydania jest identyczny i nie używa sieci; taki sam wynik uzyskano po odtworzeniu bazy, surowych danych i wydania do osobnego katalogu tymczasowego. Dotychczasowy replay RTB v0.2 nadal jest identyczny (`rtb=null`).
+
+Dla roboczego wydania `ew-2026-09-23T131458Z-80ddeb12` zachowano dokładną kopię kodu w `data/early_warning/backups/code-ew-2026-09-23T131458Z-80ddeb12/` i także zweryfikowano identyczne odtworzenie. Nie zmieniano historycznych raportów. Nie wykonano przebudowy UI ani uruchomienia harmonogramu.
+
+## Pierwsze wdrożenie sygnałów wczesnych — wcześniejszy stan z 23.09.2026
+
+Po zaakceptowaniu planu uruchomiono osobną warstwę `early-warning-1`: kontrakt obserwacji, dzienne CSV GPSJAM, RSS belzhd, SQLite, historię pobrań i wersji, raport jakości, GeoJSON oraz przegląd z dowodami. Konfiguracja: `config/early-warning.json`. Uruchomienie: `Zbierz sygnały wczesne.command` albo `scripts/early_warning.py`. [Pełna instrukcja](early-warning-runbook.md).
+
+Rzeczywisty wynik:
+
+| Miara | Wynik |
+|---|---:|
+| Dobowe siatki GNSS | 30/30, od 24.08 do 22.09.2026 |
+| Publikacje belzhd | 10, w tym 4 z rubryki przewozów wojskowych |
+| Unikalne wersje obserwacji | 40 |
+| Ponowne pobranie 3 dni + RSS | 0 nowych wersji; 13 kolejnych odczytów |
+| Wstępne oceny agenta | 6: najnowsza doba GNSS, 4 materiały wojskowe, 1 publikacja okolicznościowa |
+| Pozostałe publikacje oczekujące na przegląd | 5 |
+| Najnowsza siatka: komórki obserwowane / w obszarze | 643 / 771 |
+| Komórki bez obserwacji / poniżej roboczego minimum próby 5 | 128 / 93 |
+
+Manifest wskazuje zmianę `adsbexchange` → `merged` od 27.08.2026. W oknie jest 26 wcześniejszych dób z takim samym zestawem dostawców jak ostatnia doba, bez flagi suspect; wspólne minimum próby spełnia 491 komórek. To diagnostyka pokrycia, a nie skalibrowane odniesienie. Wskaźnik dobowy nie dowodzi ciągłości zakłóceń ani sprawcy. Stany ocen nie zmieniają RTB.
+
+RSS rubryki belzhd zwrócił 403; działa główny, publiczny RSS. Nie podłączono Telegrama. Wstępny przegląd odróżnia niedobór wagonów opisany pod koniec sierpnia, prace nad rezerwowym zarządzaniem, planowaną infrastrukturę, retrospektywne zestawienie i treść okolicznościową. Nie potwierdzono niezależnie twierdzeń wydawcy, nie sprawdzono wszystkich tabel ani załączników.
+
+Raport po ocenach: `data/early_warning/snapshots/ew-2026-09-23T122426Z-f3c0f43b/report.md` (14:24 czasu Warszawy). Odczyty źródeł pozostają z rzeczywistego pobrania około 14:15. Pierwsze dwa wydania zachowano; odpowiadają kodowi `a3848e1`.
+
+Weryfikacja: **83 testy**, w tym 21 nowych przypadków dotyczących braków danych, pochodzenia, dat, błędnych pomiarów, duplikatów, zmiany treści, cofnięcia do starszej wersji, przeglądu i atomowego eksportu. Rzeczywista baza i 32 pliki surowego archiwum przeszły kontrolę integralności. Odtwarzanie nowych danych i istniejącego RTB v0.2 daje identyczne wyniki bez sieci. Kopię SQLite wraz z materiałami odtworzono do osobnego katalogu tymczasowego; liczniki, integralność i replay były zgodne. Brak frontendowych mocków i nowych danych syntetycznych w bazach live.
+
+Nie podłączono API AUGUR ani ADS-B, nie skalibrowano detektora, nie dodano harmonogramu, płatnych usług, alertów ani strony WWW. Kod przetestowano lokalnie. Obsługę dwuklikiem w Finderze pozostawiono bez testu interaktywnego.
+
+## Aktualizacja metodologii v0.2
+
+Ujednolicono instrukcje trzech agentów, konfigurację, kontrakty JSON, metodologię i dokumentację obsługi. Obecny cel to OSINT / I&W dla Polski i flanki NATO. Dawne cele osobiste pozostały wyłącznie w oznaczonym archiwum.
+
+- Dodano `military_preparation` (15 pkt, limit 30), z wymogiem dowodów zmiany, odniesienia, znaczenia operacyjnego i sprawdzenia rutynowego wyjaśnienia. Białoruś oraz obwód królewiecki mają jawne kryteria zakresu.
+- Rozdzielono wkłady działań i przygotowań. Ponad 60 punktów oznacza przegląd analityczny; próg nie jest skalibrowaną prognozą.
+- Dodano obszary strategiczne jako priorytet, bez bonusu punktowego, i szablon scenariuszy warunkowych na 14–42 dni.
+- Oddzielono kolektory, kandydatów na źródła oraz bibliotekę doktryny. Nowe źródła operacyjne są opisane, ale nie podłączone.
+- Zarejestrowano materiały użytkownika i oba linki. Lokalny indeks obejmuje **2295 stron tekstu z 10 dostępnych PDF-ów**; dwa wcześniejsze pliki Romera są oznaczone jako nieobecne. Indeksacja nie jest pełną analizą treści ani semantycznym RAG.
+
+Kontrolny eksport offline v0.2: `2026-09-22T234233Z-c41c5e05` (23.09.2026, 01:42 czasu Warszawy). Nie pobierano nowych informacji. RTB pozostaje `null` z powodu dwóch nieocenionych materiałów i kontroli RCB/MON/OSW starszych niż osiem godzin. `alert.status=not_assessed`; brak delty. Daty pobrań zachowano. Raport: `data/snapshots/2026-09-22T234233Z-c41c5e05/report.md`.
+
+Weryfikacja tej aktualizacji: **62 testy poprawne**, w tym nowa kategoria, zakres regionalny, progi, brak punktów za priorytet geograficzny, odrzucenie doktryny jako dowodu oraz integralność i numeracja stron indeksu. Nowy replay dał identyczny wynik bez sieci. Pliki pierwszego wydania v0.1 pozostają zgodne z pierwotnym manifestem. Sprawdzono rzeczywiste wyszukiwanie i hashe wszystkich dostępnych PDF-ów. Biblioteka i dane live pozostają poza Git.
+
+## Fundament dostarczony 22.09.2026
+
+- Repozytorium Git: oryginalne materiały zachowane w commicie `759ccd3`, implementacja na gałęzi `codex/foundation-pipeline`. Brak skonfigurowanego zdalnego repozytorium.
+- Python 3.13.7 w `.venv`, przypięte zależności, konfiguracja źródeł i metodologii, JSON Schema dla oceny, zdarzenia i odczytu.
+- Kolektory RCB, MON i RSS, zachowanie surowych odpowiedzi, kontrola dostępu, ponowienia i rejestrowanie braków.
+- SQLite z migracją, blokadami zmian tabel audytu, wersjami materiałów i ocen oraz spójną kopią bazy.
+- Kolejka przeglądu, instrukcje ekstraktora i analityka, import ocen z walidacją cytatów i deklarowanej niezależności źródeł.
+- Deterministyczny scoring z oknem czasu, deduplikacją zdarzeń, limitami kategorii i blokowaniem odczytu przy niepełnych danych.
+- Wersjonowany raport Markdown, JSON i GeoJSON, atomowa zmiana wskaźnika wydania, odtwarzanie obliczeń bez sieci.
+- Polecenia do obsługi oraz plik `Zbierz dane.command` dla macOS. Skrypt `scripts/ingest.py` i dostarczone skills pozostają zachowanymi materiałami; parser RSS jest używany przez nowy moduł.
+
+## Pierwszy rzeczywisty wynik — archiwum v0.1
+
+Wydanie: `2026-09-22T141737Z-326ba3f8`; stan wiedzy 22.09.2026, 16:17 czasu Warszawy.
+
+Raport lokalny: `data/snapshots/2026-09-22T141737Z-326ba3f8/report.md`.
+
+| Miara | Wynik |
+|---|---:|
+| Unikalne wersje publikacji | 44 |
+| RCB / MON / OSW | 20 / 14 / 10 |
+| Nowe materiały przy powtórnym pobraniu | 0 |
+| Publikacje z oceną agenta | 42 |
+| Zachowane obserwacje kontekstowe | 9 |
+| Wykluczenia z uzasadnieniem | 33 |
+| Publikacje wymagające pełnej treści | 2 |
+| Kwalifikujące się punkty | 0 |
+| Główny RTB | `null`, przegląd niepełny |
+
+Naval News zwróciło 503 w obu przebiegach i jest jawnie niedostępne. CERT pozostaje wyłączony po próbie 403. Dwie nierozstrzygnięte pozycje OSW to „Najsilniejsza armia w Europie”? (w kanale tylko spis treści) oraz „Rosjanie uderzają przy granicy z Polską. 1665. dzień wojny” (pusty skrót). Nie zastąpiono braku informacji oceną 10/100.
+
+Oceny dotyczą zapisanych treści: oficjalnych komunikatów RCB/MON i skrótów RSS OSW. Nie oznaczają niezależnego potwierdzenia wszystkich twierdzeń wydawców. Żaden punkt nie otrzymał zgadywanych współrzędnych; w pierwszym GeoJSON geometrie są `null`.
+
+## Weryfikacja pierwszej dostawy z 22.09.2026
+
+Wówczas 40 testów zakończonych poprawnie. Sprawdzono m.in. zachowanie aktualizacji komunikatu, błędne i przyszłe daty, awarie źródeł, powielanie materiałów i zdarzeń, wspólne pochodzenie kopii, brak dowodu sprawcy, korekty i przywracanie kwalifikacji, ograniczenia kategorii, zmianę konfiguracji źródła, granicę czasu, przerwany eksport, współbieżną blokadę, oddzielenie fixture/live i wykrywanie zmiany wydania.
+
+Potwierdzono także na danych rzeczywistych:
+
+- ponowny odczyt trzech źródeł bez tworzenia duplikatów;
+- integralność SQLite i brak błędów powiązań;
+- identyczny replay pierwszego wydania, bez żądań sieciowych;
+- odtworzenie kopii bazy, materiałów i wydania do osobnego katalogu tymczasowego, zgodne liczniki i identyczny replay.
+
+Sprawdzono składnię skryptów Python oraz skryptów powłoki. Samo otwarcie `Zbierz dane.command` dwuklikiem w Finderze nie było testowane. Dane demonstracyjne uruchomiono osobno w `data/demo/`; są oznaczone jako syntetyczne i nie weszły do bazy live.
+
+## Kolejne prace
+
+1. Po zakończonych pilotażach API i historii badać różne pory i dni oraz stabilność źródła, z budżetem opartym na zmierzonym rozmiarze. Opracować rejestr klas obiektów z datami obowiązywania; zachować oddzielne serie historii i API. Rozwinąć niezależną weryfikację publikacji oraz rejestr wyników do przyszłej kalibracji GNSS. Wszystkie 10 publikacji ma już wstępny przegląd i polskie opisy. Uzupełnić nierozstrzygnięte pozycje OSW i źródła weryfikujące. Krótkie próby nie kalibrują zdolności przewidywania.
+2. Etap 3, obok dalszej walidacji danych: przedstawić dwa kierunki wizualne, zapisać wybór w `design.md`, `guidelines.md`, `theme.css` i zbudować dashboard. Rozdzielić rodziny danych i ich aktualność. Mapa musi obsługiwać brak geometrii, a wykres brak odczytu. Delta pozostaje pusta do uzyskania porównywalnych okresów.
+3. Etap 4: wybrać sposób automatycznego przeglądu AI, zmierzyć jakość i koszt, dodać harmonogram oraz kopie na osobnym nośniku. Skrypty działają obecnie po ręcznym uruchomieniu.
+4. Walidacja: opisać historyczne przypadki, kontrprzykłady i sprostowania; sprawdzić wagi oraz próg przeglądu, zbudować serie odniesienia dla anomalii. Rozwijać scenariusze bezpieczeństwa z jawną niepewnością.
+
+Nie uruchomiono płatnych API, modelu predykcyjnego, publicznego hostingu ani wysyłania alertów.
+
+Wcześniejsze uzupełnienie dokumentacyjne po komentarzu o wskaźnikach wyprzedzających: sprawdzono dokumentację dostawców i aktualność źródeł, zapisano projekt warstwy wczesnej oraz rejestr `source-candidates-2`. Nie uruchamiało kolektorów. Kolejne wdrożenie podłączyło osobny pilotaż i rejestr `source-candidates-3`. Ocena dostępu lotniczego dała `source-candidates-4`, pilotaż API ADSB.lol — `source-candidates-5`, a ograniczony audyt historii — `source-candidates-6`. Wagi i dane RTB pozostają bez zmian.

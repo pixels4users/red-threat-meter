@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "sample_id", "mode", "started_at", "finished_at", "config", "requests"],
+  "properties": {
+    "schema_version": {"const": "aviation-sample-1"},
+    "sample_id": {"type": "string", "pattern": "^avs_[0-9a-f]{24}$"},
+    "mode": {"enum": ["live", "fixture"]},
+    "started_at": {"type": "string", "format": "date-time"},
+    "finished_at": {"type": "string", "format": "date-time"},
+    "config": {"type": "object"},
+    "requests": {
+      "type": "array", "minItems": 4, "maxItems": 4,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["query", "requested_at", "received_at", "http_status", "raw_ref", "bytes", "headers", "error"],
+        "properties": {
+          "query": {"type": "object"},
+          "requested_at": {"type": "string", "format": "date-time"},
+          "received_at": {"type": "string", "format": "date-time"},
+          "http_status": {"type": ["integer", "null"], "minimum": 100, "maximum": 599},
+          "raw_ref": {"type": ["string", "null"], "pattern": "^raw/adsblol/[0-9a-f]{64}\\.bin$"},
+          "bytes": {"type": "integer", "minimum": 0, "maximum": 3000001},
+          "headers": {"type": "object", "additionalProperties": {"type": "string"}},
+          "error": {"type": ["string", "null"]}
+        }
+      }
+    }
+  }
+}

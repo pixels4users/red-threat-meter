@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["version", "language", "run_id", "as_of", "mode", "code_hash", "acquisition_id", "acquired_from", "acquired_until", "bbox", "source", "license", "dependency_group", "counts", "windows", "live_comparisons", "comparability", "rtb_effect", "limitations"],
+  "properties": {
+    "version": {"const": "aviation-history-report-1"}, "language": {"const": "pl"},
+    "run_id": {"type": "string", "pattern": "^ah-\\d{8}T\\d{6}Z-[0-9a-f]{8}$"},
+    "as_of": {"type": "string", "format": "date-time"}, "mode": {"enum": ["live", "fixture"]},
+    "code_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "acquisition_id": {"type": "string", "pattern": "^ahc-\\d{8}T\\d{6}Z-[0-9a-f]{8}$"},
+    "acquired_from": {"type": "string", "format": "date-time"}, "acquired_until": {"type": "string", "format": "date-time"},
+    "bbox": {"type": "array", "minItems": 4, "maxItems": 4, "items": {"type": "integer"}},
+    "source": {"const": "ADSB.lol"}, "license": {"const": "ODbL-1.0"}, "dependency_group": {"const": "adsb:adsblol"},
+    "counts": {"type": "object"}, "windows": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"type": "object"}},
+    "live_comparisons": {"type": "array", "maxItems": 3, "items": {"type": "object"}},
+    "comparability": {"type": "object", "required": ["baseline_eligible", "live_freshness_equivalence", "classification_available", "status"],
+      "properties": {"baseline_eligible": {"const": false}, "live_freshness_equivalence": {"const": false}, "classification_available": {"const": false}, "status": {"const": "descriptive_only"}}},
+    "rtb_effect": {"const": "none"}, "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+  }
+}

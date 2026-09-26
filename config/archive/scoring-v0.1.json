@@ -1,0 +1,29 @@
+{
+  "version": "rtb-v0.1",
+  "validation_status": "experimental_unvalidated",
+  "base": 10,
+  "maximum": 100,
+  "window_days": 7,
+  "timezone": "Europe/Warsaw",
+  "window_definition": "Bieżący dzień i sześć poprzednich dni kalendarzowych, do chwili odcięcia.",
+  "interpretation": "Indeks nasilenia potwierdzonych sygnałów przypisanych RU/BY w ustalonym zakresie; nie jest prawdopodobieństwem.",
+  "scope_countries": ["PL","LT","LV","EE","CZ","SK","HU","RO","BG","DE","FI","SE"],
+  "attributed_actors": ["RU","BY"],
+  "accepted_statuses": ["confirmed_primary","corroborated"],
+  "thresholds": [],
+  "categories": {
+    "sabotage": {"label":"Sabotaż infrastruktury","weight":10,"cap":30,"criteria":["intentional_action","critical_infrastructure"]},
+    "arms_explosion": {"label":"Eksplozja w zakładzie zbrojeniowym","weight":8,"cap":24,"criteria":["explosion_confirmed","arms_facility"]},
+    "airspace_breach": {"label":"Naruszenie przestrzeni NATO","weight":5,"cap":25,"criteria":["nato_airspace_breach"]},
+    "air_activity": {"label":"Anomalia aktywności lotniczej","weight":4,"cap":12,"criteria":["baseline_anomaly","military_activity"]},
+    "cyberattack": {"label":"Atak cybernetyczny","weight":3,"cap":12,"criteria":["large_scale","target_banking_or_government"]},
+    "border_pressure": {"label":"Wzrost presji na granicy","weight":3,"cap":9,"criteria":["baseline_increase","pl_by_border"]},
+    "gps_jamming": {"label":"Długotrwałe zakłócenia GPS","weight":2,"cap":8,"criteria":["duration_over_24h"]}
+  },
+  "limitations": [
+    "Wagi, baza i limity kategorii są założeniami pilotażu, bez kalibracji prognostycznej.",
+    "Źródła nie zapewniają pełnego pokrycia regionu, cyberataków, GNSS ani danych lotniczych.",
+    "Sygnały nieprzypisane RU/BY i zdarzenia na Ukrainie pozostają w obserwacjach poza punktacją.",
+    "Nieustalona data potencjalnego incydentu, błędne dowody, niepełny przegląd lub brak wymaganego źródła blokują główny wynik. Zdarzenia kontekstowe i nieprzypisane RU/BY nie naliczają punktów."
+  ]
+}

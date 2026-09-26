@@ -1,0 +1,85 @@
+{
+  "synthetic": true,
+  "source_results": [
+    {
+      "source_id": "rcb",
+      "publisher": "Rządowe Centrum Bezpieczeństwa",
+      "required": true,
+      "source_definition_hash": "ca81eb3e696a6fc27df85fe168cfe686b160b990d91b2e842fb4e586c5ae3a37",
+      "status": "ok",
+      "window_complete": true,
+      "scope": "synthetic_fixture",
+      "errors": [],
+      "raw_refs": [],
+      "items": [
+        {
+          "url": "https://example.org/synthetic/rcb",
+          "title": "DANE TESTOWE — fikcyjna publikacja rcb",
+          "published_at": "2026-09-22T10:00:00+00:00",
+          "text": "Materiał syntetyczny do demonstracji pobrania i kolejki przeglądu. Nie opisuje realnego wydarzenia.",
+          "text_kind": "feed_summary"
+        }
+      ]
+    },
+    {
+      "source_id": "mon",
+      "publisher": "Ministerstwo Obrony Narodowej",
+      "required": true,
+      "source_definition_hash": "ff02a8df604a38c928fd995fdaf7e5391828c4bce501ca76772dbd0d1df29bce",
+      "status": "ok",
+      "window_complete": true,
+      "scope": "synthetic_fixture",
+      "errors": [],
+      "raw_refs": [],
+      "items": [
+        {
+          "url": "https://example.org/synthetic/mon",
+          "title": "DANE TESTOWE — fikcyjna publikacja mon",
+          "published_at": "2026-09-22T10:00:00+00:00",
+          "text": "Materiał syntetyczny do demonstracji pobrania i kolejki przeglądu. Nie opisuje realnego wydarzenia.",
+          "text_kind": "feed_summary"
+        }
+      ]
+    },
+    {
+      "source_id": "osw",
+      "publisher": "Ośrodek Studiów Wschodnich",
+      "required": true,
+      "source_definition_hash": "cf3339133f000875ddfc9d9abbe44a306c7f4b1366766d81f7b4c1ea995fa2ba",
+      "status": "ok",
+      "window_complete": true,
+      "scope": "synthetic_fixture",
+      "errors": [],
+      "raw_refs": [],
+      "items": [
+        {
+          "url": "https://example.org/synthetic/osw",
+          "title": "DANE TESTOWE — fikcyjna publikacja osw",
+          "published_at": "2026-09-22T10:00:00+00:00",
+          "text": "Materiał syntetyczny do demonstracji pobrania i kolejki przeglądu. Nie opisuje realnego wydarzenia.",
+          "text_kind": "feed_summary"
+        }
+      ]
+    },
+    {
+      "source_id": "naval_news",
+      "publisher": "Naval News",
+      "required": false,
+      "source_definition_hash": "ab215a2a461d64ff23e254812bd7114d69f25c9c9fa1f488991d330ac972cdd7",
+      "status": "ok",
+      "window_complete": true,
+      "scope": "synthetic_fixture",
+      "errors": [],
+      "raw_refs": [],
+      "items": [
+        {
+          "url": "https://example.org/synthetic/naval_news",
+          "title": "DANE TESTOWE — fikcyjna publikacja naval_news",
+          "published_at": "2026-09-22T10:00:00+00:00",
+          "text": "Materiał syntetyczny do demonstracji pobrania i kolejki przeglądu. Nie opisuje realnego wydarzenia.",
+          "text_kind": "feed_summary"
+        }
+      ]
+    }
+  ]
+}

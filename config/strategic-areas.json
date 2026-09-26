@@ -1,0 +1,17 @@
+{
+  "version": "strategic-areas-1",
+  "purpose": "Priorytet przeglądu i jawny kontekst geograficzny; bez bonusu punktowego.",
+  "proximity_rule": "Powiązanie wymaga dowodu lokalizacji i uzasadnienia. Nie zakładamy promienia w kilometrach ani współrzędnych na podstawie samej nazwy.",
+  "areas": [
+    {"id":"suwalki_corridor","label":"Przesmyk suwalski"},
+    {"id":"rzeszow_jasionka","label":"Węzeł Rzeszów–Jasionka"},
+    {"id":"smolensk_gate","label":"Brama Smoleńska"},
+    {"id":"brest_region","label":"Rejon brzeski"},
+    {"id":"kaliningrad_oblast","label":"Obwód królewiecki"},
+    {"id":"lask_airbase","label":"Rejon bazy lotniczej w Łasku"},
+    {"id":"minsk_mazowiecki_airbase","label":"Rejon bazy lotniczej w Mińsku Mazowieckim"},
+    {"id":"swinoujscie_lng","label":"Terminal LNG w Świnoujściu"},
+    {"id":"baltic_pipe","label":"Infrastruktura Baltic Pipe"},
+    {"id":"baltic_subsea_cables","label":"Kable podmorskie na Bałtyku"}
+  ]
+}

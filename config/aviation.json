@@ -1,0 +1,27 @@
+{
+  "version": "aviation-pilot-1",
+  "role": "observations_only",
+  "source": {
+    "id": "adsblol",
+    "adapter": "adsblol-point-v1",
+    "base_url": "https://api.adsb.lol/v2/point/",
+    "documentation_url": "https://api.adsb.lol/api/openapi.json",
+    "license": "ODbL-1.0",
+    "license_url": "https://opendatacommons.org/licenses/odbl/1-0/",
+    "dependency_groups": ["adsb:adsblol"]
+  },
+  "region": {
+    "id": "cee-baltic-box-v1",
+    "label": "Europa Środkowo-Wschodnia i Bałtyk — prostokąt badawczy",
+    "bbox": [14, 49, 29, 60]
+  },
+  "history_hours": 24,
+  "request_interval_seconds": 2,
+  "collection_interval_seconds": 60,
+  "response_max_age_seconds": 60,
+  "position_max_age_seconds": 60,
+  "report_max_age_seconds": 900,
+  "future_tolerance_seconds": 5,
+  "timeout_seconds": 15,
+  "max_response_bytes": 3000000
+}

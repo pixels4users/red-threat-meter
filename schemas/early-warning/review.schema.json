@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "ew-review-1"
+    },
+    "reviewer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "agent",
+            "human"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ]
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "observation_id": {
+            "type": "string",
+            "pattern": "^ewo_[0-9a-f]{24}$"
+          },
+          "previous_revision": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "status": {
+            "enum": [
+              "new_report",
+              "anomaly_to_review",
+              "urgent_review",
+              "explained",
+              "insufficient_data"
+            ]
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 20
+          },
+          "alternatives": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 10
+            },
+            "minItems": 1
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "quote"
+                    },
+                    "quote": {
+                      "type": "string",
+                      "minLength": 10,
+                      "maxLength": 2000
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "quote"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "kind": {
+                      "const": "measurement"
+                    },
+                    "cell": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "field": {
+                      "enum": [
+                        "good",
+                        "bad",
+                        "sample",
+                        "source_adjusted_pct"
+                      ]
+                    },
+                    "value": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "cell",
+                    "field",
+                    "value"
+                  ]
+                }
+              ]
+            },
+            "minItems": 1
+          },
+          "attribution": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "actor": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "status": {
+                "enum": [
+                  "unknown",
+                  "reported_unverified"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 10
+              }
+            },
+            "required": [
+              "actor",
+              "status",
+              "reason"
+            ]
+          },
+          "event_key": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "observation_id",
+          "previous_revision",
+          "status",
+          "reason",
+          "alternatives",
+          "evidence",
+          "attribution",
+          "event_key"
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "reviewer",
+    "decisions"
+  ]
+}

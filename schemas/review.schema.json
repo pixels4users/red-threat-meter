@@ -1,0 +1,411 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://osint-dashboard.local/schemas/review.schema.json",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "reviewer": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "enum": [
+            "agent",
+            "human"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "type",
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "exclude"
+              },
+              "candidate_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true,
+                "minItems": 1
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 15,
+                "maxLength": 1500
+              }
+            },
+            "required": [
+              "kind",
+              "candidate_ids",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "const": "incident"
+              },
+              "candidate_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true,
+                "minItems": 1
+              },
+              "previous_revision": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "incident": {
+                "type": "object",
+                "properties": {
+                  "event_key": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9][a-z0-9_-]{3,119}$"
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 5,
+                    "maxLength": 250
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 15,
+                    "maxLength": 2500
+                  },
+                  "category": {
+                    "enum": [
+                      "military_preparation",
+                      "sabotage",
+                      "arms_explosion",
+                      "airspace_breach",
+                      "air_activity",
+                      "cyberattack",
+                      "border_pressure",
+                      "gps_jamming",
+                      "context"
+                    ]
+                  },
+                  "status": {
+                    "enum": [
+                      "unverified",
+                      "confirmed_primary",
+                      "corroborated",
+                      "disputed",
+                      "refuted"
+                    ]
+                  },
+                  "occurred_on": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "format": "date"
+                      }
+                    ]
+                  },
+                  "date_evidence_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "uniqueItems": true
+                  },
+                  "country": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "string",
+                        "pattern": "^[A-Z]{2}$"
+                      }
+                    ]
+                  },
+                  "attribution": {
+                    "type": "object",
+                    "properties": {
+                      "actor": {
+                        "enum": [
+                          "RU",
+                          "BY",
+                          "unknown",
+                          "other"
+                        ]
+                      },
+                      "status": {
+                        "enum": [
+                          "unverified",
+                          "confirmed_primary",
+                          "corroborated",
+                          "disputed",
+                          "refuted"
+                        ]
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 10
+                      }
+                    },
+                    "required": [
+                      "actor",
+                      "status",
+                      "reason"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "location": {
+                    "type": "object",
+                    "properties": {
+                      "label": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      },
+                      "geometry": {
+                        "anyOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "const": "Point"
+                              },
+                              "coordinates": {
+                                "type": "array",
+                                "prefixItems": [
+                                  {
+                                    "type": "number",
+                                    "minimum": -180,
+                                    "maximum": 180
+                                  },
+                                  {
+                                    "type": "number",
+                                    "minimum": -90,
+                                    "maximum": 90
+                                  }
+                                ],
+                                "items": false,
+                                "minItems": 2,
+                                "maxItems": 2
+                              }
+                            },
+                            "required": [
+                              "type",
+                              "coordinates"
+                            ],
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "precision": {
+                        "enum": [
+                          "unknown",
+                          "country",
+                          "region",
+                          "city",
+                          "approximate",
+                          "exact"
+                        ]
+                      },
+                      "evidence_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "uniqueItems": true
+                      }
+                    },
+                    "required": [
+                      "label",
+                      "geometry",
+                      "precision",
+                      "evidence_ids"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "criteria": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "uniqueItems": true,
+                      "minItems": 1
+                    }
+                  },
+                  "campaign_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "evidence": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "material_id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "claim": {
+                          "enum": [
+                            "occurrence",
+                            "attribution",
+                            "criterion",
+                            "timing",
+                            "location",
+                            "context"
+                          ]
+                        },
+                        "stance": {
+                          "enum": [
+                            "supports",
+                            "contradicts"
+                          ]
+                        },
+                        "quote": {
+                          "type": "string",
+                          "minLength": 8,
+                          "maxLength": 600
+                        },
+                        "origin_id": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "origin_reason": {
+                          "type": "string",
+                          "minLength": 10
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "material_id",
+                        "claim",
+                        "stance",
+                        "quote",
+                        "origin_id",
+                        "origin_reason"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "minItems": 1
+                  },
+                  "strategic_context": {
+                    "type": "object",
+                    "properties": {
+                      "area_ids": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "suwalki_corridor",
+                            "rzeszow_jasionka",
+                            "smolensk_gate",
+                            "brest_region",
+                            "kaliningrad_oblast",
+                            "lask_airbase",
+                            "minsk_mazowiecki_airbase",
+                            "swinoujscie_lng",
+                            "baltic_pipe",
+                            "baltic_subsea_cables"
+                          ]
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 15,
+                        "maxLength": 1500
+                      },
+                      "evidence_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                      }
+                    },
+                    "required": [
+                      "area_ids",
+                      "reason",
+                      "evidence_ids"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "event_key",
+                  "title",
+                  "summary",
+                  "category",
+                  "status",
+                  "occurred_on",
+                  "date_evidence_ids",
+                  "country",
+                  "attribution",
+                  "location",
+                  "criteria",
+                  "campaign_id",
+                  "evidence"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "kind",
+              "candidate_ids",
+              "previous_revision",
+              "incident"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "reviewer",
+    "decisions"
+  ],
+  "additionalProperties": false
+}

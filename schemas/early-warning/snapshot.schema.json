@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "ew-snapshot-2"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "as_of": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "fixture"
+      ]
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date"
+        },
+        "end": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ]
+    },
+    "config_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "code_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "counts": {
+      "type": "object"
+    },
+    "source_checks": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "gnss": {
+      "type": "object"
+    },
+    "publications": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "rtb_effect": {
+      "const": "none"
+    },
+    "language": {
+      "const": "pl"
+    }
+  },
+  "required": [
+    "schema_version",
+    "run_id",
+    "as_of",
+    "mode",
+    "window",
+    "config_hash",
+    "code_hash",
+    "counts",
+    "source_checks",
+    "gnss",
+    "publications",
+    "signals",
+    "limitations",
+    "rtb_effect",
+    "language"
+  ]
+}

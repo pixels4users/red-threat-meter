@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object", "additionalProperties": false,
+  "required": ["version", "role", "source", "region", "history_hours", "request_interval_seconds", "collection_interval_seconds", "response_max_age_seconds", "position_max_age_seconds", "report_max_age_seconds", "future_tolerance_seconds", "timeout_seconds", "max_response_bytes"],
+  "properties": {
+    "version": {"const": "aviation-pilot-1"}, "role": {"const": "observations_only"},
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "adapter", "base_url", "documentation_url", "license", "license_url", "dependency_groups"],
+      "properties": {
+        "id": {"const": "adsblol"}, "adapter": {"const": "adsblol-point-v1"},
+        "base_url": {"const": "https://api.adsb.lol/v2/point/"},
+        "documentation_url": {"const": "https://api.adsb.lol/api/openapi.json"},
+        "license": {"const": "ODbL-1.0"},
+        "license_url": {"const": "https://opendatacommons.org/licenses/odbl/1-0/"},
+        "dependency_groups": {"const": ["adsb:adsblol"]}
+      }
+    },
+    "region": {
+      "type": "object", "additionalProperties": false, "required": ["id", "label", "bbox"],
+      "properties": {"id": {"type": "string", "minLength": 1}, "label": {"type": "string", "minLength": 1},
+        "bbox": {"type": "array", "items": {"type": "integer"}, "minItems": 4, "maxItems": 4}}
+    },
+    "history_hours": {"type": "integer", "minimum": 1, "maximum": 168},
+    "request_interval_seconds": {"type": "number", "minimum": 2, "maximum": 10},
+    "collection_interval_seconds": {"type": "integer", "minimum": 60, "maximum": 3600},
+    "response_max_age_seconds": {"type": "integer", "minimum": 10, "maximum": 300},
+    "position_max_age_seconds": {"type": "integer", "minimum": 10, "maximum": 300},
+    "report_max_age_seconds": {"type": "integer", "minimum": 60, "maximum": 3600},
+    "future_tolerance_seconds": {"type": "integer", "minimum": 0, "maximum": 10},
+    "timeout_seconds": {"type": "integer", "minimum": 1, "maximum": 30},
+    "max_response_bytes": {"type": "integer", "minimum": 1000, "maximum": 3000000}
+  }
+}

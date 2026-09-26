@@ -1,0 +1,474 @@
+{
+  "version": "source-candidates-8",
+  "checked_on": "2026-09-25",
+  "policy": "Rejestr integracji i kandydatów. Działający pilotaż GNSS/belzhd jest w config/early-warning.json, pilotaż jakości ADSB.lol w config/aviation.json, audyt historii w config/aviation-history.json, kolektory RTB w config/sources.json. Pozostałe wpisy nie uruchamiają adapterów. Daty wcześniejszych ocen dostępu zachowano w opisach. Kalibracja i niezależna weryfikacja są odrębną pracą. Rozszerzenie z 25.09.2026: kandydaci pierwotni PAŻP, kanały UA, RSO, media i siły zbrojne LT/LV/EE oraz semantyka istniejącego RCB zostały zaakceptowane do integracji 25.09.2026; nie uruchamiają nowych kolektorów. Strażnik jest wyłącznie odniesieniem architektonicznym. Grupa wydawcy nie zastępuje ustalenia pochodzenia każdego dowodu. proposal_status=accepted_for_integration i accepted_on oznaczają akceptację zakresu, nie gotowość adaptera; pole status nadal opisuje dostęp i wdrożenie. Akceptacja nie zmienia dat checked_on ani wyników oceny dostępu.",
+  "candidates": [
+    {
+      "id": "pl_special_services",
+      "url": "https://www.gov.pl/web/sluzby-specjalne",
+      "role": "verification_and_context",
+      "priority": 2,
+      "status": "web_content_verified_adapter_not_connected",
+      "purpose": "Komunikaty o dywersji i atrybucji; rozdzielać ustalenie śledztwa, zarzut i wyrok. Źródło ustaleń i korekt; nie automatyczna prawda referencyjna. Klasyfikacja jako sygnał wyprzedzający zależy od treści i czasu."
+    },
+    {
+      "id": "dorsz",
+      "url": "https://www.wojsko-polskie.pl/dorsz/",
+      "role": "verification_and_context",
+      "priority": 2,
+      "status": "access_challenge_no_adapter",
+      "purpose": "Komunikaty operacyjne i odwołania alarmów. Odczyt 23.09 wymagał JavaScript i weryfikacji dostępu; nie zakładamy stabilnego scrapera. Źródło ustaleń i korekt; nie automatyczna prawda referencyjna. Klasyfikacja jako sygnał wyprzedzający zależy od treści i czasu."
+    },
+    {
+      "id": "vsd_aotd_2026",
+      "url": "https://www.vsd.lt/en/reports/national-threat-assessment-2026/",
+      "role": "periodic_assessment",
+      "priority": 3,
+      "status": "web_content_verified_manual_reference",
+      "purpose": "Ocena regionalna służb litewskich. Raport opiera się na wiedzy do 06.02.2026; nie dowodzi zdarzeń w ostatnich siedmiu dniach."
+    },
+    {
+      "id": "cert_reports",
+      "url": "https://cert.pl/tag/raport-roczny/",
+      "role": "periodic_assessment",
+      "priority": 3,
+      "status": "web_content_verified_adapter_not_connected",
+      "purpose": "Kontekst cyberbezpieczeństwa i baza porównawcza. Odczyt przeglądarkowy działał; wcześniejszy kolektor /posts/ zwracał 403, więc nie uznajemy integracji za naprawioną."
+    },
+    {
+      "id": "nato_hybrid",
+      "url": "https://www.nato.int/cps/fr/natohq/topics_156338.htm?selectedLocale=en",
+      "role": "methodological_reference",
+      "priority": 2,
+      "status": "web_reference_verified",
+      "purpose": "Terminologia działań hybrydowych, wykrywanie i atrybucja; poza punktacją incydentów."
+    },
+    {
+      "id": "warontherocks",
+      "url": "https://warontherocks.com/category/commentary/",
+      "role": "analysis",
+      "priority": 3,
+      "status": "user_proposed_access_unverified",
+      "purpose": "Interpretacje analityczne; nie zastępują pierwotnego dowodu."
+    },
+    {
+      "id": "the_war_zone",
+      "url": "https://www.twz.com",
+      "role": "analysis",
+      "priority": 3,
+      "status": "user_proposed_access_unverified",
+      "purpose": "Kontekst wojskowy; dostęp i parser wymagają weryfikacji."
+    },
+    {
+      "id": "defense_one",
+      "url": "https://www.defenseone.com",
+      "role": "analysis",
+      "priority": 3,
+      "status": "user_proposed_access_unverified",
+      "purpose": "Kontekst wojskowy; dostęp i parser wymagają weryfikacji."
+    },
+    {
+      "id": "breaking_defense",
+      "url": "https://breakingdefense.com/europe/",
+      "role": "analysis",
+      "priority": 3,
+      "status": "user_proposed_access_unverified",
+      "purpose": "Kontekst regionalny; dostęp i parser wymagają weryfikacji."
+    },
+    {
+      "id": "liveuamap",
+      "url": "https://liveuamap.com/pl",
+      "role": "incident_discovery",
+      "priority": 2,
+      "status": "user_proposed_access_and_costs_unverified",
+      "purpose": "Wykrywanie doniesień; dojść do źródła pierwotnego, nie liczyć agregatora jako niezależnego potwierdzenia."
+    },
+    {
+      "id": "deepstate",
+      "url": "https://deepstatemap.live/",
+      "role": "ukraine_context",
+      "priority": 2,
+      "status": "user_proposed_access_and_costs_unverified",
+      "purpose": "Kontekst ukraińskiego teatru wojny; nie rejestr naruszeń NATO."
+    },
+    {
+      "id": "adsb_exchange",
+      "url": "https://globe.adsbexchange.com/",
+      "role": "observational_data",
+      "priority": 2,
+      "status": "api_documentation_verified_access_not_configured",
+      "purpose": "Oddzielne szeregi aktywności RU/BY i wsparcia NATO. Potrzebne porównywalne pokrycie i historia; brak odbioru nie potwierdza braku lotu. Obecność danego typu nie ujawnia zadania ani intencji.",
+      "verification_urls": [
+        "https://adsbexchange.com/community/developer-hub/",
+        "https://www.adsbexchange.com/api/aircraft/v2/docs"
+      ],
+      "access_note": "Sprawdzono 23.09.2026: plan hobbystyczny 10 USD/miesiąc i 10 000 zapytań. Historia wymieniona w Enterprise; nie zakładamy jej w cenie hobby. Brak zakupu i klucza. Szczegóły: docs/aviation-access.md."
+    },
+    {
+      "id": "firms",
+      "url": "https://firms.modaps.eosdis.nasa.gov/",
+      "role": "observational_data",
+      "priority": 3,
+      "status": "api_documentation_verified_map_key_not_configured",
+      "purpose": "Pomocnicza weryfikacja anomalii termicznych. Rozpoznanie obozu, sabotażu lub sprawcy nie wynika z samej detekcji.",
+      "verification_urls": [
+        "https://firms.modaps.eosdis.nasa.gov/map2/",
+        "https://firms.modaps.eosdis.nasa.gov/api/area/"
+      ]
+    },
+    {
+      "id": "x_watchlist",
+      "role": "incident_discovery",
+      "priority": 3,
+      "status": "user_proposed_access_and_costs_unverified",
+      "accounts": [
+        "KofmanMichael",
+        "shashj",
+        "H_I_Sutton",
+        "Osinttechnical",
+        "Bellingcat",
+        "Oryxspioenkop",
+        "OSW_pl",
+        "Trompeta"
+      ],
+      "purpose": "Lista obserwacyjna; tożsamość kont, dostęp i koszty do sprawdzenia. Wpis nie staje się automatycznie dowodem."
+    },
+    {
+      "id": "gpsjam",
+      "url": "https://gpsjam.org/",
+      "role": "observational_data",
+      "priority": 1,
+      "status": "public_manifest_csv_live_pilot_verified",
+      "purpose": "Działający pilotaż pomiarów GNSS, pokrycia i opisowego porównania wspólnych komórek. Odniesienie nie jest skalibrowanym stanem normalnym; brak detektora i punktów RTB.",
+      "verification_urls": [
+        "https://gpsjam.org/faq",
+        "https://gpsjam.org/about"
+      ],
+      "runtime_config": "config/early-warning.json",
+      "access_note": "Pobrano 30 dni 24.08–22.09.2026; 27.08 zmiana adsbexchange → merged. Publiczne pliki mapy, bez gwarancji API i ustalonych uprawnień redystrybucji. Szczegóły: docs/early-warning-runbook.md."
+    },
+    {
+      "id": "eurocontrol_augur",
+      "url": "https://www.eurocontrol.int/online-tool/augur",
+      "role": "observational_context",
+      "priority": 1,
+      "status": "official_description_verified_api_not_tested",
+      "purpose": "Uzupełnienie GNSS o kontekst NOTAM i dostępności systemu; warunki API oraz pochodzenie poszczególnych warstw do sprawdzenia."
+    },
+    {
+      "id": "belzhd_public",
+      "url": "https://belzhd.info/category/news/",
+      "related_urls": [
+        "https://t.me/s/belzhd_live"
+      ],
+      "role": "logistics_discovery",
+      "priority": 1,
+      "status": "public_rss_live_pilot_verified",
+      "purpose": "Działający pilotaż publikacji logistycznych jednego wydawcy. Daty publikacji nie zastępują dat transportów; bez założenia pełnego pokrycia. Nie nalicza punktów RTB.",
+      "runtime_config": "config/early-warning.json",
+      "feed_url": "https://belzhd.info/feed/",
+      "access_note": "Pobrano 10 publikacji z pełną treścią RSS, cztery z rubryki wojskowej. RSS rubryki zwraca 403; główny RSS działa. Nie podłączono Telegrama. Redystrybucja nieustalona. Polski tytuł i streszczenie mają wersjonowany import; oryginał pozostaje w archiwum."
+    },
+    {
+      "id": "hajun_archive",
+      "url": "https://hajun.info/",
+      "role": "historical_reference",
+      "priority": 3,
+      "status": "halt_announcement_verified_not_current_feed",
+      "purpose": "Archiwum do badań historycznych, z pierwotnym czasem dostępności. Nie planować jako bieżącego kolektora.",
+      "verification_urls": [
+        "https://t.me/Hajun_BY/8378",
+        "https://t.me/s/Hajun_BY"
+      ]
+    },
+    {
+      "id": "public_telegram_channels",
+      "role": "incident_discovery",
+      "priority": 3,
+      "status": "specific_channels_and_ai_use_basis_required",
+      "purpose": "Konkretna lista publicznych kanałów, dostęp i dozwolone użycie wymagają ustalenia. Bot API nie zapewnia dowolnej historii. Brak skonfigurowanego konta, sesji i automatu AI.",
+      "verification_urls": [
+        "https://core.telegram.org/bots/faq",
+        "https://core.telegram.org/method/messages.getHistory",
+        "https://core.telegram.org/api/terms",
+        "https://telegram.org/tos/content-licensing"
+      ]
+    },
+    {
+      "id": "sentinel_imagery",
+      "role": "spatial_verification",
+      "priority": 3,
+      "status": "sensor_capabilities_verified_provider_not_selected",
+      "purpose": "Weryfikacja zmian przestrzennych z określonym sensorem i datą; nie automatyczny detektor obozów z samego ciepła.",
+      "verification_urls": [
+        "https://www.esa.int/Applications/Observing_the_Earth/Copernicus/Sentinel-3/Instruments",
+        "https://step.esa.int/main/wp-content/help/versions/12.0.0/snap-toolboxes/eu.esa.opt.opttbx.s2msi.reader/Sentinel2Overview.html"
+      ]
+    },
+    {
+      "id": "regional_incident_reports",
+      "role": "incident_discovery",
+      "priority": 3,
+      "status": "publishers_and_access_to_select",
+      "purpose": "Konkretne lokalne media i rejestry awarii. Potrzebna kontrola duplikatów, zmian pokrycia oraz częstości zdarzeń przypadkowych."
+    },
+    {
+      "id": "maritime_ais_and_notices",
+      "role": "observational_data",
+      "priority": 3,
+      "status": "providers_and_access_to_select",
+      "purpose": "Komunikaty morskie, portowe i obserwacje AIS po wyborze źródeł. Bliskość infrastruktury nie dowodzi wrogiej intencji; mierzyć jakość pokrycia."
+    },
+    {
+      "id": "strategic_aviation_reports",
+      "role": "ukraine_context_and_incident_discovery",
+      "priority": 3,
+      "status": "specific_publishers_and_provenance_to_select",
+      "purpose": "Doniesienia o aktywności lotnictwa strategicznego z jawnym czasem i pochodzeniem. Możliwy wpływ na Polskę jest hipotezą; bez automatycznej prognozy naruszenia przestrzeni."
+    },
+    {
+      "id": "opensky",
+      "url": "https://opensky-network.org/",
+      "role": "observational_data",
+      "priority": 2,
+      "status": "anonymous_regional_probe_verified_operational_license_required",
+      "purpose": "Dostęp do bieżących stanów, bez automatycznej identyfikacji lotów wojskowych. origin_country nie potwierdza operatora.",
+      "verification_urls": [
+        "https://openskynetwork.github.io/opensky-api/rest.html",
+        "https://opensky-network.org/about/terms-of-use"
+      ],
+      "access_note": "23.09.2026 jednorazowy test: HTTP 200, 303 rekordy w bbox [14,49,29,60]. Stałe użycie operacyjne wymaga pisemnej umowy. Brak kolektora i harmonogramu. docs/aviation-access.md."
+    },
+    {
+      "id": "adsblol",
+      "url": "https://www.adsb.lol/",
+      "role": "observational_data",
+      "priority": 1,
+      "status": "regional_api_and_history_quality_pilots_verified",
+      "purpose": "Ręczny pilotaż jakości regionalnych obserwacji nadajników, bez liczenia lotów i punktów RTB. Wiek pozycji, duplikaty, brak danych i zasięg zapytań są jawne. Typy i flaga wojskowa pochodzą z bazy dostawcy; operator i intencja pozostają nieustalone.",
+      "verification_urls": [
+        "https://www.adsb.lol/docs/open-data/api/",
+        "https://www.adsb.lol/docs/open-data/historical/",
+        "https://github.com/adsblol/globe_history/releases",
+        "https://api.adsb.lol/api/openapi.json",
+        "https://github.com/adsblol/api",
+        "https://github.com/wiedehopf/readsb/blob/dev/README-json.md",
+        "https://github.com/adsblol/globe_history_2026",
+        "https://adsb.lol/script_25c7773ecdd90f0174ac8a506f50c4ca.js",
+        "https://github.com/wiedehopf/readsb/blob/dev/globe_index.c"
+      ],
+      "access_note": "24.09.2026: potwierdzono właściwą specyfikację /api/openapi.json i regionalne odpowiedzi HTTP 200. Kolektor wykonuje do czterech zapytań point o promieniu 250 NM, z limitem lokalnym i Retry-After. Licencja ODbL 1.0; brak klucza, opłat i harmonogramu. Osobny audyt pobrał trzy półgodzinne pliki mapy z 22–24.09, łącznie 78 108 013 bajtów. Historia i API pozostają oddzielnymi seriami o wspólnym pochodzeniu. Nie stanowią skalibrowanego odniesienia; nie pobrano całych dziennych archiwów. Kontrakty: docs/aviation-runbook.md i docs/aviation-history.md; wyniki: docs/STATUS.md.",
+      "runtime_config": "config/aviation.json",
+      "history_runtime_config": "config/aviation-history.json"
+    },
+    {
+      "id": "worldmonitor_military",
+      "url": "https://www.worldmonitor.app/",
+      "role": "observational_aggregator",
+      "priority": 2,
+      "status": "openapi_verified_authenticated_data_not_tested",
+      "purpose": "Porównać klasyfikację operatorów i pochodzenie; agregator nie jest niezależnym dowodem wobec jego dostawców.",
+      "verification_urls": [
+        "https://www.worldmonitor.app/docs/usage-auth",
+        "https://www.worldmonitor.app/openapi.json",
+        "https://www.worldmonitor.app/docs/military-tracking"
+      ],
+      "access_note": "OpenAPI 23.09.2026 opisuje filtry operator i aircraft_type jako ignorowane. Cena potrzebnego API i długa historia nieustalone. Brak klucza, zakupu i kolektora. docs/aviation-access.md."
+    },
+    {
+      "id": "pansa_airspace",
+      "url": "https://airspace.pansa.pl/",
+      "role": "airspace_planning_and_activation",
+      "priority": 1,
+      "status": "official_site_identified_runtime_contract_not_tested",
+      "purpose": "ADHOC, R, D i NPZ: plan AUP/UUP, aktywacja, zmiany oraz odwołania. Hipoteza przygotowań obronnych RP wymaga nierutynowości i kontekstu. NPZ dotyczy ograniczeń planowania lotów, nie domniemanej strefy bojowej.",
+      "dependency_group": "authority:pansa",
+      "verification_urls": [
+        "https://www.pansa.pl/cat/",
+        "https://www.amc.pansa.pl/amc-polska/informacje-ogolne/",
+        "https://www.eurocontrol.int/sites/default/files/2025-11/eurocontrol-ernip-part1-airspace-design-methodology-v3-2.pdf"
+      ],
+      "access_note": "25.09.2026: sprawdzono adres i opisy oficjalne. Nie przetestowano stabilnego kontraktu danych, statusów taktycznych, limitów ani opóźnienia. Plan nie potwierdza aktywacji. Adapter niepodłączony.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "ua_air_force_public",
+      "url": "https://t.me/kpszsu",
+      "role": "primary_official_air_threat_statements",
+      "priority": 1,
+      "status": "official_channel_identity_verified_adapter_not_connected",
+      "purpose": "Komunikaty Sił Powietrznych ZSU i odwołania. Priorytet odkrywania dla obwodów lwowskiego i wołyńskiego. Publikacje nie są automatycznie surowymi pomiarami radarowymi; kurs na Ukrainę nie dowodzi zagrożenia dla Polski.",
+      "dependency_group": "authority:ua_air_force",
+      "verification_urls": [
+        "https://t.me/kpszsu",
+        "https://cpd.gov.ua/announcement/spysok-bezpechnyh-kanaliv-otrymannya-informacziyi/"
+      ],
+      "access_note": "25.09.2026: publiczny profil i urzędowy wykaz wskazują kanał. Dostęp automatyczny, historia, opóźnienie i dozwolone przetwarzanie wymagają ustalenia. Brak sesji, bota i kolektora.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "ua_monitor_public",
+      "url": "https://t.me/war_monitor",
+      "role": "publisher_air_threat_reports",
+      "priority": 1,
+      "status": "public_profile_verified_provenance_per_item_required",
+      "purpose": "Monitor: odkrywanie doniesień o rakietach manewrujących, balistyce, Shahed i startach MiG-31K. Zachować cytowane źródło, negacje, odwołania i czas zdarzenia; bez domniemanej niezależności lub dostępu do radaru.",
+      "dependency_group": "publisher:ua_monitor",
+      "access_note": "25.09.2026: publiczny profil zidentyfikowany. Nieoficjalne doniesienia; pierwotne pochodzenie wymaga oceny dla każdego wpisu. Dostęp automatyczny i dozwolone przetwarzanie nieustalone; adapter niepodłączony.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "ua_vanek_public",
+      "url": "https://t.me/vanek_nikolaev",
+      "role": "publisher_air_threat_reports",
+      "priority": 1,
+      "status": "public_profile_verified_provenance_per_item_required",
+      "purpose": "Nikolaevski Vanek: publiczne doniesienia powietrzne z jawną niepewnością, źródłem i czasem. Priorytet dla informacji dotyczących zachodniej Ukrainy; nie liczyć postów jako fizycznych obiektów.",
+      "dependency_group": "publisher:ua_vanek",
+      "access_note": "25.09.2026: publiczny profil zidentyfikowany; nie potwierdza surowej telemetrii, kompletności ani niezależności poszczególnych wpisów. Dostęp automatyczny i dozwolone przetwarzanie nieustalone; adapter niepodłączony.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "rso_public",
+      "url": "https://komunikaty.tvp.pl/komunikaty/wszystkie/wszystkie",
+      "role": "official_warning_distribution",
+      "priority": 1,
+      "status": "official_distribution_page_verified_adapter_not_connected",
+      "purpose": "Regionalny System Ostrzegania: obowiązujące komunikaty, obszary, aktualizacje i odwołania. Klasy treści L1/L2/L3 dotyczą ostrzeżeń powietrznych, nie prawnych stopni alarmowych. RCB przez RSO i gov.pl to wspólne pochodzenie.",
+      "dependency_group": "distribution:rso",
+      "origin_policy": "Ustal nadawcę każdego ostrzeżenia. Dla komunikatu RCB przypisz authority:rcb i jeden alert_key wspólnie z gov.pl; sam kanał dystrybucji nie daje niezależności.",
+      "verification_urls": [
+        "https://www.gov.pl/web/mswia/regionalny-system-ostrzegania",
+        "https://www.gov.pl/web/mswia/-obowiazujace-komunikaty-opublikowane-w-rso"
+      ],
+      "access_note": "25.09.2026: odnośnik MSWiA kieruje do wykazu TVP. Treść wykazu dostępna; kontrakt maszynowy, paginacja i kompletność historii do sprawdzenia. Adapter niepodłączony.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "rcb_alert_semantics",
+      "url": "https://www.gov.pl/web/rcb/komunikaty",
+      "role": "existing_source_classification_extension",
+      "priority": 1,
+      "status": "existing_collector_semantic_extension_not_implemented",
+      "purpose": "Rozszerzenie istniejącego źródła rcb o klasy treści L1_monitoring, L2_readiness i L3_shelter, odwołania oraz deduplikację z RSO. Bez drugiego kolektora i bez automatycznej atrybucji RU/BY lub zamiany instrukcji ochronnej na punkty RTB.",
+      "existing_source_id": "rcb",
+      "dependency_group": "authority:rcb",
+      "verification_urls": [
+        "https://www.gov.pl/web/rcb/komunikaty",
+        "https://www.gov.pl/web/rcb/alert-rcb---zmasowany-rosyjski-atak-powietrzny-na-ukraine-0809",
+        "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-17010"
+      ],
+      "access_note": "25.09.2026: sprawdzono przykłady treści i odwołań w publikacjach RCB. Kolektor gov.pl już działa w config/sources.json; klasyfikator i wspólny stan RSO/RCB nie są wdrożone.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "lt_lrt",
+      "url": "https://www.lrt.lt/en/news-in-english",
+      "country": "LT",
+      "publisher": "LRT",
+      "role": "direct_publisher_incident_reports",
+      "priority": 2,
+      "status": "candidate_reader_blocked_by_robots_no_adapter",
+      "purpose": "Incydenty morskie, lotnicze, infrastrukturalne, sabotaż i GNSS/Baltic Jammer. Oddzielić własne ustalenia od cytowania agencji, wojska lub operatora infrastruktury; odróżniać zdarzenie, ćwiczenie i retrospektywę.",
+      "dependency_group": "publisher:lt_lrt",
+      "origin_policy": "Grupa wydawcy nie dowodzi niezależności. Ustal origin_id konkretnego twierdzenia; kopie oficjalnego komunikatu liczą się raz.",
+      "access_note": "25.09.2026: Odczyt narzędziowy zablokowany przez robots.txt; dostęp automatyczny niepotwierdzony. Nie obchodzić blokady przez pośrednika.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "lt_armed_forces",
+      "url": "https://kariuomene.lt/en",
+      "country": "LT",
+      "publisher": "Lietuvos kariuomenė",
+      "role": "primary_official_incident_statements",
+      "priority": 2,
+      "status": "official_news_page_verified_adapter_not_connected",
+      "purpose": "Incydenty morskie, lotnicze, infrastrukturalne, sabotaż i GNSS/Baltic Jammer. Oddzielić własne ustalenia od cytowania agencji, wojska lub operatora infrastruktury; odróżniać zdarzenie, ćwiczenie i retrospektywę.",
+      "dependency_group": "authority:lt_armed_forces",
+      "origin_policy": "Grupa wydawcy nie dowodzi niezależności. Ustal origin_id konkretnego twierdzenia; kopie oficjalnego komunikatu liczą się raz.",
+      "access_note": "25.09.2026: Treść oficjalnej witryny dostępna; kontrakt RSS/API/HTML i opóźnienie wymagają próby.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "lv_lsm",
+      "url": "https://eng.lsm.lv/",
+      "country": "LV",
+      "publisher": "LSM",
+      "role": "direct_publisher_incident_reports",
+      "priority": 2,
+      "status": "publisher_page_verified_adapter_not_connected",
+      "purpose": "Incydenty morskie, lotnicze, infrastrukturalne, sabotaż i GNSS/Baltic Jammer. Oddzielić własne ustalenia od cytowania agencji, wojska lub operatora infrastruktury; odróżniać zdarzenie, ćwiczenie i retrospektywę.",
+      "dependency_group": "publisher:lv_lsm",
+      "origin_policy": "Grupa wydawcy nie dowodzi niezależności. Ustal origin_id konkretnego twierdzenia; kopie oficjalnego komunikatu liczą się raz.",
+      "access_note": "25.09.2026: Treść witryny dostępna; bez testu kolektora, opóźnienia i kompletności.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "lv_armed_forces",
+      "url": "https://www.mil.lv/en/zinas",
+      "country": "LV",
+      "publisher": "Nacionālie bruņotie spēki",
+      "role": "primary_official_incident_statements",
+      "priority": 2,
+      "status": "official_news_page_verified_adapter_not_connected",
+      "purpose": "Incydenty morskie, lotnicze, infrastrukturalne, sabotaż i GNSS/Baltic Jammer. Oddzielić własne ustalenia od cytowania agencji, wojska lub operatora infrastruktury; odróżniać zdarzenie, ćwiczenie i retrospektywę.",
+      "dependency_group": "authority:lv_armed_forces",
+      "origin_policy": "Grupa wydawcy nie dowodzi niezależności. Ustal origin_id konkretnego twierdzenia; kopie oficjalnego komunikatu liczą się raz.",
+      "access_note": "25.09.2026: Zweryfikowana angielska lista wiadomości używa /en/zinas; /en/news nie dała użytecznej odpowiedzi.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "ee_err",
+      "url": "https://news.err.ee/",
+      "country": "EE",
+      "publisher": "ERR",
+      "role": "direct_publisher_incident_reports",
+      "priority": 2,
+      "status": "publisher_page_verified_adapter_not_connected",
+      "purpose": "Incydenty morskie, lotnicze, infrastrukturalne, sabotaż i GNSS/Baltic Jammer. Oddzielić własne ustalenia od cytowania agencji, wojska lub operatora infrastruktury; odróżniać zdarzenie, ćwiczenie i retrospektywę.",
+      "dependency_group": "publisher:ee_err",
+      "origin_policy": "Grupa wydawcy nie dowodzi niezależności. Ustal origin_id konkretnego twierdzenia; kopie oficjalnego komunikatu liczą się raz.",
+      "access_note": "25.09.2026: Treść witryny dostępna; bez testu kolektora, opóźnienia i kompletności.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "ee_defence_forces",
+      "url": "https://mil.ee/en/news/",
+      "country": "EE",
+      "publisher": "Kaitsevägi",
+      "role": "primary_official_incident_statements",
+      "priority": 2,
+      "status": "official_news_page_verified_adapter_not_connected",
+      "purpose": "Incydenty morskie, lotnicze, infrastrukturalne, sabotaż i GNSS/Baltic Jammer. Oddzielić własne ustalenia od cytowania agencji, wojska lub operatora infrastruktury; odróżniać zdarzenie, ćwiczenie i retrospektywę.",
+      "dependency_group": "authority:ee_defence_forces",
+      "origin_policy": "Grupa wydawcy nie dowodzi niezależności. Ustal origin_id konkretnego twierdzenia; kopie oficjalnego komunikatu liczą się raz.",
+      "access_note": "25.09.2026: Treść oficjalnej listy wiadomości dostępna; kontrakt RSS/API/HTML i opóźnienie wymagają próby.",
+      "checked_on": "2026-09-25",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-25"
+    }
+  ],
+  "design_status": "integration_registry_runtime_configs_are_separate"
+}

@@ -1,0 +1,339 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "ew-observation-1"
+    },
+    "observation_id": {
+      "type": "string",
+      "pattern": "^ewo_[0-9a-f]{24}$"
+    },
+    "logical_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_id": {
+      "enum": [
+        "gpsjam",
+        "belzhd_public"
+      ]
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "source_config_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "adapter_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "dependency_groups": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "times": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "observed_start": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "observed_end": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "observed_precision": {
+          "enum": [
+            "utc_day",
+            "unknown"
+          ]
+        },
+        "published_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "first_available_at": {
+          "type": "null"
+        },
+        "availability_basis": {
+          "const": "unknown; first_seen_at is a local acquisition bound"
+        },
+        "first_seen_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fetched_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "observed_start",
+        "observed_end",
+        "observed_precision",
+        "published_at",
+        "first_available_at",
+        "availability_basis",
+        "first_seen_at",
+        "fetched_at"
+      ]
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "precision": {
+          "enum": [
+            "h3_grid_bbox",
+            "unknown"
+          ]
+        },
+        "bbox": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 4,
+              "maxItems": 4
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "label",
+        "precision",
+        "bbox"
+      ]
+    },
+    "raw_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^raw/[a-z_]+/[0-9a-f]{64}\\.bin$"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "integrity": {
+          "enum": [
+            "not_flagged_by_publisher",
+            "suspect_by_publisher",
+            "unknown"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "integrity",
+        "limitations"
+      ]
+    },
+    "data": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "const": "gnss_daily"
+            },
+            "day": {
+              "type": "string",
+              "format": "date"
+            },
+            "provider": {
+              "enum": [
+                "adsbexchange",
+                "airplaneslive",
+                "merged"
+              ]
+            },
+            "manifest_suspect": {
+              "type": "boolean"
+            },
+            "cells": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "h3": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "good": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "bad": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "sample": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "source_adjusted_pct": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "h3",
+                  "good",
+                  "bad",
+                  "sample",
+                  "source_adjusted_pct"
+                ]
+              }
+            },
+            "expected_cells": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "uniqueItems": true,
+              "minItems": 1
+            },
+            "global_rows": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "formula": {
+              "const": "100 * (bad - 1) / (good + bad)"
+            },
+            "unit": {
+              "const": "percent_per_cell"
+            },
+            "denominator": {
+              "const": "good + bad aircraft category counts in one cell and UTC day"
+            },
+            "min_cell_sample": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "type",
+            "day",
+            "provider",
+            "manifest_suspect",
+            "cells",
+            "expected_cells",
+            "global_rows",
+            "formula",
+            "unit",
+            "denominator",
+            "min_cell_sample"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "type": {
+              "const": "publication"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "text": {
+              "type": "string",
+              "minLength": 1
+            },
+            "text_kind": {
+              "enum": [
+                "rss_full_content",
+                "rss_summary"
+              ]
+            },
+            "categories": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "language": {
+              "type": "string",
+              "minLength": 1
+            },
+            "military_transport_tag": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "type",
+            "title",
+            "text",
+            "text_kind",
+            "categories",
+            "language",
+            "military_transport_tag"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "observation_id",
+    "logical_key",
+    "source_id",
+    "publisher",
+    "url",
+    "source_config_hash",
+    "adapter_version",
+    "dependency_groups",
+    "times",
+    "location",
+    "raw_refs",
+    "quality",
+    "data"
+  ]
+}

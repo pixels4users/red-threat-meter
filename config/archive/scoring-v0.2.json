@@ -1,0 +1,34 @@
+{
+  "version": "rtb-v0.2",
+  "validation_status": "experimental_unvalidated",
+  "base": 10,
+  "maximum": 100,
+  "window_days": 7,
+  "timezone": "Europe/Warsaw",
+  "window_definition": "Bieżący dzień i sześć poprzednich dni kalendarzowych, do chwili odcięcia.",
+  "interpretation": "Indeks potwierdzonych działań RU/BY i sygnałów przygotowań wojskowych istotnych dla Polski i wschodniej flanki NATO; nie jest prawdopodobieństwem ani oceną zamiaru ataku.",
+  "scope_countries": ["PL","LT","LV","EE","CZ","SK","HU","RO","BG","DE","FI","SE"],
+  "attributed_actors": ["RU","BY"],
+  "accepted_statuses": ["confirmed_primary","corroborated"],
+  "thresholds": [{"id":"analyst_review","above":60,"action":"analyst_review_required","calibrated":false}],
+  "strategic_priority_policy": "review_order_only_no_point_multiplier",
+  "outlook_days": {"minimum":14,"maximum":42,"mode":"conditional_scenarios_without_numeric_probabilities"},
+  "categories": {
+    "military_preparation": {"label":"Zmiana logistyki lub zabezpieczenia medycznego RU/BY","weight":15,"cap":30,"family":"preparation","scope_countries":["BY","RU"],"country_criteria":{"RU":["kaliningrad_oblast"]},"criteria":["logistics_or_medical_change","baseline_anomaly","operational_relevance","routine_explanation_checked"]},
+    "sabotage": {"label":"Sabotaż infrastruktury","weight":10,"cap":30,"criteria":["intentional_action","critical_infrastructure"]},
+    "arms_explosion": {"label":"Eksplozja w zakładzie zbrojeniowym","weight":8,"cap":24,"criteria":["explosion_confirmed","arms_facility"]},
+    "airspace_breach": {"label":"Naruszenie przestrzeni NATO","weight":5,"cap":25,"criteria":["nato_airspace_breach"]},
+    "air_activity": {"label":"Anomalia aktywności lotniczej RU/BY","weight":4,"cap":12,"family":"preparation","scope_countries":["PL","LT","LV","EE","CZ","SK","HU","RO","BG","DE","FI","SE","BY","RU"],"country_criteria":{"RU":["kaliningrad_oblast"]},"criteria":["baseline_anomaly","military_activity"]},
+    "cyberattack": {"label":"Atak cybernetyczny na infrastrukturę PL/LT","weight":3,"cap":12,"scope_countries":["PL","LT"],"criteria":["large_scale","target_banking_or_government"]},
+    "border_pressure": {"label":"Wzrost presji na granicy PL–BY","weight":3,"cap":9,"scope_countries":["PL","BY"],"criteria":["baseline_increase","pl_by_border"]},
+    "gps_jamming": {"label":"Długotrwałe zakłócenia GPS","weight":2,"cap":8,"criteria":["duration_over_24h"]}
+  },
+  "limitations": [
+    "Wagi, baza i limity kategorii są założeniami pilotażu, bez kalibracji prognostycznej.",
+    "Źródła nie zapewniają pełnego pokrycia regionu, przygotowań wojskowych, cyberataków, GNSS ani danych lotniczych.",
+    "Sygnały nieprzypisane RU/BY i zdarzenia na Ukrainie pozostają w obserwacjach poza punktacją.",
+    "Nieustalona data potencjalnego incydentu, błędne dowody, niepełny przegląd lub brak wymaganego źródła blokują główny wynik. Zdarzenia kontekstowe i nieprzypisane RU/BY nie naliczają punktów.",
+    "Doktryna i analogie historyczne służą hipotezom. Nie potwierdzają bieżącego zdarzenia, sprawcy, daty ani intencji.",
+    "Próg ponad 60 oznacza potrzebę pilnego przeglądu; nie jest skalibrowanym prawdopodobieństwem eskalacji. Odczyty v0.2 nie są bezpośrednio porównywalne z v0.1."
+  ]
+}
