@@ -1,5 +1,5 @@
 {
-  "version": "sources-pilot-4",
+  "version": "sources-pilot-5",
   "description": "Aktywne kolektory bieżących publikacji o bezpieczeństwie Polski i wschodniej flanki NATO. Kontekst doktrynalny jest w doctrine-sources.json, kandydaci do rozbudowy w source-candidates.json.",
   "policy": "Jedyną listą automatycznie pobieranych źródeł są poniższe wpisy enabled=true. Strony referencyjne i doktryna nie stają się incydentami. Pierwotne pochodzenie należy ustalić dla konkretnego twierdzenia, nie tylko wydawcy.",
   "sources": [
@@ -53,13 +53,14 @@
         "/transformacja-bundeswehry/",
         "/sites/default/files/"
       ],
-      "max_pages": 1,
+      "max_pages": 3,
       "max_items": 30,
       "fetch_articles": true,
       "article_parser": "osw",
       "max_backfill_items": 10,
       "max_requests": 50,
-      "notes": "RSS odkrywa publikacje; pełny tekst z HTML OSW, raporty z podlinkowanego PDF wydawcy. Do 10 znanych nierozstrzygniętych publikacji spoza RSS, 30 publikacji i 50 żądań łącznie z przekierowaniami/ponowieniami na cykl. PDF: Poppler, do 3 MB i 250 stron. Brak pełnego tekstu daje stan częściowy; nie zastępujemy zapisanej treści skrótem."
+      "notes": "RSS oraz maksymalnie 3 kolejne strony archiwum wydawcy, do przekroczenia horyzontu 216 h. Pełny HTML/PDF; maks. 30 publikacji i 50 żądań z ponowieniami/przekierowaniami; do 10 znanych zaległości. Kompletność listy publikacji nie potwierdza historii zdarzeń ani wcześniejszej wiedzy systemu.",
+      "archive_url": "https://www.osw.waw.pl/pl/publikacje"
     },
     {
       "id": "naval_news",
@@ -130,6 +131,476 @@
       "max_requests": 2,
       "fetch_articles": false,
       "notes": "Pełny eksport bieżącej kategorii ogólnej, do 500 komunikatów. Ustal organ wydający i wspólny alert_key RCB/RSO; rso_alarm nie jest klasą L1/L2/L3. Brak rekordu w wykazie nie potwierdza odwołania."
+    },
+    {
+      "id": "x_sentdefender",
+      "publisher": "OSINT Defender",
+      "kind": "secondary",
+      "enabled": true,
+      "required": false,
+      "adapter": "x_browser_import",
+      "url": "https://x.com/sentdefender",
+      "allowed_hosts": [
+        "x.com"
+      ],
+      "path_prefix": "/sentdefender/",
+      "max_pages": 1,
+      "max_items": 100,
+      "fetch_articles": false,
+      "account": "sentdefender",
+      "max_capture_age_hours": 24,
+      "filter": {
+        "regions": {
+          "PL": [
+            "Poland",
+            "Polish",
+            "Warsaw",
+            "Warszawa",
+            "Polska",
+            "Bialystok",
+            "Białystok",
+            "Rzeszow",
+            "Rzeszów"
+          ],
+          "DE": [
+            "Germany",
+            "German",
+            "Niemcy",
+            "Berlin",
+            "Bundeswehr",
+            "Ramstein"
+          ],
+          "UA": [
+            "Ukraine",
+            "Ukrainian",
+            "Ukraina",
+            "Kyiv",
+            "Kiev",
+            "Lviv",
+            "Volyn",
+            "Odesa",
+            "Odessa",
+            "Kharkiv",
+            "Kijów",
+            "Lwów"
+          ],
+          "BY": [
+            "Belarus",
+            "Belarusian",
+            "Białoruś",
+            "Minsk",
+            "Brest",
+            "Gomel"
+          ],
+          "LT": [
+            "Lithuania",
+            "Lithuanian",
+            "Litwa",
+            "Vilnius",
+            "Klaipeda"
+          ],
+          "LV": [
+            "Latvia",
+            "Latvian",
+            "Łotwa",
+            "Riga",
+            "Lielvarde",
+            "Lielvārde",
+            "Balvi"
+          ],
+          "EE": [
+            "Estonia",
+            "Estonian",
+            "Tallinn",
+            "Amari",
+            "Ämari"
+          ],
+          "MD": [
+            "Moldova",
+            "Moldovan",
+            "Mołdawia",
+            "Transnistria",
+            "Chisinau"
+          ],
+          "CEE": [
+            "Romania",
+            "Romanian",
+            "Bucharest",
+            "Czech",
+            "Czechia",
+            "Slovakia",
+            "Slovak",
+            "Hungary",
+            "Hungarian",
+            "Bulgaria",
+            "Bulgarian",
+            "eastern flank",
+            "eastern europe"
+          ],
+          "RU_west": [
+            "Kaliningrad",
+            "Pskov",
+            "Smolensk",
+            "Bryansk",
+            "Kursk",
+            "Belgorod",
+            "Moscow",
+            "Volga"
+          ],
+          "Baltic": [
+            "Baltic",
+            "Bałtyk",
+            "Suwalki",
+            "Suwałki"
+          ]
+        },
+        "broad_context": {
+          "regional_link_to_check": [
+            "Russia",
+            "Russian",
+            "Rosja",
+            "NATO",
+            "Europe",
+            "European",
+            "EU"
+          ]
+        },
+        "outside_locations": {
+          "outside_europe": [
+            "Iran",
+            "Yemen",
+            "Houthi",
+            "Houthis",
+            "Israel",
+            "Gaza",
+            "Syria",
+            "Alaska",
+            "Alaskan",
+            "Amur",
+            "Siberia",
+            "Vladivostok",
+            "Pacific",
+            "Taiwan",
+            "China"
+          ]
+        },
+        "topics": {
+          "military": [
+            "military",
+            "army",
+            "troops",
+            "fighter",
+            "fighters",
+            "aircraft",
+            "drone",
+            "drones",
+            "missile",
+            "missiles",
+            "bomber",
+            "defense",
+            "defence",
+            "airspace",
+            "navy",
+            "naval",
+            "exercise",
+            "exercises",
+            "wojsko"
+          ],
+          "hybrid": [
+            "sabotage",
+            "arson",
+            "cyberattack",
+            "cyber",
+            "GPS",
+            "GNSS",
+            "jamming",
+            "jammer",
+            "disinformation",
+            "espionage",
+            "spy",
+            "intelligence",
+            "border",
+            "migrant",
+            "pipeline",
+            "cable",
+            "firefighters"
+          ],
+          "strategic": [
+            "NATO",
+            "sanctions",
+            "elections",
+            "election",
+            "mobilisation",
+            "mobilization",
+            "logistics",
+            "ammunition",
+            "arms",
+            "weapons",
+            "summit",
+            "treaty"
+          ]
+        }
+      },
+      "notes": "Odczyt publicznych wpisów przez Codexa według skills/x-research; skrypt importuje zamrożoną paczkę, nie pobiera X. Zakres: Europa Wschodnia, flanka NATO i Niemcy. Niepełna historia; odrębny przegląd geografii, źródeł pierwotnych, tłumaczenia i tożsamości zdarzeń. Brak automatycznej atrybucji i punktów RTB."
+    },
+    {
+      "id": "x_osinttechnical",
+      "publisher": "OSINT Technical",
+      "kind": "secondary",
+      "enabled": true,
+      "required": false,
+      "adapter": "x_browser_import",
+      "url": "https://x.com/osinttechnical",
+      "allowed_hosts": [
+        "x.com"
+      ],
+      "path_prefix": "/osinttechnical/",
+      "max_pages": 1,
+      "max_items": 100,
+      "fetch_articles": false,
+      "account": "osinttechnical",
+      "max_capture_age_hours": 24,
+      "filter": {
+        "regions": {
+          "PL": [
+            "Poland",
+            "Polish",
+            "Warsaw",
+            "Warszawa",
+            "Polska",
+            "Bialystok",
+            "Białystok",
+            "Rzeszow",
+            "Rzeszów"
+          ],
+          "DE": [
+            "Germany",
+            "German",
+            "Niemcy",
+            "Berlin",
+            "Bundeswehr",
+            "Ramstein"
+          ],
+          "UA": [
+            "Ukraine",
+            "Ukrainian",
+            "Ukraina",
+            "Kyiv",
+            "Kiev",
+            "Lviv",
+            "Volyn",
+            "Odesa",
+            "Odessa",
+            "Kharkiv",
+            "Kijów",
+            "Lwów"
+          ],
+          "BY": [
+            "Belarus",
+            "Belarusian",
+            "Białoruś",
+            "Minsk",
+            "Brest",
+            "Gomel"
+          ],
+          "LT": [
+            "Lithuania",
+            "Lithuanian",
+            "Litwa",
+            "Vilnius",
+            "Klaipeda"
+          ],
+          "LV": [
+            "Latvia",
+            "Latvian",
+            "Łotwa",
+            "Riga",
+            "Lielvarde",
+            "Lielvārde",
+            "Balvi"
+          ],
+          "EE": [
+            "Estonia",
+            "Estonian",
+            "Tallinn",
+            "Amari",
+            "Ämari"
+          ],
+          "MD": [
+            "Moldova",
+            "Moldovan",
+            "Mołdawia",
+            "Transnistria",
+            "Chisinau"
+          ],
+          "CEE": [
+            "Romania",
+            "Romanian",
+            "Bucharest",
+            "Czech",
+            "Czechia",
+            "Slovakia",
+            "Slovak",
+            "Hungary",
+            "Hungarian",
+            "Bulgaria",
+            "Bulgarian",
+            "eastern flank",
+            "eastern europe"
+          ],
+          "RU_west": [
+            "Kaliningrad",
+            "Pskov",
+            "Smolensk",
+            "Bryansk",
+            "Kursk",
+            "Belgorod",
+            "Moscow",
+            "Volga"
+          ],
+          "Baltic": [
+            "Baltic",
+            "Bałtyk",
+            "Suwalki",
+            "Suwałki"
+          ]
+        },
+        "broad_context": {
+          "regional_link_to_check": [
+            "Russia",
+            "Russian",
+            "Rosja",
+            "NATO",
+            "Europe",
+            "European",
+            "EU"
+          ]
+        },
+        "outside_locations": {
+          "outside_europe": [
+            "Iran",
+            "Yemen",
+            "Houthi",
+            "Houthis",
+            "Israel",
+            "Gaza",
+            "Syria",
+            "Alaska",
+            "Alaskan",
+            "Amur",
+            "Siberia",
+            "Vladivostok",
+            "Pacific",
+            "Taiwan",
+            "China"
+          ]
+        },
+        "topics": {
+          "military": [
+            "military",
+            "army",
+            "troops",
+            "fighter",
+            "fighters",
+            "aircraft",
+            "drone",
+            "drones",
+            "missile",
+            "missiles",
+            "bomber",
+            "defense",
+            "defence",
+            "airspace",
+            "navy",
+            "naval",
+            "exercise",
+            "exercises",
+            "wojsko"
+          ],
+          "hybrid": [
+            "sabotage",
+            "arson",
+            "cyberattack",
+            "cyber",
+            "GPS",
+            "GNSS",
+            "jamming",
+            "jammer",
+            "disinformation",
+            "espionage",
+            "spy",
+            "intelligence",
+            "border",
+            "migrant",
+            "pipeline",
+            "cable",
+            "firefighters"
+          ],
+          "strategic": [
+            "NATO",
+            "sanctions",
+            "elections",
+            "election",
+            "mobilisation",
+            "mobilization",
+            "logistics",
+            "ammunition",
+            "arms",
+            "weapons",
+            "summit",
+            "treaty"
+          ]
+        }
+      },
+      "notes": "Odczyt publicznych wpisów przez Codexa według skills/x-research; skrypt importuje zamrożoną paczkę, nie pobiera X. Zakres: Europa Wschodnia, flanka NATO i Niemcy. Niepełna historia; odrębny przegląd geografii, źródeł pierwotnych, tłumaczenia i tożsamości zdarzeń. Brak automatycznej atrybucji i punktów RTB."
+    },
+    {
+      "id": "lv_mod",
+      "publisher": "Ministerstwo Obrony Łotwy",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "curated_documents",
+      "url": "https://www.mod.gov.lv/en/news/allied-fighter-jets-strengthen-protection-latvias-airspace-during-elections",
+      "allowed_hosts": [
+        "www.mod.gov.lv"
+      ],
+      "path_prefix": "/en/news/",
+      "max_pages": 1,
+      "max_items": 6,
+      "max_requests": 12,
+      "fetch_articles": true,
+      "document_parser": "lv_mod",
+      "document_urls": [
+        "https://www.mod.gov.lv/en/news/allied-fighter-jets-strengthen-protection-latvias-airspace-during-elections",
+        "https://www.mod.gov.lv/en/news/drone-shot-down-balvi-municipality-was-ukrainian-unmanned-aerial-vehicle",
+        "https://www.mod.gov.lv/en/news/foreign-drone-shot-down-allied-fighter-jets-latvian-airspace"
+      ],
+      "notes": "Wybrane komunikaty pierwotne do wyjaśnienia wzmianki OSW o Łotwie i retrospektywy z X. Kontrola zmian treści wskazanych dokumentów; nie jest to pełny strumień aktualności ani potwierdzenie horyzontu zdarzeń."
+    },
+    {
+      "id": "lv_vdd",
+      "publisher": "Państwowa Służba Bezpieczeństwa Łotwy (VDD)",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "curated_documents",
+      "url": "https://vdd.gov.lv/en/news/press-releases/vdd-implements-enhanced-measures-to-ensure-free-and-fair-saeima-elections",
+      "allowed_hosts": [
+        "vdd.gov.lv"
+      ],
+      "path_prefix": "/en/news/press-releases/",
+      "max_pages": 1,
+      "max_items": 6,
+      "max_requests": 12,
+      "fetch_articles": true,
+      "document_parser": "lv_vdd",
+      "document_urls": [
+        "https://vdd.gov.lv/en/news/press-releases/vdd-implements-enhanced-measures-to-ensure-free-and-fair-saeima-elections",
+        "https://vdd.gov.lv/en/news/press-releases/vdd-initiates-criminal-case-for-threats-by-a-pro-kremlin-group-to-commit-acts-of-terrorism-and-detains-one-person",
+        "https://vdd.gov.lv/en/news/press-releases/vdd-detains-three-latvian-citizens-on-suspicion-of-arson-in-estonia"
+      ],
+      "notes": "Wybrane komunikaty pierwotne do wyjaśnienia wzmianki OSW o Łotwie i retrospektywy z X. Kontrola zmian treści wskazanych dokumentów; nie jest to pełny strumień aktualności ani potwierdzenie horyzontu zdarzeń."
     }
   ]
 }

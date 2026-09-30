@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 from datetime import timedelta
 from pathlib import Path
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import parse_qs, urljoin, urlsplit
 
 from bs4 import BeautifulSoup
 
@@ -97,6 +97,61 @@ def full_article(item, source, fetcher):
             "content_provenance": {"responses": provenance, "extraction": extraction}}
 
 
+def archive_page(body, url, source):
+    """The publisher's dated, descending listing, not dates inferred from URLs."""
+    soup = BeautifulSoup(body, "html.parser")
+    rows = soup.select(".view-content .views-row")
+    if not rows:
+        raise ValueError("OSW archive listing missing")
+    entries = []
+    for row in rows:
+        link, stamp = row.select_one("h3 a[href]"), row.select_one("time[datetime]")
+        if not link or not stamp:
+            raise ValueError("OSW archive entry without title or timestamp")
+        published = parse_published(stamp["datetime"])
+        if not published or instant(published) > instant(now()) + timedelta(minutes=5):
+            raise ValueError("OSW archive invalid or future publication date")
+        entries.append({"url": allowed_url(urljoin(url, link["href"]), source),
+                        "title": clean_text(link.get_text(" ", strip=True)),
+                        "published_at": published, "text": "", "text_kind": "listing_summary"})
+    dates = [instant(row["published_at"]) for row in entries]
+    if dates != sorted(dates, reverse=True):
+        raise ValueError("OSW archive publication order changed")
+    next_link = soup.select_one('li.pager__item--next a[rel~="next"][href]')
+    next_url = allowed_url(urljoin(url, next_link["href"]), source) if next_link else None
+    if next_url:
+        current, following = urlsplit(url), urlsplit(next_url)
+        expected = int(parse_qs(current.query).get("page", ["0"])[0]) + 1
+        if following.path != urlsplit(source["archive_url"]).path or parse_qs(following.query) != {"page": [str(expected)]}:
+            raise ValueError("OSW archive pagination is not sequential")
+    return entries, next_url
+
+
+def collect_archive(source, window_start, fetcher, outcome):
+    entries, url, previous_oldest = [], source["archive_url"], None
+    outcome["archive_pages"] = 0
+    # RSS alone is not a proof of a complete archive (or of event history).
+    outcome["window_complete"] = False
+    for _ in range(source["max_pages"]):
+        body, _, final, raw_ref = fetcher.get(url)
+        rows, next_url = archive_page(body, final, source)
+        newest, oldest = instant(rows[0]["published_at"]), instant(rows[-1]["published_at"])
+        if previous_oldest and newest > previous_oldest:
+            raise ValueError("OSW archive changed while paginating; repeat in next cycle")
+        previous_oldest = oldest
+        outcome["archive_pages"] += 1
+        entries.extend({**row, "discovery_raw_ref": raw_ref, "raw_ref": raw_ref} for row in rows)
+        if oldest < window_start:
+            outcome["window_complete"] = True
+            outcome["archive_oldest_publication"] = rows[-1]["published_at"]
+            return entries
+        if not next_url:
+            break
+        url = next_url
+    outcome["errors"].append("OSW archive did not reach requested publication window within page limit")
+    return entries
+
+
 def collect_osw(source, window_start, fetcher, backlog=(), known_full_urls=()):
     outcome = {"source_id": source["id"], "publisher": source["publisher"], "required": source["required"],
                "status": "error", "checked_at": now(), "items": [], "errors": [], "window_complete": False,
@@ -126,6 +181,16 @@ def collect_osw(source, window_start, fetcher, backlog=(), known_full_urls=()):
                             "text": row.get("summary", ""), "text_kind": "feed_summary"})
     except Exception as exc:
         outcome["errors"].append(f"OSW feed unavailable ({type(exc).__name__}): {str(exc)[:200]}")
+    if source.get("archive_url"):
+        outcome["scope"] = "publisher_archive_full_articles_and_known_unresolved"
+        try:
+            for item in collect_archive(source, window_start, fetcher, outcome):
+                if item["url"] not in seen:
+                    entries.append(item)
+                    seen.add(item["url"])
+        except Exception as exc:
+            outcome["window_complete"] = False
+            outcome["errors"].append(f"OSW archive unavailable ({type(exc).__name__}): {str(exc)[:200]}")
     missing = [m for m in backlog if m["url"] not in seen]
     limit = source["max_backfill_items"]
     if len(missing) > limit:
@@ -151,7 +216,7 @@ def collect_osw(source, window_start, fetcher, backlog=(), known_full_urls=()):
             # Do not observe a teaser as the latest version of a previously full article.
             outcome["errors"].append(f"OSW full text unavailable ({type(exc).__name__}): {item['url']}; {str(exc)[:160]}")
             # Keep a new URL in the review queue even if it disappears from the next feed.
-            if item["url"] not in known_full_urls and item.get("text_kind") == "feed_summary":
+            if item["url"] not in known_full_urls and item.get("text_kind") in ("feed_summary", "listing_summary"):
                 outcome["items"].append(item)
     outcome["raw_refs"] = list(dict.fromkeys(fetcher.raw_refs))
     outcome["checked_at"] = now()

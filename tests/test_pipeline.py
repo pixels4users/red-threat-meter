@@ -16,9 +16,10 @@ def test_end_to_end_rerun_replay_and_geojson(tmp_path, fixture_file):
     folder=tmp_path/'demo'
     first=run(folder,fixture=fixture_file)
     second=run(folder,fixture=fixture_file)
-    assert first['new_materials']==4
+    expected=sum(len(s['items']) for s in read_json(fixture_file)['source_results'])
+    assert first['new_materials']==expected
     assert second['new_materials']==0
-    assert second['counts']['materials']==4
+    assert second['counts']['materials']==expected
     assert first['rtb'] is None
     assert replay(folder,second['run_id'])['identical']
     snapshot=read_json(folder/read_json(folder/'latest.json')['snapshot'])

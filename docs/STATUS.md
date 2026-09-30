@@ -1,10 +1,66 @@
 # Stan realizacji — 30.09.2026
 
+## Uzupełnienie OSW, konta X i dokumenty łotewskie — 30.09.2026, 08:52
+
+`sources-pilot-5` obejmuje ograniczone archiwum OSW, odczyty kont
+OSINT Defender / OSINT Technical oraz sześć wybranych dokumentów MON Łotwy
+i VDD. [Instrukcja X](x-sources.md) wykorzystuje dostarczony skill
+`x-research`; skill nie zapewnia narzędzia ani uprawnień do X. Odczyt wykonuje
+Codex w przeglądarce przed `prepare`, bez płatnego API. Import zachowuje
+oryginały, pochodzenie, ograniczenie zasięgu i filtr Europy Wschodniej/Niemiec.
+
+Rzeczywisty odczyt pokazał po pięć wpisów obu kont. Trzy regionalne wpisy
+OSINT Technical odczytano w całości i uwzględniono po polsku w raporcie;
+pozostałe siedem było poza zakresem. Nie poświadczamy pełnej historii kont.
+Źródła X są opcjonalne, stale oznaczone jako niepełne. Ponowne czytanie pliku
+nie odświeża czasu dostępu. Zmiana tekstu lub cytowanego pochodzenia wymaga
+nowej oceny, a kopie komunikatu nie zwiększają liczby niezależnych dowodów.
+
+OSW zwróciło 20 pełnych publikacji; dwie strony archiwum przekroczyły granicę
+216 godzin. Usunięto brak pokrycia listy publikacji, nie poświadczono przez to
+historii wszystkich zdarzeń. Łotewskie źródła odświeżają wyłącznie wskazane
+URL-e — nie są pełnymi strumieniami wiadomości. PAŻP zwróciła 541 wierszy
+planu, a RSO 43 komunikaty; wiersz planu nie oznacza incydentu ani aktywacji.
+
+Cykl `2026-09-30T063135Z-45abcfda` obejmował 24 materiały do oceny:
+22 rozstrzygnięto, dwa wstrzymano. Powstało dziewięć nowych obserwacji i trzy
+rewizje wcześniejszych zdarzeń. Wpis X o Milrem i komunikat VDD połączono
+w jeden sierpniowy epizod, bez potwierdzania nowej atrybucji Rosji. Dwa
+komunikaty o dronie w Balvi dotyczą jednego zdarzenia z 14 sierpnia; późniejsza
+identyfikacja obiektu jako ukraińskiego nie ustala operatora ani zamiaru.
+
+Kontrola przeglądarki ujawniła przesunięcie dziennej daty publikacji po
+konwersji łotewskiej północy. Poprawiono parser: zapisuje dzień w
+`source_record.published_on`, a bez podanej godziny zachowuje `published_at=null`.
+Nowy cykl `2026-09-30T064935Z-4e7846c9` ponownie pobrał dokumenty, zachował
+identyczne treści i dopisał ich oceny, nie nadpisując historii. Aktualizacja
+PAŻP zmieniła kolejność wierszy i znacznik aktualizacji, nie ich treść ani
+liczbę incydentów. W dashboardzie wpis bez znacznika czasu pozostaje dostępny
+w dzienniku; nie otrzymuje wymyślonej godziny na osi czasu.
+
+**RTB pozostaje niewyliczony:** nierozstrzygnięte są ogólne wzmianki OSW o
+łotewskich incydentach i VDD o pojedynczych próbach dezinformacji. Nadal brak
+podstaw do poświadczenia pełnej historii zdarzeń/rewizji w horyzoncie 216 h.
+Nie wygenerowano zapewnienia o bezpieczeństwie ani pozornego wyniku 10/100.
+
+Wydanie z **30.09.2026, 08:52 czasu Warszawy** zapisano w Supabase. Eksport,
+odczyt chmury i lokalne API są identyczne; ponowienie nie dodało duplikatu.
+Historia zawiera siedem rzeczywistych wydań. Przeglądarka automatycznie
+wyświetliła nową datę; filtr OSINT Technical pokazuje trzy polskie wpisy.
+Dowód: `data/analysis/cycles/2026-09-30T064935Z-4e7846c9/verification.json`.
+
+Weryfikacja: **293 testy Python** (test HTTP wymagał dostępu do lokalnego portu
+po blokadzie sandboxa); odtworzenie z osobnej kopii 125 plików, wraz z parserem
+RSS, dało identyczny wynik przy zablokowanej sieci. Dwa nowe wydania zachowują
+własne kopie kodu. Dane robocze i klucze pozostają poza Git. Frontendu nie
+zmieniano; wcześniejsze sześć testów JS/PostgreSQL i build sprawdzono w punkcie
+kontrolnym. Harmonogram, domena i hosting nowej aplikacji pozostają osobne.
+
 ## Punkt kontrolny Git — 30.09.2026
 
-Na prośbę użytkownika zapisujemy dotychczasowy silnik v0.3, dashboard,
+Na prośbę użytkownika zapisano i wypchnięto dotychczasowy silnik v0.3, dashboard,
 publikowanie do Supabase i dostarczone materiały na gałęzi
-`codex/dashboard-publication`. Kontrola przed commitem: 267 testów Python,
+`codex/dashboard-publication` — commit `d840c66`. Kontrola przed commitem: 267 testów Python,
 6 testów JavaScript/PostgreSQL i build zakończone poprawnie. Dane robocze,
 lokalne klucze i artefakty kompilacji pozostają poza Git. Kolejny etap obejmuje
 uzupełnienie danych i dodanie wskazanych kont OSINT na X.

@@ -1,6 +1,33 @@
 # Źródła bieżące i materiały referencyjne — v0.3
 
-Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (sources-pilot-4 od 29.09; pełne teksty OSW, PAŻP/AUP i RSO/ogólne). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
+### Archiwum OSW i źródła do przeglądu — 30.09.2026
+
+`sources-pilot-5` rozszerza OSW o maksymalnie trzy kolejne strony
+[archiwum publikacji](https://www.osw.waw.pl/pl/publikacje), czytane aż do
+przekroczenia granicy 216 godzin. RSS i archiwum są deduplikowane po URL.
+Obowiązują wcześniejsze limity: 30 publikacji i 50 żądań łącznie. Brak daty,
+zaburzona kolejność, przeskok paginacji lub wyczerpanie limitu nie dają
+potwierdzenia pełnego okna. Daty pochodzą z jawnych znaczników wydawcy.
+Kompletność listy publikacji nie jest poświadczeniem historii zdarzeń;
+przegląd tej historii pozostaje osobnym krokiem v0.3.
+
+Opcjonalne konta OSINT Defender i OSINT Technical mają [import odczytów
+przeglądarki](x-sources.md) i filtr Europy Wschodniej / Niemiec. Skill
+`x-research` prowadzi pracę Codexa, a nie automatyczny skrypt dostępu do X.
+Zapisujemy oryginały, ograniczenie zasięgu i decyzję filtra; nie naliczamy
+punktów z samych postów ani popularności konta.
+
+Dodano również dwa ograniczone zestawy dokumentów pierwotnych: łotewski MON
+(`lv_mod`, trzy komunikaty o obronie powietrznej) i VDD (`lv_vdd`, trzy
+komunikaty o wyborach, groźbach i śledztwie dotyczącym podpalenia). Adapter
+odświeża wyłącznie wskazane URL, zachowuje pełny tekst i datę z dokładnością
+do dnia (`source_record.published_on`). Bez godziny `published_at=null`;
+nie dopisujemy północy ani nie przesuwamy daty przez konwersję stref.
+Nie odkrywa nowych wiadomości i nie poświadcza
+kompletności historii wydawcy. Listy URL są jawne w konfiguracji; wspólne
+pochodzenie komunikatów wymaga deduplikacji w przeglądzie.
+
+Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (obecnie sources-pilot-5; od 30.09 także archiwum OSW, odczyty X i dokumenty łotewskie). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
 
 | Źródło | Dostęp i zakres | Rola | Wynik pilotażu |
 |---|---|---|---|
@@ -25,7 +52,7 @@ które wypadły z kanału. Limit łączny: 30 publikacji, 50 żądań (wraz z po
 i przekierowaniami), 3 MB odpowiedzi, PDF do 250 stron i 1 MB wydobytego tekstu.
 Przekroczenie limitu, brak selektora, ostrzeżenia ekstraktora albo niedostępny
 artykuł oznaczają niepełny wynik. Starsza pozycja z kolejki nie dowodzi pokrycia
-całego okna RSS. Nie wykonywane są dodatkowe przeszukiwania archiwum wydawcy.
+całego okna RSS. W tej wersji z 29.09 nie przeszukiwano dodatkowo archiwum wydawcy; rozszerzenie z 30.09 opisano powyżej.
 
 Host pozostaje `www.osw.waw.pl`; poza `/pl/` dopuszczono wyłącznie ścieżki
 `/transformacja-bundeswehry/` i `/sites/default/files/`. Archiwum przechowuje
@@ -66,7 +93,7 @@ Surowa odpowiedź trafia na lokalny dysk przed ekstrakcją. Błąd pojedynczej d
 - Pełne teksty OSW są pobierane od 29.09. Niedostępne artykuły, nowe formaty stron, skany i przekroczone limity nadal wymagają uzupełnienia; sam tytuł nie rozstrzyga oceny.
 - RCB i MON nie zapewniają kompletnej, niezależnej obserwacji wszystkich incydentów w CEE. Różne instytucje mogą powtarzać ten sam pierwotny komunikat.
 - Są dobowe pomiary GNSS i krótkie próbki lotnicze, lecz brak skalibrowanego odniesienia i automatycznego detektora. Nie ma ciągłej obserwacji lotniczej, danych granicznych i systematycznych danych o cyberatakach. Kategorie wymagające poziomu odniesienia nie mogą być wypełniane domysłem.
-- Nie podłączono X, FIRMS, płatnych map ani modeli predykcyjnych. Każda integracja wymaga sprawdzenia dostępu, zakresu, kosztów i praw do ponownego wykorzystania.
+- Konta X mają ograniczony import odczytów Codexa; nie ma pełnej historii ani autonomicznego kolektora API. FIRMS, płatne mapy i modele predykcyjne pozostają niepodłączone. Każde rozszerzenie wymaga sprawdzenia dostępu, zakresu, kosztów i praw do ponownego wykorzystania.
 - Lista z limitem stron pozwala na ograniczony powrót do starszych materiałów. Nie odtwarza automatycznie luk po wielotygodniowej przerwie ani wycofanych publikacji.
 
 Opisowe porównanie GNSS jest już wdrożone; kalibracja normalnego poziomu i detektora pozostaje dalszą pracą. [Ocena dostępu lotniczego](aviation-access.md) poprzedziła [pilotaż API](aviation-runbook.md) i [ograniczony audyt historii](aviation-history.md). Kolejne badanie danych obejmie różne pory i dni, zmienność źródła oraz klasyfikację z datami obowiązywania. Równolegle pozostaje dodanie źródeł weryfikujących. Doprecyzowany projekt: `docs/early-warning-design.md`. Zmiana aktywnego rejestru musi być widoczna w historii i uwzględniona przy porównywaniu odczytów.

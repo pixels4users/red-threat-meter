@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "x-browser-v1"
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "account": {
+      "enum": [
+        "sentdefender",
+        "osinttechnical"
+      ]
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "access_status": {
+      "enum": [
+        "partial",
+        "unavailable"
+      ]
+    },
+    "coverage_note": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 1500
+    },
+    "page_text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 250000
+    },
+    "posts": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30000
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "published_label": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "post_kind": {
+            "enum": [
+              "post",
+              "repost",
+              "quote"
+            ]
+          },
+          "text_complete": {
+            "type": "boolean"
+          },
+          "referenced_urls": {
+            "type": "array",
+            "maxItems": 30,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^https?://"
+            }
+          }
+        },
+        "required": [
+          "url",
+          "text",
+          "published_at",
+          "published_label",
+          "post_kind",
+          "text_complete",
+          "referenced_urls"
+        ]
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "synthetic",
+    "account",
+    "captured_at",
+    "access_status",
+    "coverage_note",
+    "page_text",
+    "posts"
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "version": "source-candidates-9",
+  "version": "source-candidates-10",
   "checked_on": "2026-09-25",
   "policy": "Rejestr integracji i kandydatów. Działający pilotaż GNSS/belzhd jest w config/early-warning.json, pilotaż jakości ADSB.lol w config/aviation.json, audyt historii w config/aviation-history.json, kolektory RTB w config/sources.json. Pozostałe wpisy nie uruchamiają adapterów. Daty wcześniejszych ocen dostępu zachowano w opisach. Kalibracja i niezależna weryfikacja są odrębną pracą. Rozszerzenie z 25.09.2026: kandydaci pierwotni PAŻP, kanały UA, RSO, media i siły zbrojne LT/LV/EE oraz semantyka istniejącego RCB zostały zaakceptowane do integracji 25.09.2026; nie uruchamiają nowych kolektorów. Strażnik jest wyłącznie odniesieniem architektonicznym. Grupa wydawcy nie zastępuje ustalenia pochodzenia każdego dowodu. proposal_status=accepted_for_integration i accepted_on oznaczają akceptację zakresu, nie gotowość adaptera; pole status nadal opisuje dostęp i wdrożenie. Akceptacja nie zmienia dat checked_on ani wyników oceny dostępu. Aktualizacja 29.09.2026: pansa_airspace i rso_public mają działające adaptery ograniczonego zakresu; szczegóły w ich statusach.",
   "candidates": [
@@ -471,6 +471,62 @@
       "checked_on": "2026-09-25",
       "proposal_status": "accepted_for_integration",
       "accepted_on": "2026-09-25"
+    },
+    {
+      "id": "x_sentdefender",
+      "url": "https://x.com/sentdefender",
+      "publisher": "OSINT Defender",
+      "role": "secondary_incident_discovery",
+      "priority": 2,
+      "status": "partial_browser_import_integrated",
+      "purpose": "Wpisy dotyczące Europy Wschodniej, wschodniej flanki NATO i Niemiec. Wskazówki do analizy, nie niezależne potwierdzenia. Oryginalne posty i odnośniki pierwotne wymagają rozdzielenia.",
+      "dependency_group": "publisher:x:sentdefender",
+      "access_note": "30.09.2026: tożsamość i pięć widocznych wpisów profilu sprawdzono w przeglądarce; pełna historia wymaga dodatkowego dostępu. Import zamrożonych odczytów w config/sources.json, bez API X i bez obietnicy kompletności. Skill x-research jest instrukcją pracy agenta.",
+      "checked_on": "2026-09-30",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-30",
+      "runtime_config": "config/sources.json"
+    },
+    {
+      "id": "x_osinttechnical",
+      "url": "https://x.com/osinttechnical",
+      "publisher": "OSINT Technical",
+      "role": "secondary_incident_discovery",
+      "priority": 2,
+      "status": "partial_browser_import_integrated",
+      "purpose": "Wpisy dotyczące Europy Wschodniej, wschodniej flanki NATO i Niemiec. Wskazówki do analizy, nie niezależne potwierdzenia. Oryginalne posty i odnośniki pierwotne wymagają rozdzielenia.",
+      "dependency_group": "publisher:x:osinttechnical",
+      "access_note": "30.09.2026: tożsamość i pięć widocznych wpisów profilu sprawdzono w przeglądarce; pełna historia wymaga dodatkowego dostępu. Import zamrożonych odczytów w config/sources.json, bez API X i bez obietnicy kompletności. Skill x-research jest instrukcją pracy agenta.",
+      "checked_on": "2026-09-30",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-30",
+      "runtime_config": "config/sources.json"
+    },
+    {
+      "id": "lv_mod",
+      "url": "https://www.mod.gov.lv/en",
+      "publisher": "Ministerstwo Obrony Łotwy",
+      "country": "LV",
+      "role": "selected_primary_documents",
+      "priority": 2,
+      "status": "selected_documents_integrated_not_news_feed",
+      "purpose": "Wybrane komunikaty do wyjaśnienia wzmianki OSW i retrospektywy z X; zachowanie dat zdarzeń i kolejnych ustaleń.",
+      "dependency_group": "authority:lv_mod",
+      "checked_on": "2026-09-30",
+      "runtime_config": "config/sources.json"
+    },
+    {
+      "id": "lv_vdd",
+      "url": "https://vdd.gov.lv/en",
+      "publisher": "Państwowa Służba Bezpieczeństwa Łotwy (VDD)",
+      "country": "LV",
+      "role": "selected_primary_documents",
+      "priority": 2,
+      "status": "selected_documents_integrated_not_news_feed",
+      "purpose": "Wybrane komunikaty do wyjaśnienia wzmianki OSW i retrospektywy z X; zachowanie dat zdarzeń i kolejnych ustaleń.",
+      "dependency_group": "authority:lv_vdd",
+      "checked_on": "2026-09-30",
+      "runtime_config": "config/sources.json"
     }
   ],
   "design_status": "integration_registry_runtime_configs_are_separate"

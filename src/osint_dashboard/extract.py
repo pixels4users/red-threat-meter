@@ -23,8 +23,10 @@ def make_candidate(material: dict) -> dict:
         flags.append("possible_exercise_or_planned_activity")
     if re.search(r"odwoł|brak zagrożenia|zagrożenie ustało|aktualizac", text):
         flags.append("contains_update_or_cancellation")
-    if material["text_kind"] not in ("article_body", "pdf_text", "official_dataset"):
+    if material["text_kind"] not in ("article_body", "pdf_text", "official_dataset", "social_post"):
         flags.append("summary_only")
+    if material["text_kind"].startswith("social_post"):
+        flags.append("social_report_primary_origin_required")
     if material["published_at"] is None:
         flags.append("publication_date_unknown")
     return {"candidate_id": "cand_" + digest(material["material_id"])[:24],

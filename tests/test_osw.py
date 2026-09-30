@@ -23,7 +23,10 @@ START = datetime(2026, 9, 23, tzinfo=UTC)
 
 @pytest.fixture
 def osw_source(source_config):
-    return next(s for s in source_config["sources"] if s["id"] == "osw")
+    source = dict(next(s for s in source_config["sources"] if s["id"] == "osw"))
+    source.pop("archive_url", None)  # Retain legacy RSS/backlog regression tests.
+    source["max_pages"] = 1
+    return source
 
 
 class FakeFetcher:
@@ -187,3 +190,43 @@ def test_actual_pdf_extraction_and_corrupt_pdf():
     assert meta["text_only"] is True
     with pytest.raises(ValueError, match="not a PDF"):
         osw.pdf_text(b"<html>Service unavailable</html>")
+
+
+def archive_html(rows, next_page=None):
+    body = '<div class="view-content">' + ''.join(
+        f'<div class="views-row"><h3><a href="{url}">TEST SYNTHETYCZNY</a></h3>'
+        f'<time datetime="{date}">{date[:10]}</time></div>' for url, date in rows) + '</div>'
+    if next_page is not None:
+        body += f'<li class="pager__item--next"><a rel="next" href="?page={next_page}">Następna</a></li>'
+    return body.encode()
+
+
+def test_archive_extends_short_rss_and_fetches_each_article_once(osw_source, tmp_path):
+    archive = HOST + '/pl/publikacje'
+    source = {**osw_source, 'archive_url': archive, 'max_pages': 3}
+    recent = [('/pl/a', '2026-09-29T12:00:00Z')]
+    older = [('/pl/b', '2026-09-24T12:00:00Z'), ('/pl/c', '2026-09-22T12:00:00Z')]
+    f = FakeFetcher(recent, {archive: archive_html(recent, 1), archive+'?page=1': archive_html(older, 2)})
+    result = collect.collect_source(source, tmp_path, START, f)
+    assert result['status'] == 'ok' and result['window_complete']
+    assert result['archive_pages'] == 2 and len(result['items']) == 3
+    assert f.calls.count(HOST+'/pl/a') == 1
+    assert archive+'?page=2' not in f.calls
+
+
+@pytest.mark.parametrize('case', ['missing_date', 'order', 'skipped_page', 'unavailable', 'page_limit', 'item_limit'])
+def test_archive_cannot_claim_coverage_when_incomplete(case, osw_source, tmp_path):
+    archive = HOST + '/pl/publikacje'
+    rows = [('/pl/a', '2026-09-29T12:00:00Z'), ('/pl/b', '2026-09-22T12:00:00Z')]
+    source = {**osw_source, 'archive_url': archive, 'max_pages': 1}
+    page = archive_html(rows)
+    if case == 'missing_date': page = page.replace(b'datetime=', b'unknown=')
+    if case == 'order': page = archive_html(rows[::-1])
+    if case == 'skipped_page': page = archive_html(rows, 4)
+    if case == 'unavailable': page = TimeoutError('test')
+    if case == 'page_limit': page = archive_html(rows[:1], 1)
+    if case == 'item_limit': source['max_items'] = 1
+    # An old RSS entry must not mask a broken archive.
+    f = FakeFetcher([('/pl/old', '2026-09-20T12:00:00Z')], {archive: page})
+    result = collect.collect_source(source, tmp_path, START, f)
+    assert not result['window_complete'] and result['errors'] and result['status'] == 'partial'

@@ -7,6 +7,13 @@ decyzje analityczne i pisze komentarz na podstawie zapisanych materiałów.
 
 ## Uruchomienie
 
+Od 30.09.2026 krok przed `prepare` obejmuje odczyt wskazanych kont X przez
+Codexa i import transkrypcji według [instrukcji X](x-sources.md). Dostarczony
+skill `x-research` pomaga w doborze i ocenie źródeł; nie zapewnia dostępu do
+API. Niepełna historia pozostaje niepełna także po poprawnym imporcie.
+OSW korzysta z RSS oraz paginowanego archiwum wydawcy. Dodatkowe wybrane
+dokumenty łotewskiego MON i VDD nie zastępują pełnego kolektora wiadomości.
+
 Zlecenie dla Codexa: „Wykonaj pełny dzienny cykl zgodnie z
 `agents/analysis-cycle.md`, opublikuj wynik do Supabase i sprawdź odczyt”.
 Ta sama instrukcja może być treścią zaplanowanego zadania. Sam skrypt powłoki

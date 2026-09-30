@@ -90,7 +90,7 @@ def commentary_for(data, cid):
 def test_codex_cycle_review_commentary_publish_and_replay(prepared, tmp_path):
     data, cid = prepared
     checked, audit, applied = reviewed(prepared)
-    assert applied["accepted"] == 4 and applied["held"] == 0
+    assert applied["accepted"] == len(audit["items"]) and applied["held"] == 0
     assert cycle.apply(data, cid, checked["proposal_sha256"], audit)["unchanged"]
     assert cycle.calculate(data, cid)["score"] == 15
     context, candidate, editorial = commentary_for(data, cid)

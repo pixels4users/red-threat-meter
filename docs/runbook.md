@@ -8,6 +8,12 @@ Ten dokument dotyczy procesu RTB. Działająca osobno warstwa GNSS/logistyki uż
 
 ## Zwykły przebieg
 
+Przy pełnym cyklu Codexa najpierw wykonaj [odczyt kont X](x-sources.md).
+Sam kolektor Python czyta ostatnie zapisane paczki i nie odświeża ich dat.
+Brak aktualnego odczytu pozostaje jawnym brakiem źródła opcjonalnego.
+OSW czyta teraz również ograniczone archiwum. Wybrane dokumenty Łotwy
+służą wyjaśnieniu konkretnych spraw; nie są pełnym monitoringiem Bałtyku.
+
 1. Uruchom `Zbierz dane.command` albo `.venv/bin/python scripts/collect_sources.py` w katalogu projektu.
 2. Przejrzyj wskazany plik `data/runs/<id>/review_queue.json` według `agents/evidence-reviewer.md`. Domyślne kategorie pochodzą ze słów kluczowych i nie są ustaleniami.
 3. Zapisz decyzje zgodne z `schemas/review.schema.json` w `data/reviews/`. Każde wykluczenie ma uzasadnienie. Każde zdarzenie ma cytaty z konkretnych zapisanych materiałów, status i osobną atrybucję.

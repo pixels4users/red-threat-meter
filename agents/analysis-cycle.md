@@ -21,6 +21,23 @@ użytkownika. Drugi przegląd tego samego agenta nie jest niezależnym źródłe
 
 ## 1. Przygotowanie materiałów
 
+Przed pobraniem przejrzyj wskazane w `config/sources.json` konta X zgodnie z
+`skills/x-research/SKILL.md` i `docs/x-sources.md`. Skill opisuje pracę agenta;
+nie jest kolektorem ani dostępem do API. W bieżącej integracji Codex odczytuje
+publiczne treści w przeglądarce, a `scripts/import_x_capture.py` zachowuje
+oryginały. Nie uruchamiaj płatnego API i nie obchodź logowania. Niepełny widok
+albo brak dostępu muszą trafić do paczki jako takie. Ten krok jest odrębny od
+`prepare`: sam Python nie steruje przeglądarką. Wykonuj go także w przyszłym
+zaplanowanym zadaniu Codexa, przed zamrożeniem pakietu.
+
+Zachowaj treść, URL, rzeczywistą datę odczytu, znacznik publikacji (lub null),
+pełność tekstu, cytowane URL i przedruki. Fragmentu z wyszukiwarki nie zapisuj
+jako pełnego wpisu. Oryginały pozostają niezmienione, opis w raporcie jest po
+polsku. Filtr geograficzny jest selekcją do przeglądu; nie dowodzi lokalizacji.
+Wpis o dawnym incydencie nie staje się nowym incydentem w dniu publikacji.
+Sprawdź także wybrane dokumenty pierwotne Łotwy: to materiały do wyjaśnienia
+konkretnych spraw, a nie kompletny monitoring tych wydawców.
+
 ```sh
 .venv/bin/python scripts/analysis_cycle.py prepare
 ```

@@ -158,7 +158,13 @@ def parse_article(body: bytes) -> str:
 
 
 def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher=None, *, backlog=(), known_full_urls=()) -> dict:
+    if source['adapter'] == 'x_browser_import':
+        from .x_sources import collect_captures
+        return collect_captures(source, data_dir)
     fetcher = fetcher or Fetcher(data_dir, source)
+    if source['adapter'] == 'curated_documents':
+        from .curated_sources import collect_documents
+        return collect_documents(source, fetcher)
     if source['adapter'] in ('pansa', 'rso'):
         from .official_sources import collect_official
         return collect_official(source, fetcher)

@@ -16,8 +16,9 @@ def public_material(material: dict) -> dict:
     fields = ("material_id", "document_id", "content_hash", "source_id", "publisher", "source_kind",
               "title", "text", "text_kind", "url", "published_at", "fetched_at")
     result = {key: material[key] for key in fields}
-    if "content_provenance" in material:
-        result["content_provenance"] = material["content_provenance"]
+    for key in ("content_provenance", "source_record", "triage"):
+        if key in material:
+            result[key] = material[key]
     return result
 
 

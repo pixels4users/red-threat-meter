@@ -39,7 +39,10 @@ class Store:
 
     def add_material(self, source: dict, item: dict, raw_ref: str, fetched_at: str) -> tuple[dict, bool]:
         document_id = "doc_" + digest([source["id"], item["url"]])[:24]
-        content_hash = digest({k: item.get(k) for k in ("url", "title", "published_at", "text", "text_kind")})
+        identity = {k: item.get(k) for k in ("url", "title", "published_at", "text", "text_kind")}
+        if "source_record" in item:
+            identity["source_record"] = item["source_record"]
+        content_hash = digest(identity)
         material_id = "mat_" + digest([document_id, content_hash])[:24]
         existing = self.db.execute("SELECT payload FROM materials WHERE material_id=?", (material_id,)).fetchone()
         if existing:
