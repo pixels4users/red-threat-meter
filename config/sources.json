@@ -1,5 +1,5 @@
 {
-  "version": "sources-pilot-5",
+  "version": "sources-pilot-6",
   "description": "Aktywne kolektory bieżących publikacji o bezpieczeństwie Polski i wschodniej flanki NATO. Kontekst doktrynalny jest w doctrine-sources.json, kandydaci do rozbudowy w source-candidates.json.",
   "policy": "Jedyną listą automatycznie pobieranych źródeł są poniższe wpisy enabled=true. Strony referencyjne i doktryna nie stają się incydentami. Pierwotne pochodzenie należy ustalić dla konkretnego twierdzenia, nie tylko wydawcy.",
   "sources": [
@@ -138,7 +138,7 @@
       "kind": "secondary",
       "enabled": true,
       "required": false,
-      "adapter": "x_browser_import",
+      "adapter": "x_api_import",
       "url": "https://x.com/sentdefender",
       "allowed_hosts": [
         "x.com"
@@ -341,7 +341,7 @@
           ]
         }
       },
-      "notes": "Odczyt publicznych wpisów przez Codexa według skills/x-research; skrypt importuje zamrożoną paczkę, nie pobiera X. Zakres: Europa Wschodnia, flanka NATO i Niemcy. Niepełna historia; odrębny przegląd geografii, źródeł pierwotnych, tłumaczenia i tożsamości zdarzeń. Brak automatycznej atrybucji i punktów RTB."
+      "notes": "Pobieranie API X w limitach config/x-api.json, import zamrożonych paczek bez sieci. Zachowany awaryjny import odczytu przeglądarkowego. Europa Wschodnia i Niemcy; niepełny horyzont, osobny przegląd źródeł pierwotnych, tłumaczenia i tożsamości incydentów. Brak automatycznych punktów RTB."
     },
     {
       "id": "x_osinttechnical",
@@ -349,7 +349,7 @@
       "kind": "secondary",
       "enabled": true,
       "required": false,
-      "adapter": "x_browser_import",
+      "adapter": "x_api_import",
       "url": "https://x.com/osinttechnical",
       "allowed_hosts": [
         "x.com"
@@ -552,7 +552,7 @@
           ]
         }
       },
-      "notes": "Odczyt publicznych wpisów przez Codexa według skills/x-research; skrypt importuje zamrożoną paczkę, nie pobiera X. Zakres: Europa Wschodnia, flanka NATO i Niemcy. Niepełna historia; odrębny przegląd geografii, źródeł pierwotnych, tłumaczenia i tożsamości zdarzeń. Brak automatycznej atrybucji i punktów RTB."
+      "notes": "Pobieranie API X w limitach config/x-api.json, import zamrożonych paczek bez sieci. Zachowany awaryjny import odczytu przeglądarkowego. Europa Wschodnia i Niemcy; niepełny horyzont, osobny przegląd źródeł pierwotnych, tłumaczenia i tożsamości incydentów. Brak automatycznych punktów RTB."
     },
     {
       "id": "lv_mod",

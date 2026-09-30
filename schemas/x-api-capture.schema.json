@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "x-api-v1"
+    },
+    "synthetic": {
+      "type": "boolean"
+    },
+    "account": {
+      "enum": [
+        "sentdefender",
+        "osinttechnical"
+      ]
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "access_status": {
+      "enum": [
+        "partial",
+        "unavailable"
+      ]
+    },
+    "coverage_note": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 1500
+    },
+    "posts": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "url": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 30000
+          },
+          "published_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "published_label": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "post_kind": {
+            "enum": [
+              "post",
+              "repost",
+              "quote"
+            ]
+          },
+          "text_complete": {
+            "type": "boolean"
+          },
+          "referenced_urls": {
+            "type": "array",
+            "maxItems": 30,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^https?://"
+            }
+          },
+          "edit_history_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 10,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[0-9]{1,19}$"
+            }
+          }
+        },
+        "required": [
+          "url",
+          "text",
+          "published_at",
+          "published_label",
+          "post_kind",
+          "text_complete",
+          "referenced_urls",
+          "edit_history_ids"
+        ]
+      }
+    },
+    "user_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{1,19}$"
+    },
+    "response": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "raw_ref": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "pattern": "^raw/x-api/[a-f0-9]{64}\\.json$"
+    },
+    "request_params": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "string",
+          "integer"
+        ]
+      }
+    },
+    "pagination_pending": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "schema_version",
+    "synthetic",
+    "account",
+    "captured_at",
+    "access_status",
+    "coverage_note",
+    "posts",
+    "user_id",
+    "response",
+    "raw_ref",
+    "request_params",
+    "pagination_pending"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "access_status": {
+            "const": "partial"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "response": {
+            "type": "object"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "raw_ref": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ]
+}

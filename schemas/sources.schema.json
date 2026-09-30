@@ -81,7 +81,8 @@
             "pansa",
             "rso",
             "x_browser_import",
-            "curated_documents"
+            "curated_documents",
+            "x_api_import"
           ]
         },
         "url": {
@@ -271,7 +272,10 @@
           "if": {
             "properties": {
               "adapter": {
-                "const": "x_browser_import"
+                "enum": [
+                  "x_browser_import",
+                  "x_api_import"
+                ]
               }
             }
           },

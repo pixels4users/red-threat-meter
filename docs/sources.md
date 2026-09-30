@@ -11,8 +11,8 @@ potwierdzenia pełnego okna. Daty pochodzą z jawnych znaczników wydawcy.
 Kompletność listy publikacji nie jest poświadczeniem historii zdarzeń;
 przegląd tej historii pozostaje osobnym krokiem v0.3.
 
-Opcjonalne konta OSINT Defender i OSINT Technical mają [import odczytów
-przeglądarki](x-sources.md) i filtr Europy Wschodniej / Niemiec. Skill
+Opcjonalne konta OSINT Defender i OSINT Technical mają [ograniczony kolektor
+API i import odczytów przeglądarki](x-sources.md) oraz filtr Europy Wschodniej / Niemiec. Skill
 `x-research` prowadzi pracę Codexa, a nie automatyczny skrypt dostępu do X.
 Zapisujemy oryginały, ograniczenie zasięgu i decyzję filtra; nie naliczamy
 punktów z samych postów ani popularności konta.
@@ -27,7 +27,7 @@ Nie odkrywa nowych wiadomości i nie poświadcza
 kompletności historii wydawcy. Listy URL są jawne w konfiguracji; wspólne
 pochodzenie komunikatów wymaga deduplikacji w przeglądzie.
 
-Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (obecnie sources-pilot-5; od 30.09 także archiwum OSW, odczyty X i dokumenty łotewskie). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
+Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (obecnie sources-pilot-6; od 30.09 także archiwum OSW, odczyty X i dokumenty łotewskie). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
 
 | Źródło | Dostęp i zakres | Rola | Wynik pilotażu |
 |---|---|---|---|
@@ -80,7 +80,9 @@ Z tej samej grupy pochodzenia zebrano trzy półgodzinne pliki historii mapy, ł
 
 ## Zasady dostępu
 
-Kolektor publikacji RTB wykonuje publiczne żądania GET bez logowania, omijania zabezpieczeń i płatnych API. Ma limit 15 sekund na żądanie, jedno ponowienie przy błędach sieci lub 5xx, odstęp między żądaniami i limit odpowiedzi 3 MB. HTTP 429 lub odpowiedź z `Retry-After` wstrzymuje źródło bez ponowienia; termin blokady jest zachowany w `data/fetch-state/` między cyklami (minimum 5 minut, dłużej według nagłówka). Dopuszczalne hosty, ścieżki, liczba stron i pozycji są zapisane w konfiguracji. Przekierowania poza ten zakres są odrzucane.
+Kolektor publikacji WWW/RSS wykonuje publiczne żądania GET bez logowania i omijania zabezpieczeń. Ma limit 15 sekund na żądanie, jedno ponowienie przy błędach sieci lub 5xx, odstęp między żądaniami i limit odpowiedzi 3 MB. HTTP 429 lub odpowiedź z `Retry-After` wstrzymuje źródło bez ponowienia; termin blokady jest zachowany w `data/fetch-state/` między cyklami (minimum 5 minut, dłużej według nagłówka). Dopuszczalne hosty, ścieżki, liczba stron i pozycji są zapisane w konfiguracji. Przekierowania poza ten zakres są odrzucane.
+
+Osobny kolektor X korzysta z zaakceptowanego płatnego API, tokena aplikacji i limitów opisanych w [instrukcji X](x-sources.md).
 
 Bieżący kolektor ADSB.lol ma osobny transport **bez automatycznych ponowień**. Odstępy to co najmniej 2 sekundy między żądaniami oraz 60 sekund od końca cyklu. HTTP 3xx/4xx wstrzymuje pozostałe zapytania i utrwala blokadę kolejnego cyklu według `Retry-After`, nie krótszą niż 5 minut. Nie obchodzi przekierowań ani limitów API.
 
@@ -93,7 +95,7 @@ Surowa odpowiedź trafia na lokalny dysk przed ekstrakcją. Błąd pojedynczej d
 - Pełne teksty OSW są pobierane od 29.09. Niedostępne artykuły, nowe formaty stron, skany i przekroczone limity nadal wymagają uzupełnienia; sam tytuł nie rozstrzyga oceny.
 - RCB i MON nie zapewniają kompletnej, niezależnej obserwacji wszystkich incydentów w CEE. Różne instytucje mogą powtarzać ten sam pierwotny komunikat.
 - Są dobowe pomiary GNSS i krótkie próbki lotnicze, lecz brak skalibrowanego odniesienia i automatycznego detektora. Nie ma ciągłej obserwacji lotniczej, danych granicznych i systematycznych danych o cyberatakach. Kategorie wymagające poziomu odniesienia nie mogą być wypełniane domysłem.
-- Konta X mają ograniczony import odczytów Codexa; nie ma pełnej historii ani autonomicznego kolektora API. FIRMS, płatne mapy i modele predykcyjne pozostają niepodłączone. Każde rozszerzenie wymaga sprawdzenia dostępu, zakresu, kosztów i praw do ponownego wykorzystania.
+- Konta X mają ograniczony kolektor API uruchamiany osobno przed cyklem, z kontrolą kosztów; nie ma poświadczenia pełnej historii ani harmonogramu. FIRMS, płatne mapy i modele predykcyjne pozostają niepodłączone. Każde rozszerzenie wymaga sprawdzenia dostępu, zakresu, kosztów i praw do ponownego wykorzystania.
 - Lista z limitem stron pozwala na ograniczony powrót do starszych materiałów. Nie odtwarza automatycznie luk po wielotygodniowej przerwie ani wycofanych publikacji.
 
 Opisowe porównanie GNSS jest już wdrożone; kalibracja normalnego poziomu i detektora pozostaje dalszą pracą. [Ocena dostępu lotniczego](aviation-access.md) poprzedziła [pilotaż API](aviation-runbook.md) i [ograniczony audyt historii](aviation-history.md). Kolejne badanie danych obejmie różne pory i dni, zmienność źródła oraz klasyfikację z datami obowiązywania. Równolegle pozostaje dodanie źródeł weryfikujących. Doprecyzowany projekt: `docs/early-warning-design.md`. Zmiana aktywnego rejestru musi być widoczna w historii i uwzględniona przy porównywaniu odczytów.

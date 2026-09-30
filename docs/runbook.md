@@ -8,7 +8,10 @@ Ten dokument dotyczy procesu RTB. Działająca osobno warstwa GNSS/logistyki uż
 
 ## Zwykły przebieg
 
-Przy pełnym cyklu Codexa najpierw wykonaj [odczyt kont X](x-sources.md).
+Przy pełnym cyklu Codexa najpierw wykonaj [odczyt kont X](x-sources.md):
+`.venv/bin/python scripts/collect_x.py collect`. Pobranie API ma limity kosztów
+i częstości; `status` sprawdza lokalny licznik bez sieci. Nie resetuj limitów
+ani nie ponawiaj odczytu po błędzie.
 Sam kolektor Python czyta ostatnie zapisane paczki i nie odświeża ich dat.
 Brak aktualnego odczytu pozostaje jawnym brakiem źródła opcjonalnego.
 OSW czyta teraz również ograniczone archiwum. Wybrane dokumenty Łotwy
@@ -119,4 +122,4 @@ Opcja `--fixture PLIK.json` domyślnie zapisuje do `data/demo`. Plik musi deklar
 
 ## Co wymaga dalszej realizacji
 
-Pełne teksty dodatkowych źródeł, geokoder z oceną niepewności, kontrola nadrabiania długich przerw, automatyczny przegląd modelem i limit kosztów, harmonogram, alarmy, porównywalne odczyty historyczne oraz dashboard. Obecna instalacja nie zamawia płatnych usług ani nie wysyła powiadomień.
+Pełne teksty dodatkowych źródeł, geokoder z oceną niepewności, kontrola nadrabiania długich przerw, automatyczny przegląd modelem i limit kosztów, harmonogram, alarmy, porównywalne odczyty historyczne oraz dashboard. Płatny odczyt X jest ograniczony zaakceptowanym pilotażem; instalacja nie zamawia nowych usług ani nie wysyła powiadomień.

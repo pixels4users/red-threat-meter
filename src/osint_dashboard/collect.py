@@ -158,7 +158,7 @@ def parse_article(body: bytes) -> str:
 
 
 def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher=None, *, backlog=(), known_full_urls=()) -> dict:
-    if source['adapter'] == 'x_browser_import':
+    if source['adapter'] in ('x_browser_import', 'x_api_import'):
         from .x_sources import collect_captures
         return collect_captures(source, data_dir)
     fetcher = fetcher or Fetcher(data_dir, source)

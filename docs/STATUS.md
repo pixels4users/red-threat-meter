@@ -1,5 +1,36 @@
 # Stan realizacji — 30.09.2026
 
+## API X — 30.09.2026, 09:19
+
+Podłączono token aplikacji i bezpośrednie pobieranie OSINT Defender / OSINT
+Technical. `sources-pilot-6`, `source-candidates-11`, limity `x-api-pilot-1`:
+do 20 postów i czterech żądań na przebieg, 0,12 USD dziennie i na przebieg,
+4,50 USD łącznie w lokalnym pilotażu. Sekret jest w prywatnym `.env.x`, poza
+Git, raportami i frontendem. Częstotliwość i koszt są sprawdzane przed
+żądaniem; przerwanie pozostawia rezerwację. Kolejny odczyt korzysta z zapisanego
+kursora, a zaległa paginacja nie przesuwa granicy przed ukończeniem przedziału.
+Nie pobieramy automatycznie mediów, cytowanych postów ani przedruków.
+
+Test: **cztery odpowiedzi HTTP 200**, siedem postów Defender, zero Technical
+w zadanym oknie ostatnich 24 h. Siedem postów było poza regionem; nie dodano
+z nich incydentów. Szacowany koszt zasobów: **0,055 USD**, do potwierdzenia
+w rozliczeniu dostawcy. Ponowne wywołanie wykonało zero żądań. Wcześniejsze trzy
+regionalne materiały Technical pozostają niezmienione z oryginalną metodą
+odczytu; pusta odpowiedź API nie jest dowodem ich usunięcia ani braku zdarzeń.
+
+Import do kolektora sprawdzono bez kolejnego zapytania. API ma osobny kontrakt
+i archiwum odpowiedzi, tekstów, dat oraz pochodzenia. Limit kosztów, wznowienie,
+awarie, blokada równoległych pobrań, integralność i brak odświeżania dat w trybie
+offline są objęte testami. Łącznie **316 testów Python**; test lokalnego HTTP
+wymagał uruchomienia poza blokadą portów sandboxa. Dowód rzeczywistego odczytu
+i importu: `data/x-api/runs/16063d05cc1f491d8da16964390a55b2.verification.json`.
+
+Przed przyszłym cyklem Codex wykonuje `scripts/collect_x.py collect` w tych
+limitach; samo `prepare` tylko importuje paczki, bez opłat X. [Instrukcja](x-sources.md).
+Harmonogram pozostaje niewłączony. Brak nowych regionalnych postów w tej próbie
+nie uzasadnia nowej oceny zagrożenia — ostatni opublikowany raport pozostaje
+z godziny 08:52. Nie publikowano nowego wydania ani nie zmieniano frontendu.
+
 ## Uzupełnienie OSW, konta X i dokumenty łotewskie — 30.09.2026, 08:52
 
 `sources-pilot-5` obejmuje ograniczone archiwum OSW, odczyty kont
