@@ -1,6 +1,14 @@
 from __future__ import annotations
 
 REASONS = {
+    'v03_assessment_missing': 'Brak oceny czasu i zasięgu według v0.3',
+    'occurrence_time_unknown': 'Nieustalony czas zdarzenia',
+    'occurrence_after_cutoff': 'Czas zdarzenia wykracza poza odcięcie',
+    'decay_time_ambiguous': 'Dokładność czasu nie pozwala wyznaczyć jednej wagi',
+    'expired_weight': 'Wygasły wkład modelu',
+    'episode_conflict': 'Sprzeczne opisy wspólnego epizodu',
+    'same_episode': 'Ten sam epizod, bez podwójnego naliczenia',
+    'component_in_multiple_episodes': 'Obiekt przypisany do więcej niż jednego epizodu',
     "context_only": "Kontekst, bez punktów RTB",
     "occurrence_date_unknown": "Brak potwierdzonej daty zdarzenia",
     "outside_event_window": "Poza oknem zdarzeń",
@@ -58,9 +66,19 @@ def build_report(snapshot: dict) -> str:
             elif blocker.startswith("stale_event_review:"):
                 message = "Ocena zdarzenia dotyczy starszej wersji źródła: " + blocker.split(":")[-1]
             else:
-                message = blocker
+                message = 'Nie zakończono przeglądu 216 godzin historii zdarzeń i ich korekt.' if blocker == 'event_history_unverified' else blocker
             lines.append("- " + safe(message))
         lines.append("")
+    if 'regions' in rtb:
+        lines += ['**Wyniki regionalne — widoki wojewódzkie**', '', '| Widok | RTB | Wkład bezpośredni | Wkład przeniesiony |', '|---|---:|---:|---:|']
+        for label,region in [('Warszawa / mazowieckie','PL-14'),('Łódź / łódzkie','PL-10')]:
+            r=rtb['regions'][region]
+            lines.append(f"| {label} | {r['score'] if r['score'] is not None else 'niewyliczony'} | {r['direct_points']:.3f} | {r['propagated_points']:.3f} |")
+        lines += ['', 'Wkłady przy niepełnej ocenie są diagnostyką. Korelacja GNSS: ' + ('dopuszczona według konfiguracji.' if rtb['diagnostics']['gnss_correlation_enabled'] else 'nieoceniona — brak dopuszczonego detektora o odpowiedniej rozdzielczości.'), '']
+        if rtb['alert']['status']=='analyst_review_required' and not rtb['red_priority']['eligible']:
+            lines += ['Czerwony priorytet wstrzymany: brak wymaganych niezależnych dowodów bezpośrednich.', '']
+        for warning in rtb['official_warnings']:
+            lines += [f"**Oficjalne ostrzeżenie: {safe(warning['area'])} — {safe(warning['status'])}**",safe(warning['instruction_pl']), '']
     lines += ["**Stan źródeł**", "", "| Źródło | Pobranie | Pozycji | Pokrycie okna publikacji |", "|---|---|---:|---|"]
     for source in snapshot["sources"]:
         lines.append(f"| {safe(source['publisher'])} | {safe(source['status'])} | {source['item_count']} | {'tak' if source['window_complete'] else 'niepełne'} |")

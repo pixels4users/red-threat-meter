@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "subject_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "verdict": {
+      "enum": [
+        "accept",
+        "hold"
+      ]
+    },
+    "checks": {
+      "type": "object",
+      "properties": {
+        "supported_by_evidence": {
+          "type": "boolean"
+        },
+        "no_false_reassurance": {
+          "type": "boolean"
+        },
+        "no_inferred_actor_or_intent": {
+          "type": "boolean"
+        },
+        "polish_civilian_prose": {
+          "type": "boolean"
+        },
+        "current_and_in_scope": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "supported_by_evidence",
+        "no_false_reassurance",
+        "no_inferred_actor_or_intent",
+        "polish_civilian_prose",
+        "current_and_in_scope"
+      ],
+      "additionalProperties": false
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 15,
+      "maxLength": 1500
+    }
+  },
+  "required": [
+    "subject_sha256",
+    "verdict",
+    "checks",
+    "reason"
+  ],
+  "additionalProperties": false
+}

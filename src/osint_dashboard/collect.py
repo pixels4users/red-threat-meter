@@ -6,13 +6,14 @@ import time
 import urllib.error
 import urllib.request
 from datetime import datetime, timedelta
+from email.utils import parsedate_to_datetime
 from pathlib import Path
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import unquote, urljoin, urlsplit
 from zoneinfo import ZoneInfo
 
 from bs4 import BeautifulSoup
 
-from .common import ROOT, UTC, atomic_write, canonical_url, clean_text, digest, instant, now
+from .common import ROOT, UTC, atomic_write, canonical_url, clean_text, digest, instant, now, read_json, write_json
 
 # Reuse the supplied skill's parser, never its unbounded URL discovery/fetch path.
 _spec = importlib.util.spec_from_file_location("osint_rss_skill", ROOT / "skills/rss-feeds/scripts/feed.py")
@@ -38,38 +39,65 @@ def allowed_url(url: str, source: dict) -> str:
     p = urlsplit(url)
     if p.hostname not in source["allowed_hosts"] or p.port not in (None, 80, 443):
         raise ValueError("URL outside source host allowlist")
-    if not p.path.startswith(source["path_prefix"]):
+    path = unquote(p.path)
+    prefixes = [source["path_prefix"], *source.get("additional_path_prefixes", [])]
+    if ".." in path.split("/") or "\\" in path or not any(path.startswith(prefix) for prefix in prefixes):
         raise ValueError("URL outside configured source path")
     return url
 
 
 class RestrictedRedirect(urllib.request.HTTPRedirectHandler):
-    def __init__(self, source: dict):
+    def __init__(self, source: dict, before_request=lambda: None):
         self.source = source
+        self.before_request = before_request
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         allowed_url(newurl, self.source)
+        self.before_request()
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 class Fetcher:
     def __init__(self, data_dir: Path, source: dict, timeout: float = 15):
         self.data_dir, self.source, self.timeout = data_dir, source, timeout
-        self.opener = urllib.request.build_opener(RestrictedRedirect(source))
+        self.opener = urllib.request.build_opener(RestrictedRedirect(source, self.before_request))
         self.raw_refs: list[str] = []
         self.last_request = 0.0
+        self.request_count = 0
+        self.cooldown_path = data_dir / "fetch-state" / f"{source['id']}.json"
+        self.retry_at = read_json(self.cooldown_path)["retry_at"] if self.cooldown_path.exists() else None
+
+    def before_request(self):
+        if self.retry_at and instant(now()) < instant(self.retry_at):
+            raise RuntimeError("Source cooldown active until " + self.retry_at)
+        if self.request_count >= self.source.get("max_requests", 1000):
+            raise RuntimeError("Source request budget exhausted")
+        pause = max(0, 0.3 - (time.monotonic() - self.last_request))
+        if pause:
+            time.sleep(pause)
+        self.last_request = time.monotonic()
+        self.request_count += 1
+
+    def defer_requests(self, retry_after):
+        stamp = instant(now())
+        retry_at = stamp + timedelta(minutes=5)
+        try:
+            value = str(retry_after).strip()
+            requested = stamp + timedelta(seconds=int(value)) if value.isdigit() else parsedate_to_datetime(value)
+            retry_at = max(retry_at, requested)
+        except (TypeError, ValueError, OverflowError):
+            pass
+        self.retry_at = retry_at.isoformat()
+        write_json(self.cooldown_path, {"retry_at": self.retry_at})
 
     def get(self, url: str) -> tuple[bytes, str, str, str]:
         url = allowed_url(url, self.source)
         for attempt in range(2):
-            pause = max(0, 0.3 - (time.monotonic() - self.last_request))
-            if pause:
-                time.sleep(pause)
-            self.last_request = time.monotonic()
+            self.before_request()
             try:
                 request = urllib.request.Request(url, headers={
                     "User-Agent": "OSINT-Dashboard/0.1 (local research pilot)",
-                    "Accept": "application/rss+xml, application/atom+xml, text/html, application/json;q=0.8",
+                    "Accept": "application/rss+xml, application/atom+xml, text/html, application/pdf, application/json;q=0.8",
                 })
                 with self.opener.open(request, timeout=self.timeout) as response:
                     final = allowed_url(response.url, self.source)
@@ -83,7 +111,11 @@ class Fetcher:
                 self.raw_refs.append(raw_ref)
                 return body, content_type, final, raw_ref
             except urllib.error.HTTPError as exc:
-                if attempt == 0 and (exc.code == 429 or exc.code >= 500):
+                retry_after = (exc.headers or {}).get("Retry-After")
+                if exc.code == 429 or retry_after:
+                    self.defer_requests(retry_after)
+                    raise
+                if attempt == 0 and exc.code >= 500:
                     time.sleep(1)
                     continue
                 raise
@@ -125,8 +157,14 @@ def parse_article(body: bytes) -> str:
     return clean_text(text)
 
 
-def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher=None) -> dict:
+def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher=None, *, backlog=(), known_full_urls=()) -> dict:
     fetcher = fetcher or Fetcher(data_dir, source)
+    if source['adapter'] in ('pansa', 'rso'):
+        from .official_sources import collect_official
+        return collect_official(source, fetcher)
+    if source.get("article_parser") == "osw":
+        from .osw import collect_osw
+        return collect_osw(source, window_start, fetcher, backlog, known_full_urls)
     outcome = {"source_id": source["id"], "publisher": source["publisher"], "required": source["required"],
                "status": "error", "checked_at": now(), "items": [], "errors": [], "window_complete": False,
                "scope": "configured_publications_only", "raw_refs": [], "source_definition_hash": digest(source)}

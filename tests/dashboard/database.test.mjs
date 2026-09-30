@@ -1,0 +1,59 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { PGlite } from '@electric-sql/pglite';
+
+const fixture = JSON.parse(execFileSync('.venv/bin/python', ['tests/dashboard/make_fixture.py'], { encoding: 'utf8' }));
+const migration = readFileSync('supabase/migrations/20260927170000_dashboard_publications.sql', 'utf8');
+
+test('real PostgreSQL: atomic publication, history, RLS, fixture rejection and idempotency', async () => {
+  // Entire database is in-memory PGlite. No network or Supabase credentials.
+  const db = new PGlite();
+  await db.exec(`create role anon; create role authenticated; create role service_role bypassrls;
+    create schema auth; create table auth.users(id uuid primary key);
+    create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid $$;
+    grant usage on schema public,auth to anon,authenticated,service_role;`);
+  await db.exec(migration);
+  const publish = async report => (await db.query('select public.dashboard_publish($1::jsonb) as result', [JSON.stringify(report)])).rows[0].result;
+  await db.exec('set role service_role');
+  await assert.rejects(publish(fixture.complete), /Invalid publication contract/);
+  // Exercise the cloud policy using synthetic payloads ONLY in this isolated DB.
+  const live = { ...fixture.complete, mode: 'live' };
+  const first = await publish(live); assert.equal(first.created, true);
+  assert.equal((await publish(live)).created, false);
+  assert.equal((await db.query('select count(*)::int as n from public.dashboard_reports')).rows[0].n, 1);
+  assert.equal((await db.query('select count(*)::int as n from public.dashboard_report_incidents')).rows[0].n, 1);
+  await assert.rejects(publish({ ...live, commentary: {text:'changed'} }), /different content/);
+  const duplicate = structuredClone(live); duplicate.report_id = 'rpt_' + 'a'.repeat(64); duplicate.incidents.push(duplicate.incidents[0]);
+  await assert.rejects(publish(duplicate), /duplicate key/);
+  assert.equal((await db.query('select count(*)::int as n from public.dashboard_reports')).rows[0].n, 1, 'no partial parent remains after child failure');
+  await assert.rejects(db.exec('delete from public.dashboard_reports'), /permission denied/);
+  await db.exec('reset role; set role anon');
+  await assert.rejects(db.query('select * from public.dashboard_reports'), /permission denied/);
+  await assert.rejects(publish(live), /permission denied/);
+  await db.exec('reset role; set role authenticated');
+  assert.equal((await db.query('select * from public.dashboard_reports')).rows.length, 0, 'authenticated non-member sees no data');
+  await assert.rejects(publish(live), /permission denied/);
+  await db.exec(`reset role; insert into auth.users values ('00000000-0000-0000-0000-000000000001');
+    insert into public.dashboard_readers(user_id) values ('00000000-0000-0000-0000-000000000001');
+    set role authenticated; set request.jwt.claim.sub='00000000-0000-0000-0000-000000000001';`);
+  assert.equal((await db.query('select * from public.dashboard_reports')).rows.length, 1);
+  assert.equal((await db.query('select * from public.dashboard_report_incidents')).rows.length, 1);
+  assert.equal((await db.query('select * from public.dashboard_report_sources')).rows.length, live.sources.length);
+  await assert.rejects(db.exec("update public.dashboard_reports set score=99"), /permission denied/);
+  await db.exec('reset role');
+  await assert.rejects(db.exec("update public.dashboard_reports set score=99"), /immutable/);
+  await db.exec(readFileSync('supabase/migrations/20260929190000_rtb_v03_numeric_score.sql', 'utf8'));
+  assert.deepEqual((await db.query('select payload from public.dashboard_reports')).rows[0].payload, live, 'v0.2 payload survives schema migration unchanged');
+  const fractional = structuredClone(live);
+  fractional.report_id = 'rpt_' + 'b'.repeat(64);
+  fractional.provenance.methodology_version = 'rtb-v0.3';
+  fractional.rtb.score = 12.5;
+  await db.exec('set role service_role');
+  assert.equal((await publish(fractional)).created, true);
+  assert.equal(Number((await db.query('select score from public.dashboard_reports where report_id=$1', [fractional.report_id])).rows[0].score), 12.5);
+  await db.exec('reset role; set role anon');
+  await assert.rejects(publish(fractional), /permission denied/);
+  await db.close();
+});

@@ -12,7 +12,9 @@ from osint_dashboard.store import Store
 
 @pytest.fixture
 def source_config():
-    return copy.deepcopy(read_json(ROOT / "config/sources.json"))
+    config = copy.deepcopy(read_json(ROOT / "config/sources.json"))
+    config["sources"] = [s for s in config["sources"] if s["adapter"] not in ("pansa", "rso")]
+    return config
 
 
 @pytest.fixture
@@ -82,3 +84,20 @@ def fixture_file(tmp_path, source_config):
     path = tmp_path / "fixture.json"
     write_json(path, {"synthetic": True, "source_results": results})
     return path
+
+
+@pytest.fixture
+def legacy_engine(monkeypatch):
+    """Explicit v0.2 regression path; new v0.3 tests use the active configuration."""
+    import osint_dashboard.pipeline as pipeline
+    import osint_dashboard.analysis.cycle as cycle
+    original = cycle.read_json
+    def read_legacy(path):
+        value = original(path)
+        if path == ROOT / 'config/analysis.json':
+            value = {**value, 'methodology_version': 'rtb-v0.2'}
+        return value
+    monkeypatch.setattr(cycle, 'read_json', read_legacy)
+    legacy = lambda *args: original(ROOT / 'config/scoring-v0.json')
+    monkeypatch.setattr(cycle, 'load_scoring', legacy)
+    monkeypatch.setattr(pipeline, 'load_scoring', legacy)

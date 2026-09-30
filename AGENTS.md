@@ -1,6 +1,6 @@
 # OSINT Dashboard — zasady implementacji
 
-Aktualny zakres: lokalny OSINT / Indicators & Warnings dla Polski i wschodniej flanki NATO, zaakceptowana specyfikacja rtb-v0.3 w docs/methodology.md; działający silnik i jego instrukcje agents/ nadal wykonują rtb-v0.2 z config/scoring-v0.json. Nie oznaczaj starego obliczenia jako v0.3. docs/AUDYT_I_PLAN.md i docs/archive/ zachowują wcześniejsze wersje; ich dawne cele osobiste nie obowiązują.
+Aktualny zakres: lokalny OSINT / Indicators & Warnings dla Polski i wschodniej flanki NATO, zaakceptowana specyfikacja rtb-v0.3 w docs/methodology.md; domyślny silnik od 29.09.2026 wykonuje rtb-v0.3 z config/scoring-v0.3.json, wybierane przez config/analysis.json. config/scoring-v0.json zachowuje reguły v0.2 do odtwarzania. Nie oznaczaj starego obliczenia jako v0.3. docs/AUDYT_I_PLAN.md i docs/archive/ zachowują wcześniejsze wersje; ich dawne cele osobiste nie obowiązują.
 
 - Zachowuj dostarczone skills i skrypt ingest.py jako materiały źródłowe. Działający proces jest w src/osint_dashboard/.
 - Używaj .venv/bin/python; testy: .venv/bin/python -m pytest. Konfiguracja jest w JSON, walidacja kontraktów przez JSON Schema 2020-12.

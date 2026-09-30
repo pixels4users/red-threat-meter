@@ -1,0 +1,10 @@
+{
+  "version": "analysis-v1",
+  "executor": "codex",
+  "methodology_version": "rtb-v0.3",
+  "max_candidates_per_packet": 100,
+  "max_packet_bytes": 2000000,
+  "require_evidence_audit": true,
+  "require_editorial_audit": true,
+  "external_model_api": false
+}

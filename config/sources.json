@@ -1,12 +1,135 @@
 {
-  "version": "sources-pilot-2",
+  "version": "sources-pilot-4",
   "description": "Aktywne kolektory bieżących publikacji o bezpieczeństwie Polski i wschodniej flanki NATO. Kontekst doktrynalny jest w doctrine-sources.json, kandydaci do rozbudowy w source-candidates.json.",
   "policy": "Jedyną listą automatycznie pobieranych źródeł są poniższe wpisy enabled=true. Strony referencyjne i doktryna nie stają się incydentami. Pierwotne pochodzenie należy ustalić dla konkretnego twierdzenia, nie tylko wydawcy.",
   "sources": [
-    {"id":"rcb","publisher":"Rządowe Centrum Bezpieczeństwa","kind":"primary","enabled":true,"required":true,"adapter":"govpl","url":"https://www.gov.pl/web/rcb/komunikaty","allowed_hosts":["www.gov.pl"],"path_prefix":"/web/rcb/","max_pages":3,"max_items":30,"fetch_articles":true,"notes":"Komunikaty i odwołania ostrzeżeń; ćwiczenia to osobny rodzaj informacji."},
-    {"id":"mon","publisher":"Ministerstwo Obrony Narodowej","kind":"primary","enabled":true,"required":true,"adapter":"govpl","url":"https://www.gov.pl/web/obrona-narodowa/aktualnosci5","allowed_hosts":["www.gov.pl"],"path_prefix":"/web/obrona-narodowa/","max_pages":3,"max_items":30,"fetch_articles":true,"notes":"Aktualności ministerstwa; nie stanowią pełnego rejestru incydentów ani osobnego źródła dla każdego cytowanego organu."},
-    {"id":"osw","publisher":"Ośrodek Studiów Wschodnich","kind":"analysis","enabled":true,"required":true,"adapter":"rss","url":"https://www.osw.waw.pl/pl/rss.xml","allowed_hosts":["www.osw.waw.pl"],"path_prefix":"/pl/","max_pages":1,"max_items":30,"fetch_articles":false,"notes":"Analizy regionalne. Na tym etapie przechowujemy treść kanału, nie deklarujemy pobrania pełnych artykułów."},
-    {"id":"naval_news","publisher":"Naval News","kind":"secondary","enabled":true,"required":false,"adapter":"rss","url":"https://www.navalnews.com/feed/","allowed_hosts":["www.navalnews.com"],"path_prefix":"/","max_pages":1,"max_items":20,"fetch_articles":false,"notes":"Kontekst morski; globalny zakres, często poza zakresem RTB."},
-    {"id":"cert_pl","publisher":"CERT Polska","kind":"primary","enabled":false,"required":false,"adapter":"rss","url":"https://cert.pl/posts/","allowed_hosts":["cert.pl"],"path_prefix":"/","max_pages":1,"max_items":20,"fetch_articles":false,"notes":"Wyłączone: próba dostępu 22.09.2026 zwróciła HTTP 403. Adres kanału i dostęp wymagają osobnej weryfikacji."}
+    {
+      "id": "rcb",
+      "publisher": "Rządowe Centrum Bezpieczeństwa",
+      "kind": "primary",
+      "enabled": true,
+      "required": true,
+      "adapter": "govpl",
+      "url": "https://www.gov.pl/web/rcb/komunikaty",
+      "allowed_hosts": [
+        "www.gov.pl"
+      ],
+      "path_prefix": "/web/rcb/",
+      "max_pages": 3,
+      "max_items": 30,
+      "fetch_articles": true,
+      "notes": "Komunikaty i odwołania ostrzeżeń; ćwiczenia to osobny rodzaj informacji."
+    },
+    {
+      "id": "mon",
+      "publisher": "Ministerstwo Obrony Narodowej",
+      "kind": "primary",
+      "enabled": true,
+      "required": true,
+      "adapter": "govpl",
+      "url": "https://www.gov.pl/web/obrona-narodowa/aktualnosci5",
+      "allowed_hosts": [
+        "www.gov.pl"
+      ],
+      "path_prefix": "/web/obrona-narodowa/",
+      "max_pages": 3,
+      "max_items": 30,
+      "fetch_articles": true,
+      "notes": "Aktualności ministerstwa; nie stanowią pełnego rejestru incydentów ani osobnego źródła dla każdego cytowanego organu."
+    },
+    {
+      "id": "osw",
+      "publisher": "Ośrodek Studiów Wschodnich",
+      "kind": "analysis",
+      "enabled": true,
+      "required": true,
+      "adapter": "rss",
+      "url": "https://www.osw.waw.pl/pl/rss.xml",
+      "allowed_hosts": [
+        "www.osw.waw.pl"
+      ],
+      "path_prefix": "/pl/",
+      "additional_path_prefixes": [
+        "/transformacja-bundeswehry/",
+        "/sites/default/files/"
+      ],
+      "max_pages": 1,
+      "max_items": 30,
+      "fetch_articles": true,
+      "article_parser": "osw",
+      "max_backfill_items": 10,
+      "max_requests": 50,
+      "notes": "RSS odkrywa publikacje; pełny tekst z HTML OSW, raporty z podlinkowanego PDF wydawcy. Do 10 znanych nierozstrzygniętych publikacji spoza RSS, 30 publikacji i 50 żądań łącznie z przekierowaniami/ponowieniami na cykl. PDF: Poppler, do 3 MB i 250 stron. Brak pełnego tekstu daje stan częściowy; nie zastępujemy zapisanej treści skrótem."
+    },
+    {
+      "id": "naval_news",
+      "publisher": "Naval News",
+      "kind": "secondary",
+      "enabled": true,
+      "required": false,
+      "adapter": "rss",
+      "url": "https://www.navalnews.com/feed/",
+      "allowed_hosts": [
+        "www.navalnews.com"
+      ],
+      "path_prefix": "/",
+      "max_pages": 1,
+      "max_items": 20,
+      "fetch_articles": false,
+      "notes": "Kontekst morski; globalny zakres, często poza zakresem RTB."
+    },
+    {
+      "id": "cert_pl",
+      "publisher": "CERT Polska",
+      "kind": "primary",
+      "enabled": false,
+      "required": false,
+      "adapter": "rss",
+      "url": "https://cert.pl/posts/",
+      "allowed_hosts": [
+        "cert.pl"
+      ],
+      "path_prefix": "/",
+      "max_pages": 1,
+      "max_items": 20,
+      "fetch_articles": false,
+      "notes": "Wyłączone: próba dostępu 22.09.2026 zwróciła HTTP 403. Adres kanału i dostęp wymagają osobnej weryfikacji."
+    },
+    {
+      "id": "pansa_airspace",
+      "publisher": "Polska Agencja Żeglugi Powietrznej",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "pansa",
+      "url": "https://airspace.pansa.pl/aup/current",
+      "allowed_hosts": [
+        "airspace.pansa.pl"
+      ],
+      "path_prefix": "/aup/",
+      "max_pages": 1,
+      "max_items": 1,
+      "max_requests": 2,
+      "fetch_articles": false,
+      "notes": "Bieżący plan AUP. Nie dowodzi aktywacji, nierutynowości ani zamiaru. Brak pełnej historii zdarzeń; kontekst do przeglądu."
+    },
+    {
+      "id": "rso_public",
+      "publisher": "Regionalny System Ostrzegania",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "rso",
+      "url": "https://komunikaty.tvp.pl/komunikaty/wszystkie/ogolne/0?_format=xml",
+      "allowed_hosts": [
+        "komunikaty.tvp.pl"
+      ],
+      "path_prefix": "/komunikaty/",
+      "max_pages": 1,
+      "max_items": 1,
+      "max_requests": 2,
+      "fetch_articles": false,
+      "notes": "Pełny eksport bieżącej kategorii ogólnej, do 500 komunikatów. Ustal organ wydający i wspólny alert_key RCB/RSO; rso_alarm nie jest klasą L1/L2/L3. Brak rekordu w wykazie nie potwierdza odwołania."
+    }
   ]
 }

@@ -23,7 +23,7 @@ def make_candidate(material: dict) -> dict:
         flags.append("possible_exercise_or_planned_activity")
     if re.search(r"odwoł|brak zagrożenia|zagrożenie ustało|aktualizac", text):
         flags.append("contains_update_or_cancellation")
-    if material["text_kind"] != "article_body":
+    if material["text_kind"] not in ("article_body", "pdf_text", "official_dataset"):
         flags.append("summary_only")
     if material["published_at"] is None:
         flags.append("publication_date_unknown")

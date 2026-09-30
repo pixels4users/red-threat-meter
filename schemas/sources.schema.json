@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "version",
+    "sources"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "policy": {
+      "type": "string"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    }
+  },
+  "$defs": {
+    "paths": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^/",
+        "minLength": 2
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "publisher",
+        "kind",
+        "enabled",
+        "required",
+        "adapter",
+        "url",
+        "allowed_hosts",
+        "path_prefix",
+        "max_pages",
+        "max_items",
+        "fetch_articles"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "publisher": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "primary",
+            "analysis",
+            "secondary"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "adapter": {
+          "enum": [
+            "rss",
+            "govpl",
+            "pansa",
+            "rso"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https?://"
+        },
+        "allowed_hosts": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "path_prefix": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "additional_path_prefixes": {
+          "$ref": "#/$defs/paths"
+        },
+        "max_pages": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "max_items": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "max_requests": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "fetch_articles": {
+          "type": "boolean"
+        },
+        "article_parser": {
+          "const": "osw"
+        },
+        "max_backfill_items": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "article_parser"
+            ]
+          },
+          "then": {
+            "required": [
+              "max_backfill_items",
+              "max_requests"
+            ],
+            "properties": {
+              "id": {
+                "const": "osw"
+              },
+              "adapter": {
+                "const": "rss"
+              },
+              "fetch_articles": {
+                "const": true
+              },
+              "max_pages": {
+                "const": 1
+              },
+              "max_items": {
+                "maximum": 30
+              },
+              "max_requests": {
+                "maximum": 50
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "version": "prg-20260929-v1",
+  "nodes": {
+    "PL-32": "zachodniopomorskie",
+    "PL-08": "lubuskie",
+    "PL-02": "dolnośląskie",
+    "PL-30": "wielkopolskie",
+    "PL-22": "pomorskie",
+    "PL-16": "opolskie",
+    "PL-04": "kujawsko-pomorskie",
+    "PL-24": "śląskie",
+    "PL-10": "łódzkie",
+    "PL-12": "małopolskie",
+    "PL-28": "warmińsko-mazurskie",
+    "PL-14": "mazowieckie",
+    "PL-26": "świętokrzyskie",
+    "PL-18": "podkarpackie",
+    "PL-20": "podlaskie",
+    "PL-06": "lubelskie"
+  },
+  "edges": [
+    [
+      "PL-02",
+      "PL-08"
+    ],
+    [
+      "PL-02",
+      "PL-16"
+    ],
+    [
+      "PL-02",
+      "PL-30"
+    ],
+    [
+      "PL-04",
+      "PL-10"
+    ],
+    [
+      "PL-04",
+      "PL-14"
+    ],
+    [
+      "PL-04",
+      "PL-22"
+    ],
+    [
+      "PL-04",
+      "PL-28"
+    ],
+    [
+      "PL-04",
+      "PL-30"
+    ],
+    [
+      "PL-06",
+      "PL-14"
+    ],
+    [
+      "PL-06",
+      "PL-18"
+    ],
+    [
+      "PL-06",
+      "PL-20"
+    ],
+    [
+      "PL-06",
+      "PL-26"
+    ],
+    [
+      "PL-08",
+      "PL-30"
+    ],
+    [
+      "PL-08",
+      "PL-32"
+    ],
+    [
+      "PL-10",
+      "PL-14"
+    ],
+    [
+      "PL-10",
+      "PL-16"
+    ],
+    [
+      "PL-10",
+      "PL-24"
+    ],
+    [
+      "PL-10",
+      "PL-26"
+    ],
+    [
+      "PL-10",
+      "PL-30"
+    ],
+    [
+      "PL-12",
+      "PL-18"
+    ],
+    [
+      "PL-12",
+      "PL-24"
+    ],
+    [
+      "PL-12",
+      "PL-26"
+    ],
+    [
+      "PL-14",
+      "PL-20"
+    ],
+    [
+      "PL-14",
+      "PL-26"
+    ],
+    [
+      "PL-14",
+      "PL-28"
+    ],
+    [
+      "PL-16",
+      "PL-24"
+    ],
+    [
+      "PL-16",
+      "PL-30"
+    ],
+    [
+      "PL-18",
+      "PL-26"
+    ],
+    [
+      "PL-20",
+      "PL-28"
+    ],
+    [
+      "PL-22",
+      "PL-28"
+    ],
+    [
+      "PL-22",
+      "PL-30"
+    ],
+    [
+      "PL-22",
+      "PL-32"
+    ],
+    [
+      "PL-24",
+      "PL-26"
+    ],
+    [
+      "PL-30",
+      "PL-32"
+    ]
+  ],
+  "provenance": {
+    "authority": "GUGiK PRG",
+    "url": "https://mapy.geoportal.gov.pl/wss/service/PZGIK/PRG/WFS/AdministrativeBoundaries?service=WFS&version=2.0.0&request=GetFeature&typeNames=ms%3AA01_Granice_wojewodztw&count=16&srsName=EPSG%3A2180",
+    "retrieved_on": "2026-09-29",
+    "sha256": "cf7d31b14a3f489b22c3fbb71982fa6885a5dfdf599ed5da18b8403cf84afaf2",
+    "method": "Wspólne odcinki pierścieni PRG EPSG:2180; współrzędne do 0,001 m; wspólny punkt nie jest krawędzią.",
+    "features": 16,
+    "edges": 34
+  }
+}

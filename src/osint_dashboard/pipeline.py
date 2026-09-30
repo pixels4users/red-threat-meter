@@ -11,7 +11,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from .collect import collect_source
-from .common import ROOT, atomic_write, canonical_json, digest, instant, load_config, now, read_json, write_json
+from .common import ROOT, atomic_write, canonical_json, digest, instant, load_config, load_scoring, now, read_json, write_json
 from .extract import extract_candidates
 from .report import build_report, geojson
 from .review import import_review, validate_schema
@@ -46,6 +46,11 @@ def code_hash() -> str:
     files = list((ROOT / "src/osint_dashboard").glob("*.py"))
     files += list((ROOT / "schemas").glob("*.json")) + list((ROOT / "migrations").glob("*.sql"))
     files += list((ROOT / "agents").glob("*.md")) + [ROOT / "skills/rss-feeds/scripts/feed.py"]
+    files += list((ROOT / "src/osint_dashboard/analysis").glob("*.py"))
+    files += list((ROOT / "schemas/analysis").glob("*.json"))
+    files += list((ROOT / "prompts").glob("analysis-*.md"))
+    files += list((ROOT / "schemas/dashboard").glob("commentary-*.schema.json"))
+    files += [ROOT / "prompts/dashboard-commentary-system.md"]
     return digest([(str(p.relative_to(ROOT)), digest(p.read_bytes())) for p in sorted(files)])
 
 
@@ -92,7 +97,7 @@ def make_snapshot(inputs: dict) -> dict:
     return snapshot
 
 
-def publish(store, inputs: dict, snapshot: dict) -> Path:
+def publish(store, inputs: dict, snapshot: dict, extras: dict | None = None) -> Path:
     data_dir, run_id = store.data_dir, inputs["run_id"]
     target = data_dir / "snapshots" / run_id
     staging = data_dir / "snapshots" / (".staging-" + run_id)
@@ -100,8 +105,17 @@ def publish(store, inputs: dict, snapshot: dict) -> Path:
     try:
         write_json(staging / "snapshot.json", snapshot)
         write_json(staging / "incidents.geojson", geojson(snapshot))
-        atomic_write(staging / "report.md", build_report(snapshot))
+        report_text = build_report(snapshot)
+        if (extras or {}).get("commentary-review.json"):
+            from .analysis.commentary import public_commentary
+            commentary = public_commentary(extras["commentary-review.json"], digest(snapshot), snapshot["run_id"], snapshot["rtb"]["score"])
+            report_text += "\n## Komentarz analityczny\n\n" + commentary["text"] + "\n"
+        atomic_write(staging / "report.md", report_text)
         write_json(staging / "replay-input.json", inputs)
+        for name, content in (extras or {}).items():
+            if name not in ("analysis-audit.json", "commentary-review.json"):
+                raise ValueError("Unknown snapshot supplement")
+            write_json(staging / name, content)
         manifest = {"run_id": run_id, "schema_version": "1", "files": {
             p.name: digest(p.read_bytes()) for p in staging.iterdir() if p.is_file()}}
         write_json(staging / "manifest.json", manifest)
@@ -121,11 +135,11 @@ def publish(store, inputs: dict, snapshot: dict) -> Path:
 
 def run(data_dir: Path, sources_path: Path | None = None, offline: bool = False,
         fixture: Path | None = None, review_path: Path | None = None, collect_only: bool = False,
-        progress=lambda message: None) -> dict:
+        progress=lambda message: None, methodology: str | None = None) -> dict:
     data_dir = data_dir.resolve()
     mode = "fixture" if fixture else "live"
     source_config = load_config(sources_path)
-    scoring = read_json(ROOT / "config/scoring-v0.json")
+    scoring = load_scoring(methodology)
     enabled = [s for s in source_config["sources"] if s["enabled"]]
     run_id = now().replace(":", "").replace("+0000", "Z") + "-" + uuid.uuid4().hex[:8]
     with locked(data_dir):
@@ -149,8 +163,15 @@ def run(data_dir: Path, sources_path: Path | None = None, offline: bool = False,
                 else:
                     start = instant(window_for(now(), scoring)["start"])
                     progress(f"Pobieram {len(enabled)} źródła.")
+                    from .osw import pending_backlog
+                    latest, resolutions = store.latest_materials(now()), store.resolutions(now())
+                    backlogs = {s["id"]: pending_backlog(latest, resolutions, s["id"])
+                                for s in enabled if s.get("article_parser") == "osw"}
                     with ThreadPoolExecutor(max_workers=3) as pool:
-                        futures = [(s, pool.submit(collect_source, s, data_dir, start)) for s in enabled]
+                        futures = [(s, pool.submit(collect_source, s, data_dir, start, backlog=backlogs.get(s["id"], ()),
+                                                  known_full_urls={m["url"] for m in latest if m["source_id"] == s["id"] and
+                                                                   m["text_kind"] in ("article_body", "pdf_text")}))
+                                   for s in enabled]
                         outcomes = []
                         for source, future in futures:
                             result = future.result()
@@ -178,6 +199,7 @@ def run(data_dir: Path, sources_path: Path | None = None, offline: bool = False,
                 write_json(queue_path, {"instructions": "agents/evidence-reviewer.md", "mode": mode,
                                         "candidates": inputs["candidates"], "materials": inputs["materials"],
                                         "existing_resolutions": inputs["resolutions"]})
+                write_json(queue_path.with_name("review-input.json"), inputs)
                 if collect_only:
                     store.finish_run(run_id, "collected")
                     return {"run_id": run_id, "new_materials": new_materials, "review_queue": str(queue_path), "counts": store.counts()}

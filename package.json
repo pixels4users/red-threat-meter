@@ -1,0 +1,21 @@
+{
+  "name": "red-threat-meter-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "test": "node --test tests/dashboard/*.test.mjs",
+    "test:database": "node --test tests/dashboard/database.test.mjs"
+  },
+  "dependencies": {
+    "d3": "7.9.0",
+    "lucide": "0.468.0",
+    "topojson-client": "3.1.0"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.14",
+    "vite": "^7.1.7"
+  }
+}

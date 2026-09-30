@@ -1,13 +1,13 @@
 # Metodologia RTB v0.3
 
-**Wersja `rtb-v0.3`, zaakceptowana 25.09.2026.** To obowiązująca specyfikacja analityczna dla dalszego rozwoju projektu, eksperymentalna i bez kalibracji prognostycznej. Akceptacja obejmuje źródła pierwotne i reguły poniżej; nie oznacza zakończenia integracji ani wdrożenia nowych obliczeń.
+**Wersja `rtb-v0.3`, zaakceptowana 25.09.2026.** To obowiązująca specyfikacja analityczna dla dalszego rozwoju projektu, eksperymentalna i bez kalibracji prognostycznej. Obliczenia wdrożono 29.09.2026; dostępność danych, kalibracja i poszczególne integracje zachowują osobne statusy.
 
 | Element | Wersja / stan |
 |---|---|
 | Obowiązująca metodologia | `rtb-v0.3`, zaakceptowana specyfikacja |
-| Działający silnik i wydania | `rtb-v0.2` w `config/scoring-v0.json`; nowe heurystyki jeszcze niewdrożone |
+| Działający silnik i wydania | `rtb-v0.3` w `config/scoring-v0.3.json`, wybierane przez `config/analysis.json`; wcześniejsze wydania pozostają v0.2 |
 | Reguły dotychczasowych obliczeń | [Metodologia v0.2](archive/methodology-v0.2.md) i `config/archive/scoring-v0.2.json` |
-| Rozszerzenie źródeł | Zaakceptowane do integracji; dostęp i wdrożenie każdego adaptera mają osobny status |
+| Rozszerzenie źródeł | PAŻP/AUP i RSO/ogólne podłączone; aktywacja stref, UA i Bałtyk nadal wymagają integracji |
 
 Źródła i status dostępu: [rejestr kandydatów](sources.md#rozszerzenie-zrodel-25-09-2026). Dane pozyskujemy bezpośrednio od instytucji i wydawców; Strażnik jest odniesieniem architektonicznym, nie dostawcą danych. ADS-B pozostaje w istniejącym strumieniu ADSB.lol. Wersja i hash reguł w każdym wydaniu opisują faktycznie użyty silnik; sama akceptacja dokumentacji nie zmienia etykiety wcześniejszych ani nowych wyników v0.2.
 
@@ -52,13 +52,13 @@ Dla anomalii analityk podaje miarę, okres odniesienia, wartości porównania, �
 
 Jedno zdarzenie ma stabilny `event_key`, jedną kategorię i najwyżej jedną aktualną rewizję. Wiele publikacji może wskazywać to samo zdarzenie; jedna publikacja może opisywać kilka odrębnych zdarzeń. Tożsamość ustala analityk. Tego samego lotu nie punktujemy raz jako logistyki, a drugi raz jako anomalii lotniczej. Powtórzenie pobrania identycznej treści nie tworzy nowego materiału.
 
-Wspólny `campaign_id` ogranicza punktowanie do jednego epizodu w danej kategorii. V0.3 wybiera najwyższy aktualny wkład po wygaszaniu i synergii, przed projekcją regionalną; remis rozstrzyga `event_key`. Działający kod v0.2 nie rozpoznaje automatycznie wspólnego zdarzenia pod różnymi kluczami lub kategoriami. Limity kategorii ograniczają nadmierny wkład jednej kategorii, lecz nie naprawiają błędnego przeglądu. Surowa suma, wkłady i wykluczenia pozostają dostępne do audytu.
+Wspólny `campaign_id` ogranicza punktowanie do jednego epizodu w danej kategorii. V0.3 wybiera najwyższy aktualny wkład po wygaszaniu i synergii, przed projekcją regionalną; remis rozstrzyga `event_key`. Silnik v0.3 kontroluje wspólny episode_key i identyfikatory składowych; semantyczne rozpoznanie tożsamości nadal wymaga przeglądu. Limity kategorii ograniczają nadmierny wkład jednej kategorii, lecz nie naprawiają błędnego przeglądu. Surowa suma, wkłady i wykluczenia pozostają dostępne do audytu.
 
 ## Próg i priorytet geograficzny
 
-Wynik **ściśle ponad 60** kieruje do pilnego przeglądu analitycznego. Czerwony priorytet v0.3 wymaga dodatkowo opisanej niżej bramki niezależnych, bezpośrednich dowodów. Próg pozostaje roboczy, z `calibrated=false`, bez przypisywania wysokiego prawdopodobieństwa wojny. Wynik 60 nie przekracza progu. Przy `score: null` status wynosi `not_assessed`; brak oceny nie jest sygnałem uspokojenia. Działający silnik v0.2 zapisuje samo `alert.status=analyst_review_required`, bez nowej bramki koloru. Nie działa wysyłanie powiadomień.
+Wynik **ściśle ponad 60** kieruje do pilnego przeglądu analitycznego. Czerwony priorytet v0.3 wymaga dodatkowo opisanej niżej bramki niezależnych, bezpośrednich dowodów. Próg pozostaje roboczy, z `calibrated=false`, bez przypisywania wysokiego prawdopodobieństwa wojny. Wynik 60 nie przekracza progu. Przy `score: null` status wynosi `not_assessed`; brak oceny nie jest sygnałem uspokojenia. Archiwalny silnik v0.2 zapisuje samo `alert.status=analyst_review_required`, bez nowej bramki koloru. Nie działa wysyłanie powiadomień.
 
-Obszary w `config/strategic-areas.json` nadają priorytet przeglądowi, bez własnego mnożnika punktów ani arbitralnego promienia bliskości. `strategic_context`, jeśli występuje, wymaga identyfikatorów obszarów, uzasadnienia i dowodów lokalizacji. Samo skojarzenie nazwy miejsca z ważną bazą nie wystarcza. Regionalna propagacja v0.3 ma osobne reguły 40% / 16% i nie nadaje punktów za samą obecność obiektu strategicznego. Silnik v0.2 nadal nie oblicza wyników regionalnych.
+Obszary w `config/strategic-areas.json` nadają priorytet przeglądowi, bez własnego mnożnika punktów ani arbitralnego promienia bliskości. `strategic_context`, jeśli występuje, wymaga identyfikatorów obszarów, uzasadnienia i dowodów lokalizacji. Samo skojarzenie nazwy miejsca z ważną bazą nie wystarcza. Regionalna propagacja v0.3 ma osobne reguły 40% / 16% i nie nadaje punktów za samą obecność obiektu strategicznego. Wyniki regionalne v0.3 zawierają osobno wkład bezpośredni i przeniesiony.
 
 GeoJSON używa WGS84 i kolejności `[długość, szerokość]`. Punkt wymaga dowodu lokalizacji i jawnej dokładności. W przeciwnym razie geometria ma wartość `null`; nazwa regionu nie staje się jego środkiem. Aktualna implementacja nie ma automatycznego geokodera. Lokalną bazą jest SQLite, bez wymogu PostGIS.
 
@@ -82,7 +82,7 @@ Biblioteka `data/doctrine_rag` ma osobny rejestr i indeks lokalny. Pomaga formu�
 
 ## Kompletność i brak odczytu
 
-Wynik pozostaje pusty, gdy wymagane źródło jest niedostępne, częściowe, nie obejmuje wymaganego horyzontu lub przekracza limit świeżości; gdy definicja źródła zmieniła się od pobrania; albo gdy pozostały nieprzejrzane aktualne wersje materiałów. Stara publikacja również może zawierać nową aktualizację. Działający v0.2 sprawdza siedem dni kalendarzowych publikacji i osiem godzin od pobrania. V0.3 wymaga co najmniej 216 godzin historii zdarzeń i rewizji oraz osobnych limitów dla warstwy taktycznej; opisano je w warunkach wdrożenia. Akceptacja kandydata nie zmienia automatycznie listy źródeł wymaganych przez bieżący silnik.
+Wynik pozostaje pusty, gdy wymagane źródło jest niedostępne, częściowe, nie obejmuje wymaganego horyzontu lub przekracza limit świeżości; gdy definicja źródła zmieniła się od pobrania; albo gdy pozostały nieprzejrzane aktualne wersje materiałów. Stara publikacja również może zawierać nową aktualizację. Archiwalny v0.2 sprawdza siedem dni kalendarzowych publikacji i osiem godzin od pobrania. V0.3 wymaga co najmniej 216 godzin historii zdarzeń i rewizji oraz osobnych limitów dla warstwy taktycznej; opisano je w warunkach wdrożenia. Akceptacja kandydata nie zmienia automatycznie listy źródeł wymaganych przez bieżący silnik.
 
 Nierozstrzygnięta data potencjalnego incydentu, błędne dowody i użycie nieaktualnej wersji materiału również mogą blokować odczyt. Zdarzenia kontekstowe, poza zakresem lub niespełniające kryteriów mają uzasadnienie wykluczenia. Nie przedstawiamy ich jako potwierdzonych punktów. Błąd źródła opcjonalnego jest widoczny, lecz nie blokuje liczby.
 
@@ -96,14 +96,14 @@ Wydanie zachowuje wejścia, wersję i hash metodologii, konfigurację źródeł 
 
 Zmiana na v0.2 dodaje kategorię przygotowań, uściśla zakres lotnictwa i cyberataków, dodaje próg przeglądu, dwa wkłady oraz kontekst obszarów strategicznych. Odczyty v0.1 i v0.2 nie są bezpośrednio porównywalne. `delta_points` i `comparison_run_id` pozostają `null` do wdrożenia porównywania zgodnych okresów, źródeł i kompletności. Nie oznaczamy braku porównania jako „stabilnie”.
 
-Akceptacja v0.3 zastępuje specyfikację v0.2 w tym dokumencie. Jej dokładny poprzedni tekst i parametry zachowano w `docs/archive/methodology-v0.2.md` oraz `config/archive/scoring-v0.2.json` z kodu `2bccbb2`. Nowy model wymaga osobnych wydań z identyfikatorem `rtb-v0.3`; nie wolno przemianować odczytów v0.2 ani łączyć wersji w jeden trend. Do czasu wdrożenia i sprawdzenia nowego silnika `config/scoring-v0.json` nadal deklaruje `rtb-v0.2`.
+Akceptacja v0.3 zastępuje specyfikację v0.2 w tym dokumencie. Jej dokładny poprzedni tekst i parametry zachowano w `docs/archive/methodology-v0.2.md` oraz `config/archive/scoring-v0.2.json` z kodu `2bccbb2`. Nowy model wymaga osobnych wydań z identyfikatorem `rtb-v0.3`; nie wolno przemianować odczytów v0.2 ani łączyć wersji w jeden trend. `config/scoring-v0.json` pozostaje niezmienioną konfiguracją v0.2; nowe obliczenia mają odrębny plik. [Stan wdrożenia i kontrakty](v0.3-implementation.md).
 
 <a id="projekt-v03--wygaszanie-regiony-i-korelacja"></a>
 <a id="wygaszanie-regiony-i-korelacja"></a>
 
 ## Wygaszanie, regiony i korelacja — v0.3
 
-**Status: specyfikacja zaakceptowana 25.09.2026, `calibrated=false`; implementacja pozostaje do wykonania.** Inspiracją są opisane przez [Strażnika](https://straznik.eu/) wygaszanie taktyczne i propagacja regionalna. Publiczna [konfiguracja autora](https://github.com/cukierrro/Straznik/blob/main/backend/app/config.py), sprawdzona 25.09.2026, wskazuje 30 minut pełnej wagi, koniec po 60 minutach i współczynnik sąsiedztwa 0,4. To sprawdzenie opublikowanych reguł, nie audyt działającego serwera ani dowód trafności modelu. Profil strukturalny, współczynniki korelacji i warunki poniżej są **naszymi roboczymi założeniami badawczymi**, nie potwierdzonymi parametrami Strażnika.
+**Status: specyfikacja zaakceptowana 25.09.2026, `calibrated=false`; obliczenia wdrożone 29.09.2026; bonus GNSS wyłączony do walidacji detektora.** Inspiracją są opisane przez [Strażnika](https://straznik.eu/) wygaszanie taktyczne i propagacja regionalna. Publiczna [konfiguracja autora](https://github.com/cukierrro/Straznik/blob/main/backend/app/config.py), sprawdzona 25.09.2026, wskazuje 30 minut pełnej wagi, koniec po 60 minutach i współczynnik sąsiedztwa 0,4. To sprawdzenie opublikowanych reguł, nie audyt działającego serwera ani dowód trafności modelu. Profil strukturalny, współczynniki korelacji i warunki poniżej są **naszymi roboczymi założeniami badawczymi**, nie potwierdzonymi parametrami Strażnika.
 
 RTB nadal obejmuje sabotaż, cyberataki, logistykę, presję graniczną, zakłócenia i zdarzenia kinetyczne. Nowe źródła nie zmieniają automatycznie kryteriów wystąpienia ani atrybucji. Aktywacja PAŻP, lot obronny NATO i ostrzeżenie RCB są kontekstem lub potwierdzeniem konkretnego twierdzenia; nie stają się samodzielnymi zdarzeniami `military_preparation` RU/BY. Niezweryfikowany sygnał pozostaje widoczny w warstwie wczesnej, bez punktów RTB.
 
@@ -128,7 +128,7 @@ Wiek ujemny wyklucza punktację. Nieznany czas albo sama data dzienna, która ni
 
 Odwołanie alertu lub dezaktywacja strefy kończy ich aktywny wkład od znanego czasu zakończenia; późniejsza wiedza nie zmienia dawnych raportów. Zakończenie akcji ratowniczej nie usuwa historycznego faktu sabotażu — jego wkład nadal wygasa profilem strukturalnym. Wygaśnięcie wagi modelu nie jest odwołaniem oficjalnego ostrzeżenia: jego treść i status obowiązywania pokazujemy osobno.
 
-Przed obliczeniem dopuszczamy tylko wersje materiałów, pomiarów i ocen rzeczywiście znane systemowi do `T`. Obliczenia wieku używają czasu UTC i upływu sekund, niezależnie od zmiany czasu letniego. Odczyt dobowy i tygodniowy używa tego samego wzoru w chwili `T`; rytm raportu nie zmienia wagi i **nie sumujemy siedmiu dziennych indeksów**. Przyszły kolektor musi zapewnić co najmniej 216 godzin historii istotnych zdarzeń oraz ich rewizji; obecnej kontroli siedmiu dni publikacji nie uznajemy za spełnienie tego wymogu. Historyczne piki można zestawić tylko z zapisanych, kompletnych odczytów, z jawnymi lukami.
+Przed obliczeniem dopuszczamy tylko wersje materiałów, pomiarów i ocen rzeczywiście znane systemowi do `T`. Obliczenia wieku używają czasu UTC i upływu sekund, niezależnie od zmiany czasu letniego. Odczyt dobowy i tygodniowy używa tego samego wzoru w chwili `T`; rytm raportu nie zmienia wagi i **nie sumujemy siedmiu dziennych indeksów**. Proces musi zapewnić co najmniej 216 godzin historii istotnych zdarzeń oraz ich rewizji; obecnej kontroli siedmiu dni publikacji nie uznajemy za spełnienie tego wymogu. Historyczne piki można zestawić tylko z zapisanych, kompletnych odczytów, z jawnymi lukami.
 
 ### Wkład i kolejność obliczeń
 
@@ -193,7 +193,7 @@ Trzy klasy treści RCB/RSO z [rejestru źródeł](sources.md#rso-rcb-klasy) są 
 
 Zaakceptowano specyfikację z identyfikatorem `rtb-v0.3`; parametry pozostają nieskalibrowane. Wdrożenie wymaga konfiguracji obliczeń i schematów v0.3, wersji grafu oraz rejestru źródeł, tłumaczeń, reguł grupowania i bramek jakości. Nie wystarczy zmiana pola `version` w konfiguracji v0.2. Uruchomić najpierw obliczenia porównawcze na osobnych danych, zachowując v0.2 i replay. Osiem godzin świeżości źródeł RTB i 36 godzin pilotażu GNSS nie są dopuszczalnymi limitami dla minutowego ostrzegania. Dla taktycznej korelacji przyjęto wymóg kontroli PAŻP i RCB/RSO nie starszej niż 5 minut względem `T`; jej osiągalność musi zostać zmierzona przed użyciem.
 
-| Przypadek syntetyczny / warunek | Oczekiwany wynik przyszłej implementacji |
+| Przypadek syntetyczny / warunek | Oczekiwany wynik / przypadek testowy |
 |---|---|
 | Taktyczny: wiek 0, 30, 45, 60 min | `D=1; 1; 0,5; 0` |
 | Strukturalny: wiek 48, 132, 216 h | `D=1; 0,5; 0` |
@@ -209,7 +209,7 @@ Wyniki trzeba sprawdzić na odseparowanym okresie historycznym, z ćwiczeniami, 
 
 ## Ustalenia robocze i dalsza walidacja
 
-Po komentarzu użytkownika wdrożono osobne pilotaże GNSS/logistyki, API ADSB.lol i historii lotniczej, opisane w `docs/early-warning-design.md`. Obserwacje mogą trafiać do przeglądu bez potwierdzonego sprawcy; detektor alarmowy i nowe heurystyki nie są jeszcze wdrożone. Wagi, kryteria i odczyty działającej v0.2 pozostają bez zmian do wdrożenia zaakceptowanej specyfikacji v0.3. Kontrola pokrycia i ocena wyprzedzenia muszą zachować wiedzę dostępną w chwili prognozy.
+Po komentarzu użytkownika wdrożono osobne pilotaże GNSS/logistyki, API ADSB.lol i historii lotniczej, opisane w `docs/early-warning-design.md`. Obserwacje mogą trafiać do przeglądu bez potwierdzonego sprawcy; heurystyki v0.3 są wdrożone, natomiast detektor anomalii GNSS i kalibracja nadal wymagają pracy. Dawne odczyty v0.2 pozostają niezmienione. Kontrola pokrycia i ocena wyprzedzenia muszą zachować wiedzę dostępną w chwili prognozy.
 
 Przyjęte w v0.3: Polska i flanka NATO jako cel; wygaszanie według profilu zdarzenia; 14–42 dni dla scenariuszy; propagacja regionalna 40% / 16%; korelacja i fala z ograniczonym mnożnikiem; ponad 60 jako wezwanie do przeglądu z osobną bramką czerwonego; biblioteka doktryny oddzielona od zdarzeń. Żadna nowa integracja nie korzysta z danych agregowanych przez Strażnika.
 

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "executor",
+    "methodology_version",
+    "max_candidates_per_packet",
+    "max_packet_bytes",
+    "require_evidence_audit",
+    "require_editorial_audit",
+    "external_model_api"
+  ],
+  "properties": {
+    "version": {
+      "const": "analysis-v1"
+    },
+    "executor": {
+      "const": "codex"
+    },
+    "methodology_version": {
+      "enum": [
+        "rtb-v0.2",
+        "rtb-v0.3"
+      ]
+    },
+    "max_candidates_per_packet": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200
+    },
+    "max_packet_bytes": {
+      "type": "integer",
+      "minimum": 10000,
+      "maximum": 5000000
+    },
+    "require_evidence_audit": {
+      "const": true
+    },
+    "require_editorial_audit": {
+      "const": true
+    },
+    "external_model_api": {
+      "const": false
+    }
+  }
+}

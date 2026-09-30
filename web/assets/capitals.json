@@ -1,0 +1,173 @@
+[
+  {
+    "country_code": "AT",
+    "name": "Wiedeń",
+    "source_name": "Vienna",
+    "coordinates": [
+      16.364693,
+      48.201961
+    ]
+  },
+  {
+    "country_code": "BG",
+    "name": "Sofia",
+    "source_name": "Sofia",
+    "coordinates": [
+      23.314708,
+      42.685295
+    ]
+  },
+  {
+    "country_code": "BY",
+    "name": "Mińsk",
+    "source_name": "Minsk",
+    "coordinates": [
+      27.564681,
+      53.901923
+    ]
+  },
+  {
+    "country_code": "CZ",
+    "name": "Praga",
+    "source_name": "Prague",
+    "coordinates": [
+      14.422939,
+      50.086967
+    ]
+  },
+  {
+    "country_code": "DE",
+    "name": "Berlin",
+    "source_name": "Berlin",
+    "coordinates": [
+      13.399603,
+      52.523764
+    ]
+  },
+  {
+    "country_code": "DK",
+    "name": "Kopenhaga",
+    "source_name": "København",
+    "coordinates": [
+      12.56154,
+      55.68051
+    ]
+  },
+  {
+    "country_code": "EE",
+    "name": "Tallinn",
+    "source_name": "Tallinn",
+    "coordinates": [
+      24.728041,
+      59.433877
+    ]
+  },
+  {
+    "country_code": "FI",
+    "name": "Helsinki",
+    "source_name": "Helsinki",
+    "coordinates": [
+      24.932457,
+      60.163804
+    ]
+  },
+  {
+    "country_code": "HU",
+    "name": "Budapeszt",
+    "source_name": "Budapest",
+    "coordinates": [
+      19.081375,
+      47.501952
+    ]
+  },
+  {
+    "country_code": "LT",
+    "name": "Wilno",
+    "source_name": "Vilnius",
+    "coordinates": [
+      25.316635,
+      54.683366
+    ]
+  },
+  {
+    "country_code": "LV",
+    "name": "Ryga",
+    "source_name": "Riga",
+    "coordinates": [
+      24.099965,
+      56.950024
+    ]
+  },
+  {
+    "country_code": "MD",
+    "name": "Kiszyniów",
+    "source_name": "Chișinău",
+    "coordinates": [
+      28.857711,
+      47.005024
+    ]
+  },
+  {
+    "country_code": "NO",
+    "name": "Oslo",
+    "source_name": "Oslo",
+    "coordinates": [
+      10.748033,
+      59.918636
+    ]
+  },
+  {
+    "country_code": "PL",
+    "name": "Warszawa",
+    "source_name": "Warsaw",
+    "coordinates": [
+      21.005347,
+      52.230872
+    ]
+  },
+  {
+    "country_code": "RO",
+    "name": "Bukareszt",
+    "source_name": "Bucharest",
+    "coordinates": [
+      26.098001,
+      44.435318
+    ]
+  },
+  {
+    "country_code": "RU",
+    "name": "Moskwa",
+    "source_name": "Moscow",
+    "coordinates": [
+      37.613577,
+      55.75411
+    ]
+  },
+  {
+    "country_code": "SE",
+    "name": "Sztokholm",
+    "source_name": "Stockholm",
+    "coordinates": [
+      18.0663,
+      59.324127
+    ]
+  },
+  {
+    "country_code": "SK",
+    "name": "Bratysława",
+    "source_name": "Bratislava",
+    "coordinates": [
+      17.116981,
+      48.150018
+    ]
+  },
+  {
+    "country_code": "UA",
+    "name": "Kijów",
+    "source_name": "Kyiv",
+    "coordinates": [
+      30.514682,
+      50.435313
+    ]
+  }
+]

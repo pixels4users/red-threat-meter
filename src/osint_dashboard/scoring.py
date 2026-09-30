@@ -9,6 +9,10 @@ from .review import validate_evidence
 
 
 def window_for(as_of: str, config: dict) -> dict:
+    if config['version'] == 'rtb-v0.3':
+        end = instant(as_of)
+        return {'start': (end - timedelta(hours=config['window_hours'])).isoformat(), 'end': end.isoformat(),
+                'timezone': config['timezone'], 'definition': config['window_definition']}
     zone = ZoneInfo(config["timezone"])
     end = instant(as_of)
     first_day = end.astimezone(zone).date() - timedelta(days=config["window_days"] - 1)
@@ -27,6 +31,9 @@ def alert_for(value: int | None, config: dict) -> dict:
 
 
 def score(inputs: dict) -> tuple[dict, dict]:
+    if inputs['scoring']['version'] == 'rtb-v0.3':
+        from .scoring_v03 import score_v03
+        return score_v03(inputs)
     config, as_of = inputs["scoring"], inputs["as_of"]
     window = window_for(as_of, config)
     zone = ZoneInfo(config["timezone"])

@@ -1,0 +1,332 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "rtb-v0.3"
+    },
+    "profile": {
+      "enum": [
+        "tactical",
+        "structural"
+      ]
+    },
+    "time": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "earliest": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "latest": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "earliest",
+            "latest",
+            "evidence_ids"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "episode_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "confirmed_primary",
+              "corroborated"
+            ]
+          },
+          "time": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "earliest": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "latest": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "evidence_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "earliest",
+              "latest",
+              "evidence_ids"
+            ]
+          },
+          "evidence_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "key",
+          "status",
+          "time",
+          "evidence_ids"
+        ]
+      },
+      "maxItems": 100
+    },
+    "direct_kinetic": {
+      "type": "boolean"
+    },
+    "kinetic_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "region_ids": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "PL-02",
+          "PL-04",
+          "PL-06",
+          "PL-08",
+          "PL-10",
+          "PL-12",
+          "PL-14",
+          "PL-16",
+          "PL-18",
+          "PL-20",
+          "PL-22",
+          "PL-24",
+          "PL-26",
+          "PL-28",
+          "PL-30",
+          "PL-32"
+        ]
+      },
+      "uniqueItems": true
+    },
+    "region_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "regional_scope_known": {
+      "type": "boolean"
+    },
+    "active_until": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "end_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "correlation": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "signals": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "family": {
+                    "enum": [
+                      "gnss",
+                      "pansa",
+                      "osint"
+                    ]
+                  },
+                  "time": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "earliest": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "latest": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "evidence_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "minItems": 1,
+                        "uniqueItems": true
+                      }
+                    },
+                    "required": [
+                      "earliest",
+                      "latest",
+                      "evidence_ids"
+                    ]
+                  },
+                  "region_ids": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "PL-02",
+                        "PL-04",
+                        "PL-06",
+                        "PL-08",
+                        "PL-10",
+                        "PL-12",
+                        "PL-14",
+                        "PL-16",
+                        "PL-18",
+                        "PL-20",
+                        "PL-22",
+                        "PL-24",
+                        "PL-26",
+                        "PL-28",
+                        "PL-30",
+                        "PL-32"
+                      ]
+                    },
+                    "uniqueItems": true,
+                    "minItems": 1
+                  },
+                  "evidence_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  },
+                  "valid_until": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "family",
+                  "time",
+                  "region_ids",
+                  "evidence_ids",
+                  "valid_until"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "gnss_method": {
+              "type": "string",
+              "minLength": 1
+            },
+            "baseline_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "link_reason": {
+              "type": "string",
+              "minLength": 20
+            },
+            "nonroutine_evidence_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "signals",
+            "gnss_method",
+            "baseline_sha256",
+            "link_reason",
+            "nonroutine_evidence_ids"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "profile",
+    "time",
+    "episode_key",
+    "components",
+    "direct_kinetic",
+    "kinetic_evidence_ids",
+    "region_ids",
+    "region_evidence_ids",
+    "regional_scope_known",
+    "active_until",
+    "end_evidence_ids",
+    "correlation"
+  ]
+}

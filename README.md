@@ -1,6 +1,6 @@
 # OSINT Threat Dashboard
 
-Lokalny pilotaż OSINT / Indicators & Warnings dla Polski i wschodniej flanki NATO. Gotowy jest proces danych z etapów 0–2: pobranie → archiwum → kolejka przeglądu → SQLite → raport i JSON/GeoJSON. Zaakceptowana metodologia to **RTB v0.3**; działający silnik nadal liczy według v0.2, do wdrożenia nowych reguł i kontraktów. Nowe źródła pierwotne są wybrane do integracji bez pośrednictwa Strażnika. Projekt dashboardu oraz sposobu zasilania frontendu danymi jest osobnym, następnym krokiem.
+Lokalny pilotaż OSINT / Indicators & Warnings dla Polski i wschodniej flanki NATO. Gotowy jest proces danych: pobranie → archiwum → kolejka przeglądu → SQLite → raport i JSON/GeoJSON. Frontend **B — Chronologia** czyta publikacje z Supabase przez lokalne API. Pełny cykl na rzeczywistych danych sprawdzono 27.09.2026; szczegóły opisuje [integracja Supabase](supabase/README.md). Zaakceptowana metodologia to **RTB v0.3**; silnik od 29.09.2026 wykonuje v0.3. Dodano bezpośrednie PAŻP/AUP i RSO/ogólne; [zakres i ograniczenia](docs/v0.3-implementation.md).
 
 Działa również **osobny pilotaż sygnałów wczesnych**: dzienne pomiary GPSJAM i publikacje logistyczne belzhd. Pierwsze pobranie obejmuje 30 dni GNSS i 10 publikacji. Warstwa zachowuje obserwacje bez ustalonego sprawcy, pokazuje jakość danych i umożliwia przegląd. Nie ma jeszcze skalibrowanego detektora anomalii.
 
@@ -22,9 +22,24 @@ Nowe lub zmienione publikacje otrzymują polski opis w przeglądzie agenta. Moż
 
 Raport może pokazać **„Niewyliczony — dane lub przegląd niepełne”**. To prawidłowy stan, kiedy pojawiły się nieocenione wiadomości albo nie działa wymagane źródło. Samo pobranie tekstu nie potwierdza incydentu. RTB jest niewalidowanym indeksem; wynik ponad 60 oznacza potrzebę pilnego przeglądu, bez przypisywania mu prawdopodobieństwa wojny.
 
-Nowe materiały wymagają przeglądu w Codex lub przez analityka. Gotowa instrukcja znajduje się w `agents/evidence-reviewer.md`. Możesz zlecić: „Przejrzyj najnowszą kolejkę OSINT zgodnie z instrukcją evidence-reviewer, zapisz oceny i odśwież raport”. Oceny AI są jawnie oznaczone jako wykonane przez agenta. W tle nie działa jeszcze autonomiczny model ani harmonogram.
+Nowe materiały przegląda Codex. Możesz zlecić: **„Wykonaj pełny dzienny cykl
+według agents/analysis-cycle.md, opublikuj wynik do Supabase i sprawdź odczyt”**.
+Gotowy proces obejmuje pobranie, ocenę, drugi przegląd dowodów, obliczenie RTB
+i komentarz oparty na ustaleniach. Oceny AI są oznaczone jako wykonane przez
+agenta. Nie potrzeba osobnego API modelu; harmonogram pozostaje niewłączony.
+[Obsługa silnika](docs/analysis-runbook.md).
 
 ## Polecenia
+
+Dashboard budujemy przez `npm ci` i `npm run build`. Po skonfigurowaniu
+prywatnego dostępu do Supabase uruchamia go
+`.venv/bin/python scripts/serve_dashboard.py`. Publikacja kolejnego odczytu:
+`.venv/bin/python scripts/publish_dashboard.py cycle`.
+Strona sprawdza nowe publikacje co 30 sekund; przycisk odświeżania nie uruchamia
+analizy. Na Macu ten sam cykl pobrania i publikacji uruchamia
+`Opublikuj raport.command`; ten skrót nie wykonuje przeglądu Codexa.
+[Pełna instrukcja i izolowany test](docs/dashboard-runbook.md),
+[kontrakt danych](docs/dashboard-data-contract.md).
 
 W Terminalu otwartym w katalogu projektu:
 
@@ -102,7 +117,7 @@ Ograniczony audyt historii ma własne archiwum `data/aviation_history/`. Zapisan
 |---|---|
 | `data/latest.json` | Wskaźnik ostatniego kompletnego wydania |
 | `data/snapshots/<id>/report.md` | Czytelny raport ze źródłami i przyczynami wykluczeń |
-| `data/snapshots/<id>/snapshot.json` | Kontrakt danych dla przyszłego dashboardu |
+| `data/snapshots/<id>/snapshot.json` | Wewnętrzny snapshot procesu; wejście eksportera dashboardu |
 | `data/snapshots/<id>/incidents.geojson` | Obserwacje i lokalizacje; geometria może być `null` |
 | `data/runs/<id>/review_queue.json` | Materiały wymagające oceny wraz z wcześniejszymi decyzjami |
 | `data/reviews/` | Pakiety ocen przygotowane przez analityka lub agenta |
@@ -112,11 +127,15 @@ Ograniczony audyt historii ma własne archiwum `data/aviation_history/`. Zapisan
 | `data/doctrine_index/` | Wersjonowane indeksy tekstu stron, poza bazą incydentów |
 | `data/briefs/` | Interpretacje analityka wskazujące konkretne wydanie danych, tworzone w razie potrzeby |
 
-Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu projektu serwerem WWW. Frontend będzie korzystał z osobnego, ograniczonego eksportu, a nie bezpośrednio z bazy i surowych treści.
+Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu projektu serwerem WWW. Frontend korzysta z osobnego, ograniczonego eksportu `dashboard-v1`. Lokalny serwer udostępnia wyłącznie `dist/` i API publikacji; surowe źródła pozostają poza nim.
 
 ## Dokumentacja i dalszy zakres
 
-- [GitHub i Supabase](supabase/README.md) — repozytorium, wskazany projekt, konfiguracja gałęzi i zakres przyszłej integracji. Samo połączenie usług nie wdraża kolektorów ani strony.
+- [Dashboard — obsługa](docs/dashboard-runbook.md) — ręczny cykl, publikacja, historia, korekty, uruchomienie i testy.
+- [Silnik Codexa](docs/analysis-runbook.md) — pełny cykl analizy, dowody, komentarz i publikacja, bez osobnego API modelu.
+- [Kontrakt dashboardu](docs/dashboard-data-contract.md) — dozwolone pola, daty, braki, wersje i granica eksportu.
+- [Design System](design.md) — zaakceptowany układ B, kolory, komponenty i zasady UI.
+- [GitHub i Supabase](supabase/README.md) — repozytorium, migracja, uprawnienia i rzeczywisty stan połączenia. Samo połączenie usług nie uruchamia kolektorów ani strony.
 - [Metodologia RTB v0.3](docs/methodology.md) — zaakceptowane reguły, dowody, ograniczenia i jawny stan wdrożenia; [reguły silnika v0.2](docs/archive/methodology-v0.2.md).
 - [Biblioteka doktryny](docs/doctrine.md) — katalog materiałów, dwa dodane artykuły, lokalne wyszukiwanie i zasady interpretacji.
 - [Szablon briefu](docs/templates/analytical-brief.md) — scenariusze warunkowe na 14–42 dni, dowody i kontrargumenty.
@@ -131,4 +150,8 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 - [Stan realizacji](docs/STATUS.md) — wynik sprawdzeń i następny etap.
 - [Audyt i zaakceptowany plan](docs/AUDYT_I_PLAN.md) — pierwotna ocena materiałów; opis stanu sprzed wdrożenia.
 
-Następny krok to zaprojektowanie dashboardu i sposobu zasilania frontendu danymi; nie rozpoczynamy go w ramach akceptacji metodologii. Przed implementacją przedstawimy dwa kierunki wizualne dla mapy, rejestru zdarzeń i historii odczytów. Rozwój danych odniesienia i niezależna weryfikacja źródeł mogą przebiegać obok prac nad interfejsem; strona pokaże osobno rodziny danych, daty i braki. Automatyzacja oraz walidacja progów pozostają dalszymi etapami; wcześniejsze osobiste cele projektu mają wyłącznie status archiwalny.
+Dwa kierunki UI zostały przedstawione; użytkownik zaakceptował B — Chronologia
+i wdrożenie przepływu danych. Zapis i odczyt rzeczywistego wydania przez Supabase
+oraz automatyczne odświeżenie ekranu zostały sprawdzone. Pozostało osobne
+wdrożenie hostingu aplikacji i późniejszy harmonogram. Silnik ma już ścieżkę
+przeglądu Codexa i zatwierdzania komentarza. Reguły v0.3 są wdrożone. Integracje osobnych pilotaży, uzupełnienie historii zdarzeń i kalibracja pozostają kolejnymi pracami.

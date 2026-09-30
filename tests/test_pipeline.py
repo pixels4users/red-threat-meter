@@ -3,6 +3,8 @@ import sqlite3
 
 import pytest
 
+pytestmark = pytest.mark.usefixtures("legacy_engine")
+
 from osint_dashboard.common import read_json, write_json
 from osint_dashboard.pipeline import locked, replay, run
 from osint_dashboard.review import import_review

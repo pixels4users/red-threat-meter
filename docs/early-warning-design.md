@@ -1,6 +1,6 @@
 # Wczesne ostrzeganie — doprecyzowanie projektu
 
-Aktualizacja: 25.09.2026. Status: **dotychczasowy plan zaakceptowany; kontrakt obserwacji, pilotaż GPSJAM/belzhd, pilotaż jakości ADSB.lol i ograniczony audyt historii wdrożone**. Rozszerzenie o źródła pierwotne i metodologię v0.3 zostało zaakceptowane 25.09.2026; adaptery i nowe obliczenia pozostają do wdrożenia. Strażnik jest odniesieniem architektonicznym, a dane pozyskujemy od wskazanych instytucji i wydawców. Wykonywalny zakres opisują [instrukcja GNSS/logistyki](early-warning-runbook.md), [instrukcja lotnictwa](aviation-runbook.md) i [audyt historii](aviation-history.md). Wagi RTB v0.2 pozostają osobne; nie uruchomiono harmonogramu, usług AI ani detektora anomalii.
+Aktualizacja: 25.09.2026. Status: **dotychczasowy plan zaakceptowany; kontrakt obserwacji, pilotaż GPSJAM/belzhd, pilotaż jakości ADSB.lol i ograniczony audyt historii wdrożone**. Rozszerzenie o źródła pierwotne i metodologię v0.3 zostało zaakceptowane 25.09.2026; obliczenia v0.3 oraz PAŻP/AUP i RSO/ogólne wdrożono 29.09.2026. Pozostałe adaptery i detektor minutowy GNSS wymagają dalszej pracy. Strażnik jest odniesieniem architektonicznym, a dane pozyskujemy od wskazanych instytucji i wydawców. Wykonywalny zakres opisują [instrukcja GNSS/logistyki](early-warning-runbook.md), [instrukcja lotnictwa](aviation-runbook.md) i [audyt historii](aviation-history.md). Wagi RTB v0.3 pozostają osobne wobec pilotaży; nie uruchomiono harmonogramu, usług AI ani detektora anomalii.
 
 Kolejna dostawa z 23.09 dodaje polskie tytuły i streszczenia, [porównanie GNSS na wspólnej siatce](gnss-reference-methodology.md) oraz [ocenę dostępu lotniczego](aviation-access.md). Mediana historii nie jest ustalonym poziomem normalnej aktywności. Przegląd agentowy obejmuje już wszystkie 10 pobranych publikacji; niezależne potwierdzenie twierdzeń pozostaje odrębne.
 
@@ -11,7 +11,7 @@ Rozbudować system o osobną warstwę sygnałów wczesnych. Obecny RTB celowo wy
 | Wynik dla użytkownika | Co opisuje | Warunek |
 |---|---|---|
 | Sygnały wczesne | Zaobserwowane odchylenia i doniesienia wymagające uwagi | Jawne źródło, czas dostępności, jakość i uzasadnienie; atrybucja może być nieznana |
-| RTB | Potwierdzone, kwalifikujące się działania i przygotowania | Zaakceptowana metodologia v0.3; działające odczyty nadal v0.2 |
+| RTB | Potwierdzone, kwalifikujące się działania i przygotowania | Domyślny silnik v0.3; wcześniejsze odczyty zachowują v0.2 |
 | Jakość pokrycia | Co rzeczywiście obserwujemy i gdzie brakuje danych | Aktualność, liczebność próby, kompletność i zależności źródeł |
 
 Na początek sygnały wczesne otrzymują statusy: „nowe doniesienie”, „anomalia do sprawdzenia”, „pilny przegląd”, „wyjaśnione” albo „brak podstaw do oceny”. Nie dodajemy drugiej nieskalibrowanej liczby 0–100. „Pilny przegląd” jest priorytetem analitycznym, nie prognozą ataku. Sam raport o dużej możliwej wadze może trafić do pilnego przeglądu mimo pojedynczego źródła; etykieta nie zmienia się wtedy na „potwierdzone”.
@@ -97,7 +97,7 @@ Dane sensorowe powinny dostać osobną tabelę obserwacji i własny kontrakt. Ni
 - alternatywne wyjaśnienia, status przeglądu, grupę zależności źródeł i powiązany event_key, jeśli ustalono;
 - osobny status atrybucji oraz odnośniki do późniejszego potwierdzenia lub sprostowania.
 
-Rozszerzenie kontraktu v0.3 powinno zachować również `episode_key`, składowe `event_key`, `origin_id` i grupy zależności, identyfikator/rewizję strefy lub alertu, `valid_from/until`, `supersedes`/odwołanie, przedział niepewności czasu, rozróżnienie planu i wykonania, profil wygaszania oraz wersje odniesienia, korelacji i grafu. Wyjście zawiera `base_weight`, `decay_factor`, przesłanki i składniki `synergy_factor`, wagę przed/po limitach, wkład bezpośredni/przeniesiony i powody wstrzymania czerwonego. To zaakceptowane wymagania nowego kontraktu; obecne importy nie przyjmują tych pól automatycznie.
+Rozszerzenie kontraktu v0.3 powinno zachować również `episode_key`, składowe `event_key`, `origin_id` i grupy zależności, identyfikator/rewizję strefy lub alertu, `valid_from/until`, `supersedes`/odwołanie, przedział niepewności czasu, rozróżnienie planu i wykonania, profil wygaszania oraz wersje odniesienia, korelacji i grafu. Wyjście zawiera `base_weight`, `decay_factor`, przesłanki i składniki `synergy_factor`, wagę przed/po limitach, wkład bezpośredni/przeniesiony i powody wstrzymania czerwonego. Import przyjmuje `assessment_v03` i `official_warning`; dokładne nazwy pól i rozbicie wyniku podaje [wdrożenie v0.3](v0.3-implementation.md).
 
 Sygnał istnieje także wtedy, gdy RTB jest `null`. Brak bieżącego odczytu jednej rodziny danych nie usuwa poprawnych obserwacji z innych rodzin; obok pokazujemy brak pokrycia. Nowe źródła początkowo działają jako obserwacyjne, bez dodawania wszystkich do globalnej bramki kompletności RTB.
 

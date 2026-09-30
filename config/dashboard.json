@@ -1,0 +1,8 @@
+{
+  "contract_version": "dashboard-v1",
+  "supabase_project_ref": "dubhsimiblpfcaudbvjb",
+  "report_type": "daily",
+  "refresh_seconds": 30,
+  "stale_after_hours": 30,
+  "history_page_size": 30
+}

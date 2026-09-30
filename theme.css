@@ -1,0 +1,121 @@
+/* RTB Design System 0.2 — zaakceptowany układ B: Chronologia.
+ * Źródło tokenów dla podglądu i działającego frontendu.
+ * Czerwień: wyłącznie znaczenie zagrożenia i znak marki, nigdy akcja.
+ */
+.rtb-app {
+  --color-canvas: light-dark(#ffffff, #0a0a0a);
+  --color-sidebar: light-dark(#f6f6f6, #141414);
+  --color-surface: light-dark(#ffffff, #1e1e1e);
+  --color-surface-hover: light-dark(#ededed, #292929);
+  --color-text: light-dark(#171717, #f5f5f5);
+  --color-text-secondary: light-dark(#626262, #a7a7a7);
+  --color-border: light-dark(#dedede, #313131);
+  --color-control-border: light-dark(#858585, #767676);
+  --color-action: light-dark(#171717, #f5f5f5);
+  --color-on-action: light-dark(#ffffff, #171717);
+  --color-focus: light-dark(#171717, #f5f5f5);
+  --color-signal-neutral: light-dark(#525252, #b8b8b8);
+  --color-on-signal: light-dark(#ffffff, #141414);
+  --color-threat: light-dark(#bd302b, #ff7973);
+  --color-threat-surface: light-dark(#fff1f0, #321918);
+  --color-brand-mark: var(--color-threat);
+  --color-map-land: light-dark(#fafafa, #1a1a1a);
+  --color-map-water: light-dark(#ececec, #101010);
+  --color-map-border: light-dark(#bcbcbc, #505050);
+  --color-overlay: light-dark(rgb(0 0 0 / .36), rgb(0 0 0 / .72));
+
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-numbers: var(--font-body);
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-strong: 600;
+  --text-caption: 12px;
+  --text-body-small: 14px;
+  --text-body: 16px;
+  --text-section: 18px;
+  --text-title: 28px;
+  --text-kpi: 112px;
+  --text-kpi-mobile: 88px;
+  --leading-caption: 16px;
+  --leading-body: 24px;
+  --leading-title: 36px;
+
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+  --page-gutter: var(--space-xl);
+  --section-gap: var(--space-2xl);
+  --group-gap: var(--space-sm);
+  --sidebar-width: 200px;
+  --content-max: 1440px;
+  --target-size: 44px;
+  --radius-small: 4px;
+  --radius-control: 8px;
+  --radius-panel: 8px;
+  --radius-round: 50%;
+
+  --z-base: 0;
+  --z-data: 1;
+  --z-selected: 2;
+  --z-map-tools: 3;
+  --z-sticky: 10;
+  --z-dropdown: 20;
+  --z-modal-backdrop: 30;
+  --z-modal: 40;
+  --z-toast: 50;
+  --z-tooltip: 60;
+  --motion-fast: 140ms;
+
+  /* Semantyczne aliasy adaptera istniejącego prototypu. */
+  --r-bg: var(--color-canvas);
+  --r-sidebar: var(--color-sidebar);
+  --r-surface: var(--color-surface);
+  --r-text: var(--color-text);
+  --r-muted: var(--color-text-secondary);
+  --r-line: var(--color-border);
+  --r-soft: var(--color-surface-hover);
+  --r-link: var(--color-action);
+  --r-signal: var(--color-signal-neutral);
+  --r-land: var(--color-map-land);
+  --r-water: var(--color-map-water);
+  --r-map-border: var(--color-map-border);
+  --r-selected: var(--color-on-signal);
+  --r-kpi-size: var(--text-kpi);
+  --r-map-share: 62%;
+  --r-trend: var(--color-text-secondary);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--text-body-small);
+  line-height: var(--leading-body);
+  text-align: left;
+}
+
+.rtb-app[data-appearance="light"] { color-scheme: light; }
+.rtb-app[data-appearance="dark"] { color-scheme: dark; }
+.rtb-app[data-trend="up"] { --r-trend: var(--color-threat); }
+.rtb-app[data-trend="down"] { --r-trend: var(--color-text-secondary); }
+
+/* Stan zagrożenia przekazuje ocena; kolor nie ustala progu punktacji. */
+.rtb-app [data-threat="high"] {
+  --event-color: var(--color-threat);
+  --signal-background: var(--color-threat-surface);
+}
+.rtb-app .r-marker[data-threat="high"] .r-marker-glyph { background: var(--color-threat); }
+.rtb-app .r-tag[data-threat="high"] { color: var(--color-threat); }
+
+@media (max-width: 900px) {
+  .rtb-app { --page-gutter: var(--space-lg); --sidebar-width: 176px; }
+}
+@media (max-width: 620px) {
+  .rtb-app { --page-gutter: var(--space-md); --section-gap: var(--space-xl); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rtb-app { --motion-fast: 0ms; }
+}

@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+from jsonschema import Draft202012Validator
+
 ROOT = Path(__file__).resolve().parents[2]
 UTC = timezone.utc
 
@@ -73,6 +75,7 @@ def load_config(path: Path | None = None) -> dict:
     config = read_json(path or ROOT / "config/sources.json")
     if not isinstance(config, dict) or not config.get("sources"):
         raise ValueError("Empty source configuration")
+    Draft202012Validator(read_json(ROOT / "schemas/sources.schema.json")).validate(config)
     ids = [s["id"] for s in config["sources"]]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate source identifier")
@@ -80,4 +83,17 @@ def load_config(path: Path | None = None) -> dict:
         if source["enabled"]:
             if urlsplit(canonical_url(source["url"])).hostname not in source["allowed_hosts"]:
                 raise ValueError(f"Source host is not allowed: {source['id']}")
+    return config
+
+
+def load_scoring(version: str | None = None) -> dict:
+    version = version or read_json(ROOT / 'config/analysis.json')['methodology_version']
+    paths = {'rtb-v0.2': 'scoring-v0.json', 'rtb-v0.3': 'scoring-v0.3.json'}
+    if version not in paths:
+        raise ValueError('Unsupported methodology version')
+    config = read_json(ROOT / 'config' / paths[version])
+    if config['version'] != version:
+        raise ValueError('Scoring version mismatch')
+    if version == 'rtb-v0.3':
+        Draft202012Validator(read_json(ROOT / 'schemas/scoring-v03.schema.json')).validate(config)
     return config

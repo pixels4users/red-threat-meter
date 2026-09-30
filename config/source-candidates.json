@@ -1,7 +1,7 @@
 {
-  "version": "source-candidates-8",
+  "version": "source-candidates-9",
   "checked_on": "2026-09-25",
-  "policy": "Rejestr integracji i kandydatów. Działający pilotaż GNSS/belzhd jest w config/early-warning.json, pilotaż jakości ADSB.lol w config/aviation.json, audyt historii w config/aviation-history.json, kolektory RTB w config/sources.json. Pozostałe wpisy nie uruchamiają adapterów. Daty wcześniejszych ocen dostępu zachowano w opisach. Kalibracja i niezależna weryfikacja są odrębną pracą. Rozszerzenie z 25.09.2026: kandydaci pierwotni PAŻP, kanały UA, RSO, media i siły zbrojne LT/LV/EE oraz semantyka istniejącego RCB zostały zaakceptowane do integracji 25.09.2026; nie uruchamiają nowych kolektorów. Strażnik jest wyłącznie odniesieniem architektonicznym. Grupa wydawcy nie zastępuje ustalenia pochodzenia każdego dowodu. proposal_status=accepted_for_integration i accepted_on oznaczają akceptację zakresu, nie gotowość adaptera; pole status nadal opisuje dostęp i wdrożenie. Akceptacja nie zmienia dat checked_on ani wyników oceny dostępu.",
+  "policy": "Rejestr integracji i kandydatów. Działający pilotaż GNSS/belzhd jest w config/early-warning.json, pilotaż jakości ADSB.lol w config/aviation.json, audyt historii w config/aviation-history.json, kolektory RTB w config/sources.json. Pozostałe wpisy nie uruchamiają adapterów. Daty wcześniejszych ocen dostępu zachowano w opisach. Kalibracja i niezależna weryfikacja są odrębną pracą. Rozszerzenie z 25.09.2026: kandydaci pierwotni PAŻP, kanały UA, RSO, media i siły zbrojne LT/LV/EE oraz semantyka istniejącego RCB zostały zaakceptowane do integracji 25.09.2026; nie uruchamiają nowych kolektorów. Strażnik jest wyłącznie odniesieniem architektonicznym. Grupa wydawcy nie zastępuje ustalenia pochodzenia każdego dowodu. proposal_status=accepted_for_integration i accepted_on oznaczają akceptację zakresu, nie gotowość adaptera; pole status nadal opisuje dostęp i wdrożenie. Akceptacja nie zmienia dat checked_on ani wyników oceny dostępu. Aktualizacja 29.09.2026: pansa_airspace i rso_public mają działające adaptery ograniczonego zakresu; szczegóły w ich statusach.",
   "candidates": [
     {
       "id": "pl_special_services",
@@ -280,16 +280,18 @@
       "url": "https://airspace.pansa.pl/",
       "role": "airspace_planning_and_activation",
       "priority": 1,
-      "status": "official_site_identified_runtime_contract_not_tested",
+      "status": "current_aup_integrated_activation_not_observed",
       "purpose": "ADHOC, R, D i NPZ: plan AUP/UUP, aktywacja, zmiany oraz odwołania. Hipoteza przygotowań obronnych RP wymaga nierutynowości i kontekstu. NPZ dotyczy ograniczeń planowania lotów, nie domniemanej strefy bojowej.",
       "dependency_group": "authority:pansa",
       "verification_urls": [
         "https://www.pansa.pl/cat/",
         "https://www.amc.pansa.pl/amc-polska/informacje-ogolne/",
-        "https://www.eurocontrol.int/sites/default/files/2025-11/eurocontrol-ernip-part1-airspace-design-methodology-v3-2.pdf"
+        "https://www.eurocontrol.int/sites/default/files/2025-11/eurocontrol-ernip-part1-airspace-design-methodology-v3-2.pdf",
+        "https://airspace.pansa.pl/aup/current",
+        "https://www.pansa.pl/OPS/ops_rpa_pl.htm"
       ],
-      "access_note": "25.09.2026: sprawdzono adres i opisy oficjalne. Nie przetestowano stabilnego kontraktu danych, statusów taktycznych, limitów ani opóźnienia. Plan nie potwierdza aktywacji. Adapter niepodłączony.",
-      "checked_on": "2026-09-25",
+      "access_note": "29.09.2026: bezpośredni HTML /aup/current; 422 wiersze planu w próbie. Adapter w config/sources.json. Plan, nie potwierdzona aktywacja; brak UUP i historii stanu. Y/N nie jest statusem operacyjnym.",
+      "checked_on": "2026-09-29",
       "proposal_status": "accepted_for_integration",
       "accepted_on": "2026-09-25"
     },
@@ -341,16 +343,17 @@
       "url": "https://komunikaty.tvp.pl/komunikaty/wszystkie/wszystkie",
       "role": "official_warning_distribution",
       "priority": 1,
-      "status": "official_distribution_page_verified_adapter_not_connected",
+      "status": "general_xml_integrated_history_not_verified",
       "purpose": "Regionalny System Ostrzegania: obowiązujące komunikaty, obszary, aktualizacje i odwołania. Klasy treści L1/L2/L3 dotyczą ostrzeżeń powietrznych, nie prawnych stopni alarmowych. RCB przez RSO i gov.pl to wspólne pochodzenie.",
       "dependency_group": "distribution:rso",
       "origin_policy": "Ustal nadawcę każdego ostrzeżenia. Dla komunikatu RCB przypisz authority:rcb i jeden alert_key wspólnie z gov.pl; sam kanał dystrybucji nie daje niezależności.",
       "verification_urls": [
         "https://www.gov.pl/web/mswia/regionalny-system-ostrzegania",
-        "https://www.gov.pl/web/mswia/-obowiazujace-komunikaty-opublikowane-w-rso"
+        "https://www.gov.pl/web/mswia/-obowiazujace-komunikaty-opublikowane-w-rso",
+        "https://komunikaty.tvp.pl/komunikaty/wszystkie/ogolne/0?_format=xml"
       ],
-      "access_note": "25.09.2026: odnośnik MSWiA kieruje do wykazu TVP. Treść wykazu dostępna; kontrakt maszynowy, paginacja i kompletność historii do sprawdzenia. Adapter niepodłączony.",
-      "checked_on": "2026-09-25",
+      "access_note": "29.09.2026: publiczny eksport XML kategorii ogólnej, 42 rekordy w próbie, totalItems zgodne z liczbą. Adapter zachowuje pełne treści i identyfikatory. Lista bieżąca nie dowodzi historii ani odwołań; L1/L2/L3 wymaga przeglądu treści.",
+      "checked_on": "2026-09-29",
       "proposal_status": "accepted_for_integration",
       "accepted_on": "2026-09-25"
     },

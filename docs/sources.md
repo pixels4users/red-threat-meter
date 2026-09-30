@@ -1,6 +1,6 @@
 # Źródła bieżące i materiały referencyjne — v0.3
 
-Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (sources-pilot-2). Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
+Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (sources-pilot-4 od 29.09; pełne teksty OSW, PAŻP/AUP i RSO/ogólne). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
 
 | Źródło | Dostęp i zakres | Rola | Wynik pilotażu |
 |---|---|---|---|
@@ -11,6 +11,30 @@
 | [CERT Polska](https://cert.pl/posts/) | Integracja wyłączona; adres RSS nieweryfikowany | Kandydat na późniejszy etap | Próbny dostęp do strony: HTTP 403 |
 
 Dwa pobrania dały łącznie 44 unikalne wersje materiałów; drugie nie dodało duplikatów. W przyszłości zmiana treści tej samej publikacji tworzy nową wersję i nową pozycję do oceny.
+
+### Pełne treści OSW — rozszerzenie 29.09.2026
+
+RSS służy do odkrywania publikacji. Kolektor pobiera właściwy tekst HTML
+(`article.publikacje .field--name-body`); dla raportów pobiera jednoznacznie
+podlinkowany PDF OSW. Interaktywny skrót raportu nie zastępuje dokumentu.
+PDF wymaga lokalnego Popplera (`pdfinfo`, `pdftotext`); zapis `pdf_text` oznacza
+ekstrakcję tekstu, bez OCR ani automatycznej interpretacji map i tabel.
+
+Zakres obejmuje bieżący RSS oraz do 10 znanych, nierozstrzygniętych publikacji,
+które wypadły z kanału. Limit łączny: 30 publikacji, 50 żądań (wraz z ponowieniami
+i przekierowaniami), 3 MB odpowiedzi, PDF do 250 stron i 1 MB wydobytego tekstu.
+Przekroczenie limitu, brak selektora, ostrzeżenia ekstraktora albo niedostępny
+artykuł oznaczają niepełny wynik. Starsza pozycja z kolejki nie dowodzi pokrycia
+całego okna RSS. Nie wykonywane są dodatkowe przeszukiwania archiwum wydawcy.
+
+Host pozostaje `www.osw.waw.pl`; poza `/pl/` dopuszczono wyłącznie ścieżki
+`/transformacja-bundeswehry/` i `/sites/default/files/`. Archiwum przechowuje
+RSS, HTML/PDF, końcowe URL-e i sposób ekstrakcji. Tożsamość dokumentu zachowuje
+pierwotny URL publikacji także po przekierowaniu. Nowy pełny tekst otrzymuje
+nowy `material_id` i wymaga nowej oceny. Nieudane pobranie nie zastępuje
+wcześniej zapisanego pełnego tekstu skrótem. Nowe, jeszcze niepobrane publikacje
+zachowują skrót w kolejce do ponowienia; nie są oznaczane jako pełna treść.
+Dotychczasowe materiały i oceny pozostają w historii. Ten etap OSW zakończono jeszcze na v0.2; późniejsze wdrożenie v0.3 opisano niżej.
 
 ## Osobna warstwa obserwacji — rzeczywiste pobrania 23.09.2026
 
@@ -29,7 +53,7 @@ Z tej samej grupy pochodzenia zebrano trzy półgodzinne pliki historii mapy, ł
 
 ## Zasady dostępu
 
-Kolektor publikacji RTB wykonuje publiczne żądania GET bez logowania, omijania zabezpieczeń i płatnych API. Ma limit 15 sekund na żądanie, jedno ponowienie przy błędach sieci, 429 lub 5xx, odstęp między żądaniami i limit odpowiedzi 3 MB. Dopuszczalne hosty, ścieżki, liczba stron i pozycji są zapisane w konfiguracji. Przekierowania poza ten zakres są odrzucane.
+Kolektor publikacji RTB wykonuje publiczne żądania GET bez logowania, omijania zabezpieczeń i płatnych API. Ma limit 15 sekund na żądanie, jedno ponowienie przy błędach sieci lub 5xx, odstęp między żądaniami i limit odpowiedzi 3 MB. HTTP 429 lub odpowiedź z `Retry-After` wstrzymuje źródło bez ponowienia; termin blokady jest zachowany w `data/fetch-state/` między cyklami (minimum 5 minut, dłużej według nagłówka). Dopuszczalne hosty, ścieżki, liczba stron i pozycji są zapisane w konfiguracji. Przekierowania poza ten zakres są odrzucane.
 
 Bieżący kolektor ADSB.lol ma osobny transport **bez automatycznych ponowień**. Odstępy to co najmniej 2 sekundy między żądaniami oraz 60 sekund od końca cyklu. HTTP 3xx/4xx wstrzymuje pozostałe zapytania i utrwala blokadę kolejnego cyklu według `Retry-After`, nie krótszą niż 5 minut. Nie obchodzi przekierowań ani limitów API.
 
@@ -39,13 +63,13 @@ Surowa odpowiedź trafia na lokalny dysk przed ekstrakcją. Błąd pojedynczej d
 
 ## Luki i następne rozszerzenia
 
-- RSS OSW może zawierać pusty skrót albo spis treści. Taki rekord pozostaje do przeglądu pełnej publikacji, jeśli nie da się ustalić jego znaczenia.
+- Pełne teksty OSW są pobierane od 29.09. Niedostępne artykuły, nowe formaty stron, skany i przekroczone limity nadal wymagają uzupełnienia; sam tytuł nie rozstrzyga oceny.
 - RCB i MON nie zapewniają kompletnej, niezależnej obserwacji wszystkich incydentów w CEE. Różne instytucje mogą powtarzać ten sam pierwotny komunikat.
 - Są dobowe pomiary GNSS i krótkie próbki lotnicze, lecz brak skalibrowanego odniesienia i automatycznego detektora. Nie ma ciągłej obserwacji lotniczej, danych granicznych i systematycznych danych o cyberatakach. Kategorie wymagające poziomu odniesienia nie mogą być wypełniane domysłem.
 - Nie podłączono X, FIRMS, płatnych map ani modeli predykcyjnych. Każda integracja wymaga sprawdzenia dostępu, zakresu, kosztów i praw do ponownego wykorzystania.
 - Lista z limitem stron pozwala na ograniczony powrót do starszych materiałów. Nie odtwarza automatycznie luk po wielotygodniowej przerwie ani wycofanych publikacji.
 
-Opisowe porównanie GNSS jest już wdrożone; kalibracja normalnego poziomu i detektora pozostaje dalszą pracą. [Ocena dostępu lotniczego](aviation-access.md) poprzedziła [pilotaż API](aviation-runbook.md) i [ograniczony audyt historii](aviation-history.md). Kolejne badanie danych obejmie różne pory i dni, zmienność źródła oraz klasyfikację z datami obowiązywania. Równolegle pozostaje uzupełnienie pełnych tekstów OSW i źródeł weryfikujących. Doprecyzowany projekt: `docs/early-warning-design.md`. Zmiana aktywnego rejestru musi być widoczna w historii i uwzględniona przy porównywaniu odczytów.
+Opisowe porównanie GNSS jest już wdrożone; kalibracja normalnego poziomu i detektora pozostaje dalszą pracą. [Ocena dostępu lotniczego](aviation-access.md) poprzedziła [pilotaż API](aviation-runbook.md) i [ograniczony audyt historii](aviation-history.md). Kolejne badanie danych obejmie różne pory i dni, zmienność źródła oraz klasyfikację z datami obowiązywania. Równolegle pozostaje dodanie źródeł weryfikujących. Doprecyzowany projekt: `docs/early-warning-design.md`. Zmiana aktywnego rejestru musi być widoczna w historii i uwzględniona przy porównywaniu odczytów.
 
 ## Odrębne rejestry
 
@@ -62,7 +86,7 @@ War on the Rocks, The War Zone, Defense One, Breaking Defense, mapy Liveuamap/De
 
 ## Rozszerzenie źródeł — zaakceptowane 25.09.2026
 
-Rejestr `source-candidates-8` oznacza poniższe 12 pozycji jako `accepted_for_integration`, z datą `accepted_on=2026-09-25`. To akceptacja doboru źródeł i rozszerzenia RCB, nie potwierdzenie dostępu ani gotowości produkcyjnej. Sprawdzono opisy i adresy WWW; **nie wdrożono nowych kolektorów, detektorów ani harmonogramu**. RCB ma już kolektor `rcb` w `config/sources.json` — rozszerzenie dotyczy semantyki jego treści, nie kolejnego pobierania tych samych materiałów. `checked_on` zachowuje datę ostatniej oceny dostępu; `accepted_on` dotyczy decyzji projektowej. Sama akceptacja nie odświeża wyniku kontroli źródła.
+Rejestr `source-candidates-9` oznacza poniższe 12 pozycji jako `accepted_for_integration`, z datą `accepted_on=2026-09-25`. To akceptacja doboru źródeł i rozszerzenia RCB, nie potwierdzenie dostępu ani gotowości produkcyjnej. 25.09 sprawdzono opisy i adresy WWW. Od 29.09 działają adaptery PAŻP/AUP i RSO/ogólne opisane niżej; pozostałe źródła, detektory i harmonogram zachowują odrębny status. RCB ma już kolektor `rcb` w `config/sources.json` — rozszerzenie dotyczy semantyki jego treści, nie kolejnego pobierania tych samych materiałów. `checked_on` zachowuje datę ostatniej oceny dostępu; `accepted_on` dotyczy decyzji projektowej. Sama akceptacja nie odświeża wyniku kontroli źródła.
 
 [Strażnik](https://straznik.eu/) służy analizie architektury. Nie jest źródłem naszych zdarzeń ani zależnością procesu; nie planujemy scrapowania jego interfejsu ani pobierania jego agregatów. ADS-B nadal pochodzi bezpośrednio z ADSB.lol, według [oceny dostępu](aviation-access.md), [pilotażu API](aviation-runbook.md) i [audytu historii](aviation-history.md). Nowe strumienie rozszerzają obserwację zagrożeń hybrydowych, infrastrukturalnych, morskich i geostrategicznych.
 
@@ -72,9 +96,9 @@ Kandydat `pansa_airspace`: [airspace.pansa.pl](https://airspace.pansa.pl/), AUP/
 
 Rejestrować ADHOC, R (Restricted), D (Danger) i NPZ oraz ich zmiany, zachowując oryginalny typ dostawcy. **NPZ w dokumentacji EUROCONTROL oznacza Non-standard Planning Zone**, obszar ograniczeń planowania lotu, a nie automatycznie „No Penetration Zone”. Nie każda struktura jest wojskowa. TRA/TSA/MRT/ATZ i regularne aktywacje służą również rozpoznaniu rutynowych wyjaśnień. [Definicja NPZ — ERNIP, pkt 2.5.5.3](https://www.eurocontrol.int/sites/default/files/2025-11/eurocontrol-ernip-part1-airspace-design-methodology-v3-2.pdf).
 
-Kontrakt przyszłego adaptera: identyfikator i rewizja strefy, geometria i dokładność, dolna/górna granica z jednostką i odniesieniem wysokości, planowany przedział UTC, rzeczywisty status i czas jego zmiany, publikacja/pobranie, podstawa AUP/UUP/NOTAM oraz opis celu, jeśli podany. Stany: `planned`, `active`, `inactive`, `cancelled`, `unknown`; wpis w planie nie wystarcza do `active`. Tożsamość wystąpienia: strefa + okres obowiązywania, z rewizjami zamiast nowych incydentów przy każdym UUP. Brak na niepełnej liście nie dowodzi dezaktywacji. Regularność porównywać co najmniej z zebranym tygodniem; luka w historii daje `routine_status=unknown`, nie „rzadką strefę”.
+Docelowy kontrakt rozszerzonego adaptera: identyfikator i rewizja strefy, geometria i dokładność, dolna/górna granica z jednostką i odniesieniem wysokości, planowany przedział UTC, rzeczywisty status i czas jego zmiany, publikacja/pobranie, podstawa AUP/UUP/NOTAM oraz opis celu, jeśli podany. Stany: `planned`, `active`, `inactive`, `cancelled`, `unknown`; wpis w planie nie wystarcza do `active`. Tożsamość wystąpienia: strefa + okres obowiązywania, z rewizjami zamiast nowych incydentów przy każdym UUP. Brak na niepełnej liście nie dowodzi dezaktywacji. Regularność porównywać co najmniej z zebranym tygodniem; luka w historii daje `routine_status=unknown`, nie „rzadką strefę”.
 
-Dostęp: publiczna witryna i dokumentacja zostały zidentyfikowane; stabilnego API, kompletności statusów taktycznych, limitów i opóźnienia nie przetestowano. Adapter wymaga małej próby na źródle PAŻP. Nie kopiujemy aktywacji z mapy Strażnika.
+Dostęp: 29.09 sprawdzono i podłączono publiczny HTML current AUP. Nie potwierdzono kompletności rzeczywistych statusów taktycznych ani opóźnienia. Nie kopiujemy aktywacji z mapy Strażnika.
 
 ### Ukraińskie doniesienia powietrzne — bez pośredniego agregatora
 
@@ -94,7 +118,7 @@ Zachowywać identyfikator wiadomości, rewizję, źródło cytowane/przekazane, 
 
 ### RSO i RCB — trzy klasy treści ostrzeżeń
 
-**RSO to Regionalny System Ostrzegania**, prowadzony przez MSWiA we współpracy z TVP. Kandydat `rso_public` korzysta z [opisu MSWiA](https://www.gov.pl/web/mswia/regionalny-system-ostrzegania) i wskazanego tam [wykazu obowiązujących komunikatów](https://komunikaty.tvp.pl/komunikaty/wszystkie/wszystkie). TVP jest tu kanałem dystrybucji systemu, nie niezależnym potwierdzeniem. Kontrakt odczytu maszynowego, paginacja i kompletność historii wymagają próby adaptera.
+**RSO to Regionalny System Ostrzegania**, prowadzony przez MSWiA we współpracy z TVP. Kandydat `rso_public` korzysta z [opisu MSWiA](https://www.gov.pl/web/mswia/regionalny-system-ostrzegania) i wskazanego tam [wykazu obowiązujących komunikatów](https://komunikaty.tvp.pl/komunikaty/wszystkie/wszystkie). TVP jest tu kanałem dystrybucji systemu, nie niezależnym potwierdzeniem. 29.09 podłączono publiczny eksport XML kategorii ogólnej i sprawdzono zgodność liczby rekordów; kompletność historii pozostaje nieustalona.
 
 Pozycja `rcb_alert_semantics` rozszerza przegląd materiałów istniejącego źródła [RCB](https://www.gov.pl/web/rcb/komunikaty). Przyjęto wewnętrzną klasyfikację **treści dotyczących zagrożenia z powietrza**, a nie nowe urzędowe stopnie alarmowe ani domniemanie gotowości bojowej wojska:
 
@@ -136,3 +160,29 @@ Poniższe źródła uzupełniają warstwę potwierdzeń i kontekstu. Ocena dost�
 Oficjalne materiały [NATO o zagrożeniach hybrydowych](https://www.nato.int/cps/fr/natohq/topics_156338.htm?selectedLocale=en) mogą ujednolicić terminologię. Nie zastępują atrybucji konkretnego wydarzenia. Dokumenty pierwotne należy zestawiać z niezależnym pokryciem, a nie traktować wszystkie oficjalne twierdzenia jako bezbłędne.
 
 Przed włączeniem nowego źródła potrzebne są: stabilny dostęp, zapis treści i dat, test parsera na zachowanej próbce, jawna rola required/optional oraz co najmniej jeden rzeczywisty przebieg z oceną pokrycia. Dane lotnicze, GNSS, ruch graniczny i logistyka wymagają również serii odniesienia; bez nich nie oceniamy skali anomalii.
+
+### PAŻP i RSO — pierwsze adaptery v0.3, 29.09.2026
+
+| Źródło bezpośrednie | Wdrożony zakres | Ograniczenie |
+|---|---|---|
+| [PAŻP — current AUP](https://airspace.pansa.pl/aup/current) | Publiczne tabele HTML planu: oznaczenie strefy, pola wysokości/czasu/użytkownika, ważność i aktualizacja w UTC; 422 wiersze w pierwszej próbie | To plan, nie rejestr rzeczywistej aktywacji. UUP, geometrie i historia zmian nie są jeszcze podłączone |
+| [RSO — ogólne, XML](https://komunikaty.tvp.pl/komunikaty/wszystkie/ogolne/0?_format=xml) | Cała dostępna lista kategorii ogólnej, ID, pełna treść, województwa i surowe okresy ważności; 42 rekordy w pierwszej próbie | Bez osobnych strumieni pogodowych/hydrologicznych i bez gwarancji historii. Klasyfikacja treści L1/L2/L3 wymaga przeglądu; rso_alarm nie jest tą klasyfikacją |
+
+Oba adaptery działają w głównym `collect_sources.py` / `analysis_cycle.py`.
+Maksymalnie dwa żądania na źródło (wliczając przekierowania i ewentualne jedno ponowienie po błędzie sieci/5xx);
+respektują utrwalone Retry-After i wspólny limit odpowiedzi. Parser sprawdza
+metadane oraz strukturę PAŻP i liczbę rekordów RSO względem totalItems;
+zmiana formatu nie daje pustego poprawnego wyniku. Limity: 1500 wierszy AUP,
+500 komunikatów RSO. RSO publikuje daty bez strefy: przyjęto jawnie
+Europe/Warsaw, a niejednoznaczność lub luka przy zmianie czasu odrzuca odczyt.
+Surowy okres ważności jest nadal przedmiotem przeglądu.
+
+W tabelach PAŻP Y/N nie dowodzi aktywacji. [Instrukcja PAŻP](https://www.pansa.pl/OPS/ops_rpa_pl.htm)
+rozróżnia plan AUP i jego aktualizacje; strumień nie potwierdza sam zamiaru
+ani rozpoczęcia operacji. Zniknięcie komunikatu z XML RSO nie jest odwołaniem.
+Wspólny alert RCB/gov.pl/RSO zachowuje jednego nadawcę i alert_key.
+
+Oryginały i wersje są archiwizowane lokalnie. Material URL wskazuje rzeczywisty
+zestaw XML, bez zgadywania adresu szczegółów na podstawie ID. Są to źródła
+opcjonalne o zakresie current_official_state_only; poprawna bieżąca lista
+nie otwiera bramki 216 godzin historii. Ich awaria jest raportowana.

@@ -10,10 +10,10 @@
 
 **Proponuję zacząć od technicznego pilotażu ADSB.lol**, ponieważ publikuje API i historię na jawnej licencji. Najpierw trzeba potwierdzić aktualny kontrakt odpowiedzi oraz zmierzyć jakość w naszym regionie. OpenSky zachowujemy jako sprawdzony technicznie wariant wymagający uzgodnienia użycia operacyjnego. Nie ma jeszcze podstaw do zakupienia planu ADS-B Exchange ani WorldMonitor.
 
-| Wariant | Sprawdzone | Historia i koszt | Stan integracji |
+|  | Dokumentacja publicznego API i archiwum, aktualne metadane wydania | Dostawca deklaruje otwarte dane na ODbL 1.0; jeden sprawdzony zestaw dzienny ma ok. 3,84 GB | Kandydat na pilotaż; odpowiedzi pomiarowej jeszcze nie testowano |
+| OpenSkyWariant | Sprawdzone | Historia i koszt | Stan integracji |
 |---|---|---|---|
-| ADSB.lol | Dokumentacja publicznego API i archiwum, aktualne metadane wydania | Dostawca deklaruje otwarte dane na ODbL 1.0; jeden sprawdzony zestaw dzienny ma ok. 3,84 GB | Kandydat na pilotaż; odpowiedzi pomiarowej jeszcze nie testowano |
-| OpenSky | Anonimowy odczyt regionalny HTTP 200 | Dostęp techniczny bez klucza; stałe użycie operacyjne wymaga osobnej umowy | Jednorazowy test badawczy, bez podłączenia do procesu |
+| ADSB.lol | Anonimowy odczyt regionalny HTTP 200 | Dostęp techniczny bez klucza; stałe użycie operacyjne wymaga osobnej umowy | Jednorazowy test badawczy, bez podłączenia do procesu |
 | ADS-B Exchange | Dokumentacja API i oferta | Plan hobbystyczny: 10 USD/miesiąc, 10 000 zapytań; historii nie zakładamy w tej cenie | Klucz i plan nieuruchomione |
 | WorldMonitor | Dokumentacja, uwierzytelnianie i OpenAPI | Nie potwierdzono ceny potrzebnego API ani dostępności długiej historii | Nie testowano endpointu wymagającego klucza |
 

@@ -1,8 +1,8 @@
 # Obsługa lokalnego procesu
 
-Zaakceptowana specyfikacja: `docs/methodology.md`, rtb-v0.3. Działające polecenia wykonują nadal rtb-v0.2; ich reguły zachowano w `docs/archive/methodology-v0.2.md`. Rejestr źródeł do pobrania: `config/sources.json`. Kandydaci i biblioteka doktryny nie uruchamiają dodatkowych kolektorów.
+Zaakceptowana specyfikacja: `docs/methodology.md`, rtb-v0.3. Działające polecenia domyślnie wykonują rtb-v0.3; poprzednie reguły zachowano w `docs/archive/methodology-v0.2.md`. Rejestr źródeł do pobrania: `config/sources.json`. Kandydaci i biblioteka doktryny nie uruchamiają dodatkowych kolektorów.
 
-Akceptacja z 25.09.2026 obejmuje procedury PAŻP/RCB/RSO i sanity check przed odczytem dobowym lub tygodniowym. Heurystyki v0.3 są zatwierdzoną specyfikacją w [metodologii](methodology.md#wygaszanie-regiony-i-korelacja); polecenia poniżej nadal wykonują v0.2. Ręczne sprawdzenie nowego źródła nie oznacza działającego adaptera ani zmiany konfiguracji live.
+Akceptacja z 25.09.2026 obejmuje procedury PAŻP/RCB/RSO i sanity check przed odczytem dobowym lub tygodniowym. Heurystyki v0.3 są zatwierdzoną specyfikacją w [metodologii](methodology.md#wygaszanie-regiony-i-korelacja); polecenia poniżej wykonują v0.3. Ręczne sprawdzenie nowego źródła nie oznacza działającego adaptera ani zmiany konfiguracji live.
 
 Ten dokument dotyczy procesu RTB. Działająca osobno warstwa GNSS/logistyki używa `config/early-warning.json`, własnej bazy i polecenia `scripts/early_warning.py`. Jej uruchamianie, przegląd, kopie i metodologia: [instrukcja sygnałów wczesnych](early-warning-runbook.md). `scripts/backup.py` opisany poniżej nie obejmuje nowej bazy obserwacji.
 
@@ -17,7 +17,7 @@ Ten dokument dotyczy procesu RTB. Działająca osobno warstwa GNSS/logistyki uż
 
 Przebieg `run_pipeline.py` bez `--offline` pobiera źródła i publikuje stan. Może to być raport niepełny, jeśli nowe materiały nie mają ocen. Sam przegląd nie zmienia istniejących raportów; potrzebny jest nowy przebieg.
 
-Skrypt i plik `.command` nie wykonują jeszcze kontroli nowych źródeł z kroku 5. Pierwszy automatycznie otwarty raport jest wynikiem obecnego pilotażu, nie potwierdzeniem sprawdzenia PAŻP/RSO. Do czasu wdrożenia v0.3 jej punktacji nie wyliczamy tymi poleceniami.
+Główny cykl pobiera teraz PAŻP/AUP i ogólne RSO. Nie weryfikuje automatycznie aktywacji stref ani semantyki ostrzeżeń. Do pełnego odczytu v0.3 używaj `analysis_cycle.py` i przeglądu 216 godzin historii: [instrukcja wdrożenia](v0.3-implementation.md). Sam `run_pipeline.py` bez tego przeglądu zapisze wynik niepełny.
 
 ## Zasady przeglądu i korekt
 
@@ -29,11 +29,24 @@ Wykluczenie kandydata zastępuje jego bieżące powiązania ze zdarzeniami. Pono
 
 Wątpliwa, niepełna treść pozostaje do przeglądu. Nie wolno oznaczać jej jako „poza zakresem” wyłącznie w celu uzyskania liczbowego RTB. Nieprzeczytanego pełnego artykułu nie przedstawiamy jako zweryfikowanego na podstawie pustego skrótu RSS.
 
+Od 29.09 kolektor OSW uzupełnia artykuły z RSS pełnym HTML lub tekstem PDF
+oraz wraca do znanych nierozstrzygniętych publikacji spoza kanału. Uruchamia go
+zwykłe pobranie lub `analysis_cycle.py prepare`; nie wymaga osobnego polecenia.
+Raporty PDF potrzebują Popplera (`pdfinfo`, `pdftotext`). Brak narzędzia,
+nieczytelny dokument, zmiana struktury strony lub przekroczenie limitu pozostawia
+źródło niepełne. `pdf_text` nie oznacza odczytania wykresów i map; twierdzenia
+oparte na grafice sprawdzaj w oryginalnym PDF. Szczegóły i limity: [źródła](sources.md).
+
+Uzupełnienie treści tworzy nowego kandydata, także gdy wcześniejszy skrót był
+wykluczony. Powiąż ponownie aktualne dowody z istniejącym zdarzeniem, zamiast
+tworzyć drugi incydent. Pobranie starszego artykułu dzisiaj nie zmienia daty
+zdarzenia ani historycznej wiedzy systemu.
+
 ### Przed odczytem dobowym i tygodniowym
 
 Zamroź wspólny czas odcięcia po kontrolach. Sprawdź strefy ADHOC/R/D/NPZ w PAŻP, rozdziel plan AUP/UUP od potwierdzonej aktywacji i porównaj ze zwykłym użyciem przestrzeni. Sprawdź pełne treści RCB oraz obowiązujące komunikaty RSO, ich obszary, klasy L1/L2/L3, aktualizacje i odwołania. Zapisz URL, wersję/hash dowodu i rzeczywisty czas odczytu. Niedostępne lub niewdrożone źródło ma jawny status; nie wpisuj „brak aktywności”. Szczegółowa lista i robocze limity świeżości są w [procedurze kontroli](early-warning-runbook.md#kontrola-przed-odczytem).
 
-Dobowa i tygodniowa publikacja to rytm odczytu tego samego stanu na `T`; w zaakceptowanej v0.3 wiek oblicza funkcja wygaszania. Nie dodawaj do siebie dziennych indeksów i nie odświeżaj wieku zdarzenia datą artykułu. Kontrola obecnie wymaganego RCB nadal podlega bramce v0.2; kandydaci PAŻP/RSO nie trafiają do niej automatycznie. W nowym modelu brak istotnego pokrycia blokuje odpowiedni wynik lub bonus zgodnie z nowym kontraktem.
+Dobowa i tygodniowa publikacja to rytm odczytu tego samego stanu na `T`; w zaakceptowanej v0.3 wiek oblicza funkcja wygaszania. Nie dodawaj do siebie dziennych indeksów i nie odświeżaj wieku zdarzenia datą artykułu. RCB pozostaje źródłem wymaganym; PAŻP/RSO mają ograniczony zakres bieżący i są opcjonalne. W v0.3 brak istotnego pokrycia blokuje odpowiedni wynik lub bonus zgodnie z nowym kontraktem.
 
 ### Sanity check przed zatwierdzeniem ocen
 
@@ -43,7 +56,7 @@ RCB i jego dystrybucja w RSO tworzą jeden alert. PAŻP, GNSS i OSINT są dowoda
 
 ## Doktryna i interpretacja
 
-Zarejestruj metadane i hash nowego PDF-u w `config/doctrine-sources.json`, następnie uruchom `.venv/bin/python scripts/doctrine.py index`. Polecenie `.venv/bin/python scripts/doctrine.py search 'kontrola refleksyjna'` zwróci strony do przeczytania. Pliki nieobecne, zmienione, nieprzeczytane skany i nowe niezarejestrowane PDF-y są sygnalizowane jawnie. Poppler jest wymagany tylko do indeksacji; nie jest zależnością samego RTB. Szczegóły: `docs/doctrine.md`.
+Zarejestruj metadane i hash nowego PDF-u w `config/doctrine-sources.json`, następnie uruchom `.venv/bin/python scripts/doctrine.py index`. Polecenie `.venv/bin/python scripts/doctrine.py search 'kontrola refleksyjna'` zwróci strony do przeczytania. Pliki nieobecne, zmienione, nieprzeczytane skany i nowe niezarejestrowane PDF-y są sygnalizowane jawnie. Poppler jest wymagany do indeksacji doktryny i pobierania raportów PDF OSW, ale nie do obliczeń na zamrożonych tekstach ani replay. Szczegóły: `docs/doctrine.md`.
 
 Interpretację scenariuszową zapisuj jako osobny plik `data/briefs/<data>-<run_id>.md`, z konkretnym snapshotem oraz cytowaniami dokumentów. Utwórz katalog przy pierwszym zapisie. Nie zmieniaj gotowego raportu w snapshots. Korzystaj z `docs/templates/analytical-brief.md`. Indeks tekstowy nie jest automatycznym generatorem ocen ani scenariuszy.
 
@@ -57,9 +70,9 @@ Replay sprawdza również kod i instrukcje agentów. Dla wydań v0.1 użyj osobn
 
 ## Akceptacja v0.3 i stan migracji
 
-Metodologia v0.3 i dobór nowych źródeł zostały zaakceptowane 25.09.2026. Dokładne reguły v0.2 zachowano w `docs/archive/methodology-v0.2.md` oraz `config/archive/scoring-v0.2.json`; działające `config/scoring-v0.json` nadal wskazuje v0.2. Nowy silnik wymaga implementacji wygaszania, grafu, grupowania, korelacji i kontraktów oraz sprawdzenia przypadków z metodologii. Akceptacja źródła w rejestrze kandydatów nie podłącza adaptera.
+Metodologia v0.3 i dobór nowych źródeł zostały zaakceptowane 25.09.2026. Dokładne reguły v0.2 zachowano w `docs/archive/methodology-v0.2.md` oraz `config/archive/scoring-v0.2.json`; działające `config/scoring-v0.json` nadal wskazuje v0.2. Silnik v0.3 implementuje wygaszanie, graf PRG, grupowanie, bramki korelacji i kontrakty; przypadki matematyczne sprawdzają testy. Akceptacja źródła w rejestrze kandydatów nie podłącza adaptera.
 
-Nie zmieniaj etykiet metodologii w zapisanych odczytach ani nie dopisuj wyników v0.3 do serii v0.2. Instrukcje przeglądu w `agents/` pozostają instrukcjami działającego silnika v0.2 do wdrożenia nowego kontraktu. Dashboard i sposób zasilania frontendu są odrębnym następnym krokiem.
+Nie zmieniaj etykiet metodologii w zapisanych odczytach ani nie dopisuj wyników v0.3 do serii v0.2. Instrukcje w `agents/` używają kontraktu v0.3. Dane do dashboardu przechodzą przez wersjonowany eksport i Supabase; harmonogram i hosting są osobnymi etapami.
 
 ## Błędy i odzyskiwanie pracy
 
@@ -81,7 +94,7 @@ Nowe wydanie powstaje w katalogu tymczasowym. Wskaźnik `latest.json` zmienia si
 
 Wykonaj `.venv/bin/python scripts/backup.py`. Skrypt używa mechanizmu backup SQLite, uwzględnia WAL, sprawdza integralność i odmawia nadpisania istniejącej kopii. Obok zapisuje hash i liczniki rekordów.
 
-Pełny pakiet odzyskiwania obejmuje kopię SQLite, `data/raw/`, `data/snapshots/`, `data/runs/`, `data/reviews/`, `data/latest.json`, `data/.mode.json` oraz właściwą wersję repozytorium i `requirements.lock`. Sama kopia bazy nie zawiera surowych odpowiedzi ani wszystkich plików eksportu. Na etapie 2 nie ma automatycznych kopii na osobny dysk.
+Pełny pakiet odzyskiwania obejmuje kopię SQLite, `data/raw/`, `data/snapshots/`, `data/runs/`, `data/reviews/`, `data/fetch-state/` (blokady źródeł), `data/latest.json`, `data/.mode.json` oraz właściwą wersję repozytorium i `requirements.lock`. Sama kopia bazy nie zawiera surowych odpowiedzi ani wszystkich plików eksportu. Na etapie 2 nie ma automatycznych kopii na osobny dysk.
 
 Odtwarzaj najpierw **do nowego katalogu**, nie nadpisuj aktywnej bazy:
 

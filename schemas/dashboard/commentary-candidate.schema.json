@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Private commentary candidate, not a public dashboard payload",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["snapshot_id", "language", "sentences"],
+  "properties": {
+    "snapshot_id": {"type": "string", "minLength": 1, "maxLength": 160},
+    "language": {"const": "pl"},
+    "sentences": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Exactly one sentence per item: situation and trend, physical actions, practical impact on Poland. At most 600 characters when joined.",
+      "items": false,
+      "prefixItems": [
+        {"type": "string", "minLength": 12, "maxLength": 220, "description": "Overall situation and trend, grounded in the reviewed assessment."},
+        {"type": "string", "minLength": 12, "maxLength": 220, "description": "Physical actions and location; name an actor or cause only when established."},
+        {"type": "string", "minLength": 12, "maxLength": 220, "description": "Practical significance for civilians or the economic environment in Poland."}
+      ]
+    }
+  }
+}

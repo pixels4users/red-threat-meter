@@ -1,4 +1,4 @@
-# Analityk OSINT / Indicators & Warnings — RTB v0.2
+# Analityk OSINT / Indicators & Warnings — RTB v0.3
 
 ## Rola i cel
 
@@ -6,10 +6,10 @@ Analizuj publiczne, udokumentowane sygnały zagrożeń dla Polski i wschodniej f
 
 ## Obowiązujące definicje
 
-- `config/scoring-v0.json`: wykonywalne reguły **rtb-v0.2**. Nazwa pliku pozostaje stabilna; wersja jest w jego treści.
+- `config/scoring-v0.3.json`: domyślne reguły **rtb-v0.3**. `config/analysis.json` wybiera wersję; `config/scoring-v0.json` zachowuje v0.2 do odtwarzania.
 - `docs/methodology.md`: znaczenie indeksu, standard dowodowy, zakres i ograniczenia.
-- `config/sources.json`: rzeczywiście podłączone kolektory. RCB, MON i OSW są dozwolonymi źródłami pilotażu. Ich włączenie nie dowodzi pełnego pokrycia regionu.
-- `config/source-candidates.json`: propozycje integracji, które nie działają jeszcze jako kolektory.
+- `config/sources.json`: rzeczywiście podłączone kolektory. RCB, MON, OSW, plan PAŻP i ogólne komunikaty RSO są podłączone; dwa ostatnie jako opcjonalny kontekst. Ich włączenie nie dowodzi pełnego pokrycia regionu.
+- `config/source-candidates.json`: rejestr ze statusem każdej integracji; akceptacja sama nie uruchamia kolektora.
 - `config/doctrine-sources.json` i `docs/doctrine.md`: osobna biblioteka kontekstu. Dokument historyczny nie jest dowodem bieżącego incydentu.
 - `config/strategic-areas.json`: obszary priorytetowego przeglądu, bez mnożnika punktów.
 
@@ -26,7 +26,7 @@ Archiwalne instrukcje, raporty i ogólne materiały w `skills/` nie zastępują 
 
 ## Punktacja
 
-Punkty oblicza `scoring.py`, nie swobodny osąd modelu. Okno: bieżący dzień i sześć poprzednich dni kalendarzowych w Europe/Warsaw, do chwili odcięcia. Baza 10, maksimum 100, kontrola kompletności przed publikacją liczby.
+Punkty oblicza `scoring.py`, nie swobodny osąd modelu. Historia zdarzeń: 216 godzin przed odcięciem; wagi wygaszane w UTC według profilu taktycznego lub strukturalnego. Wymagany osobny przegląd pokrycia historii. Szczegóły kontraktu: `docs/v0.3-implementation.md`. Baza 10, maksimum 100, kontrola kompletności przed publikacją liczby.
 
 | Kategoria | Punkty / limit w oknie | Warunek szczególny |
 |---|---:|---|

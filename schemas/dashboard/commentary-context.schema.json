@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Private reviewed context for civilian dashboard commentary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "snapshot_id",
+    "mode",
+    "analysis_complete",
+    "rtb",
+    "findings"
+  ],
+  "properties": {
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "fixture"
+      ]
+    },
+    "analysis_complete": {
+      "type": "boolean"
+    },
+    "rtb": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "score",
+        "delta_points",
+        "methodology_version"
+      ],
+      "properties": {
+        "score": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 100
+        },
+        "delta_points": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -99,
+          "maximum": 99
+        },
+        "methodology_version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "role",
+          "status",
+          "text_pl",
+          "evidence_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "role": {
+            "enum": [
+              "situation",
+              "action",
+              "impact"
+            ]
+          },
+          "status": {
+            "enum": [
+              "accepted",
+              "uncertain",
+              "rejected"
+            ]
+          },
+          "text_pl": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "evidence_refs": {
+            "type": "array",
+            "maxItems": 30,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          }
+        }
+      }
+    }
+  }
+}

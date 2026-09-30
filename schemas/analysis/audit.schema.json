@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "decision_id": {
+            "type": "string"
+          },
+          "verdict": {
+            "enum": [
+              "accept",
+              "hold"
+            ]
+          },
+          "checks": {
+            "type": "object",
+            "properties": {
+              "quotes_support_claims": {
+                "type": "boolean"
+              },
+              "independent_origins": {
+                "type": "boolean"
+              },
+              "event_identity": {
+                "type": "boolean"
+              },
+              "dates_and_locations": {
+                "type": "boolean"
+              },
+              "category_and_scope": {
+                "type": "boolean"
+              },
+              "polish_and_factual": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "quotes_support_claims",
+              "independent_origins",
+              "event_identity",
+              "dates_and_locations",
+              "category_and_scope",
+              "polish_and_factual"
+            ],
+            "additionalProperties": false
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 15,
+            "maxLength": 1500
+          }
+        },
+        "required": [
+          "decision_id",
+          "verdict",
+          "checks",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 200
+    }
+  },
+  "required": [
+    "items"
+  ],
+  "additionalProperties": false
+}

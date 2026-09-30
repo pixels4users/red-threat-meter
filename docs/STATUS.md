@@ -1,4 +1,177 @@
-# Stan realizacji — 26.09.2026
+# Stan realizacji — 30.09.2026
+
+## Punkt kontrolny Git — 30.09.2026
+
+Na prośbę użytkownika zapisujemy dotychczasowy silnik v0.3, dashboard,
+publikowanie do Supabase i dostarczone materiały na gałęzi
+`codex/dashboard-publication`. Kontrola przed commitem: 267 testów Python,
+6 testów JavaScript/PostgreSQL i build zakończone poprawnie. Dane robocze,
+lokalne klucze i artefakty kompilacji pozostają poza Git. Kolejny etap obejmuje
+uzupełnienie danych i dodanie wskazanych kont OSINT na X.
+
+## Silnik v0.3 i pierwsze źródła — odbiór 29.09.2026, 19:27
+
+Domyślny silnik wykonuje teraz `rtb-v0.3`: wygaszanie, regionalną propagację
+na grafie PRG (16 województw, 34 krawędzie), grupowanie epizodów, efekt fali
+oraz bramki korelacji i czerwonego priorytetu. Bonus GNSS pozostaje wyłączony
+z powodu braku zatwierdzonego detektora o odpowiedniej rozdzielczości.
+Opis kontraktów i procedury: [wdrożenie v0.3](v0.3-implementation.md).
+
+Pierwsze kolektory: bezpośredni current AUP PAŻP (422 wiersze planu) i ogólna
+lista XML RSO (42 komunikaty). Plan nie potwierdza aktywacji; bieżące listy
+nie poświadczają historii. Oba pobrania zakończyły się poprawnie, po jednym
+żądaniu. Pozostałe cztery źródła także odpowiedziały; RSS OSW nie objął już
+pełnego horyzontu 216 godzin, choć pełne teksty dostępnych pozycji pobrano.
+
+W cyklu `2026-09-29T172300Z-57d7b9f6` przejrzano sześciu kandydatów:
+pięciu rozstrzygnięto, jeden materiał OSW o Łotwie pozostaje wstrzymany.
+Do wcześniejszego incydentu dotyczącego Ustki dołączono RSO jako dystrybucję
+tego samego komunikatu RCB, bez podwójnego zliczania. Dodano obserwację planu
+PAŻP i zapowiedź ćwiczeń syren. Nie naliczono z nich punktów.
+
+**RTB pozostaje niewyliczony:** brak potwierdzenia kompletnej historii zdarzeń
+z 216 godzin, niepełny horyzont OSW i nierozstrzygnięta pozycja o Łotwie.
+Nie utworzono fikcyjnego poświadczenia historii ani komentarza o bezpieczeństwie.
+To ograniczenie danych, odrębne od wykonanej implementacji obliczeń.
+
+Migrację numeric zastosowano w Supabase, bez zmiany dawnych payloadów i RLS.
+Nowe rzeczywiste wydanie odczytano z chmury i lokalnego API: są identyczne
+z eksportem. Historia zawiera pięć raportów. Przeglądarka pokazała stan na
+19:27 i sześć dzisiejszych sygnałów, w tym PAŻP oraz ćwiczenie RCB/RSO.
+Potwierdzenie: `data/analysis/cycles/2026-09-29T172300Z-57d7b9f6/verification.json`.
+
+Weryfikacja: **267 testów Python, 6 testów JavaScript/PostgreSQL i poprawny
+build**. Test numeric=12,5 wykonano wyłącznie w pamięci PGlite. Oddzielne
+kopie kodu odtworzyły identycznie raporty v0.2 i v0.3 przy zablokowanej sieci.
+Wykonano kopię SQLite przed pobraniem. Syntetyki nie trafiły do live.
+
+Następny krok danych: uzupełnienie archiwum OSW do co najmniej 216 godzin
+zdarzeń/rewizji i rozwiązanie wzmianki o łotewskich incydentach u pierwotnych
+wydawców. Dalej: aktywacja PAŻP/UUP, UA, Bałtyk i kalibracja. Harmonogram,
+domena oraz hosting nowej aplikacji pozostają osobnymi etapami.
+Kod jest lokalnie na `codex/dashboard-publication`, bez nowego commita/pusha.
+
+## Pełne treści OSW — odbiór 29.09.2026, 18:22
+
+Kolektor OSW pobiera teraz pełne artykuły HTML i tekst raportów PDF bezpośrednio
+od wydawcy. Wraca również do znanych nierozstrzygniętych publikacji, które
+wypadły z RSS. Rejestr źródeł ma wersję `sources-pilot-3`; obliczenia nadal
+wykonują **`rtb-v0.2`**. Szczegóły: [źródła](sources.md#pełne-treści-osw--rozszerzenie-29092026),
+[obsługa](runbook.md). Nowe treści mają własne wersje i oceny; poprzednie
+materiały, oceny i raporty pozostają w historii.
+
+Rzeczywisty cykl `2026-09-29T161625Z-e468a958` pobrał **12 pełnych publikacji
+OSW: 11 artykułów HTML i jeden 67-stronicowy PDF**, wykonując 15 żądań do OSW.
+Dwie publikacje odzyskano spoza bieżącego RSS. Uzupełniono wszystkie cztery
+braki pełnej treści z poprzedniego cyklu. RCB, MON i OSW odpowiedziały poprawnie;
+opcjonalny Naval News zwrócił HTTP 503, zachowany jako jawna niedostępność.
+
+Przegląd agenta rozstrzygnął 11 materiałów: osiem wykluczeń oraz pięć obserwacji
+kontekstowych z trzech analiz wojennych. Jedna nowa publikacja pozostaje do
+wyjaśnienia: analiza wyborów na Łotwie wspomina o naruszeniach przestrzeni
+powietrznej bez dat i szczegółów pozwalających rozdzielić zdarzenia. Jej pełny
+tekst jest już dostępny; dalsza weryfikacja wymaga komunikatów pierwotnych.
+**RTB pozostaje niewyliczony z powodu tej jednej nierozstrzygniętej pozycji.**
+Nowe obserwacje kontekstowe nie otrzymały punktów; komentarz główny pominięto.
+
+Raport ze stanem na **29.09.2026, 18:22 czasu Warszawy** opublikowano do
+Supabase. Eksport, odczyt chmury i lokalne API są identyczne; historia zawiera
+cztery rzeczywiste wydania. Otwarty dashboard sam zaktualizował datę i pokazał
+cztery sygnały z bieżącego dnia. Potwierdzenie:
+`data/analysis/cycles/2026-09-29T161625Z-e468a958/verification.json` (poza Git).
+Poprzednie potwierdzenie zachowano w katalogu wcześniejszego cyklu.
+
+Weryfikacja: **227 testów Python**, w tym dziesięć nowych testów kolektora OSW.
+Sprawdzono PDF, zaległości, zmiany treści, limity, przekierowania i utrwalanie
+`Retry-After`. Odtworzenie z zamrożonych wejść i osobnej kopii 92 plików kodu
+dało identyczny wynik przy zablokowanej sieci. Przed pobraniem wykonano kopię
+bazy; dane testowe pozostały w katalogach tymczasowych.
+
+Ten etap zamyka uzupełnianie treści OSW. Dalszy zaakceptowany zakres obejmuje
+źródła pierwotne i wykonanie metodologii v0.3. Harmonogram, domena i wdrożenie
+nowej aplikacji pozostają osobnymi zadaniami. Kod jest lokalnie na gałęzi
+`codex/dashboard-publication`, bez nowego commita/pusha.
+
+## Silnik analityczny Codexa — wcześniejszy cykl 29.09.2026, 17:41
+
+Wykonawcą AI jest Codex pracujący w tym repozytorium, bez osobnego API modelu.
+`scripts/analysis_cycle.py` prowadzi cykl: pobranie → zamrożony pakiet →
+propozycja ocen → kontrola dowodów → drugi przegląd agenta → obliczenie RTB →
+opcjonalny komentarz po przeglądzie → niezmienne wydanie → Supabase → kontrola
+odczytu. Zmiana materiałów lub kodu zatrzymuje korzystanie ze starego pakietu.
+Instrukcja: [obsługa silnika](analysis-runbook.md),
+[zadanie dla Codexa](../agents/analysis-cycle.md).
+
+Przeprowadzono rzeczywisty cykl `2026-09-29T153254Z-d3ca4c60`. Kolektory pobrały
+54 publikacje; wszystkie cztery źródła odpowiedziały poprawnie. Kolejka z
+zaległościami liczyła 50 materiałów. Przegląd rozstrzygnął 46: 36 wykluczeń
+kontekstu spoza punktacji oraz 9 obserwacji z 10 materiałów. Dwa nakładające się
+komunikaty RCB połączono w jeden zapis dziennej sekwencji ostrzeżeń. Oceny
+oznaczono `reviewer.type=agent`; drugi przegląd nie jest weryfikacją człowieka.
+
+**W tym cyklu RTB pozostał niewyliczony:** cztery publikacje OSW miały pusty skrót RSS albo
+sam spis treści. Zachowano wstrzymanie, bez uzupełniania treści z tytułu. Nowe
+obserwacje są kontekstem cywilnym i obronnym; nie otrzymały punktów działań
+RU/BY. Komentarz główny jest pominięty z powodu niepełnej analizy. Metodologia
+wykonywana nadal ma wersję `rtb-v0.2`.
+
+Raport ze stanem na **29.09.2026, 17:41 czasu Warszawy** opublikowano do
+Supabase. Pakiety eksportu, chmury i lokalnego API są identyczne. Ponowienie
+zwraca `created=false`, historia ma trzy rzeczywiste wydania. Przeglądarka
+wyświetliła nową datę, obserwację w osi czasu i nowe wydanie w archiwum.
+Replay dał identyczny wynik bez sieci. Potwierdzenie:
+`data/analysis/cycles/2026-09-29T153254Z-d3ca4c60/verification.json` (poza Git).
+Zachowano także 90 plików kodu i instrukcji z manifestem w
+`data/analysis/code/<code_hash>/`; odtworzenie z tej kopii jest identyczne.
+
+Weryfikacja kodu: **217 testów Python i 5 testów JavaScript/PostgreSQL**,
+poprawny build frontendu. Pełna ścieżka komentarza została sprawdzona na
+odseparowanych danych syntetycznych, bez publikowania ich do live.
+Skorygowano także istniejący kontrakt snapshotu: obsługuje kategorię
+`military_preparation` i kontekst strategiczny, już obecne w metodologii v0.2.
+
+Harmonogram nie został włączony; lokalne zadanie będzie potrzebować włączonego
+Maca i działającej aplikacji Codex. Hosting nowej aplikacji w Sites pozostaje
+osobnym wdrożeniem. Zaplanowano wtedy: archiwizowanie pełnych treści brakujących
+publikacji OSW, ustawienie harmonogramu Codexa oraz produkcyjny adapter WWW.
+Wagi, kalibracja i wdrożenie v0.3 pozostają odrębnym zakresem. Kod tego etapu
+jest lokalnie na gałęzi `codex/dashboard-publication`, bez nowego commita/pusha.
+
+## Dashboard i publikacje — odbiór 27.09.2026
+
+Użytkownik wybrał opcję 2, **B — Chronologia**, oraz zaakceptował kontrakt,
+publikowanie i frontend. Design System 0.2 zapisuje tę decyzję w `design.md`,
+`guidelines.md` i `theme.css`. `web/` zawiera działający interfejs, a
+`schemas/dashboard/report.schema.json` kontrakt `dashboard-v1`.
+
+Gotowe są weryfikacja zamrożonych wejść, ograniczony eksport, atomowy i
+idempotentny wydawca, historia oraz lokalne API odczytu. Frontend sprawdza nowe
+wydania co 30 sekund bez przebudowy. Zachowuje daty, niewyliczony RTB, braki
+źródeł i brak skalibrowanej pewności. Wersji v0.2 nie oznacza jako v0.3.
+
+Migrację czterech tabel i reguł RLS zastosowano w Supabase przez SQL Editor;
+schemat potwierdzono zapytaniem kontrolnym. **CLI jest zalogowane, repozytorium
+powiązane z projektem, historia migracji zgodna.** W Supabase są dwa rzeczywiste
+wydania; syntetyczne dane pozostały lokalnie. Nowy raport z 27.09, 20:20 czasu
+Warszawy, został zapisany, odczytany i automatycznie wyświetlony przez otwarty
+dashboard. Wszystkie trzy wymagane źródła są gotowe; RTB pozostaje niewyliczony,
+bo 32 materiały wymagają przeglądu. Ponowienie publikacji nie dodało duplikatu.
+Eksport, pakiet Supabase i odpowiedź lokalnego API są identyczne. Szczegóły:
+[stan Supabase](../supabase/README.md).
+
+Sprawdzono lokalny cykl analiza → przegląd → eksport → publikacja → odczyt,
+na odseparowanych danych syntetycznych. Ekran sam zmienił brak wyniku na 15 po
+kolejnej publikacji. Testy PostgreSQL/PGlite potwierdzają atomowość, brak
+duplikatów, niezmienność historii i role dostępu. Przeglądarka potwierdziła
+mapę i szczegóły, zoom, duży widok, skalę osi czasu, oba filtry dziennika,
+odczyt/pobranie raportu, menu mobile przy 320 px, stan awarii i powrót połączenia.
+
+Nie wdrożono nowej aplikacji w Sites ani harmonogramu. Komentarz pozostaje
+neutralnym brakiem podsumowania do czasu integracji rejestru zatwierdzonych
+ustaleń. Dane osobnych pilotaży wymagają osobnych adapterów prezentacyjnych.
+[Kontrakt](dashboard-data-contract.md), [uruchamianie](dashboard-runbook.md).
+
+## Fundament pilotażu — wcześniejsze etapy
 
 Etapy 0–2 mają działającą pierwszą wersję. Proces został uruchomiony na rzeczywistych źródłach i zakończony raportem z jawnym brakiem odczytu RTB. To fundament pilotażu, bez kompletnego pokrycia regionu i bez autonomicznego monitoringu.
 
@@ -178,7 +351,7 @@ Potwierdzono także na danych rzeczywistych:
 
 Sprawdzono składnię skryptów Python oraz skryptów powłoki. Samo otwarcie `Zbierz dane.command` dwuklikiem w Finderze nie było testowane. Dane demonstracyjne uruchomiono osobno w `data/demo/`; są oznaczone jako syntetyczne i nie weszły do bazy live.
 
-## Kolejne prace
+## Wcześniejszy plan kolejnych prac — 22.09.2026
 
 1. Po zakończonych pilotażach API i historii badać różne pory i dni oraz stabilność źródła, z budżetem opartym na zmierzonym rozmiarze. Opracować rejestr klas obiektów z datami obowiązywania; zachować oddzielne serie historii i API. Rozwinąć niezależną weryfikację publikacji oraz rejestr wyników do przyszłej kalibracji GNSS. Wszystkie 10 publikacji ma już wstępny przegląd i polskie opisy. Uzupełnić nierozstrzygnięte pozycje OSW i źródła weryfikujące. Krótkie próby nie kalibrują zdolności przewidywania.
 2. Etap 3, obok dalszej walidacji danych: przedstawić dwa kierunki wizualne, zapisać wybór w `design.md`, `guidelines.md`, `theme.css` i zbudować dashboard. Rozdzielić rodziny danych i ich aktualność. Mapa musi obsługiwać brak geometrii, a wykres brak odczytu. Delta pozostaje pusta do uzyskania porównywalnych okresów.
