@@ -61,7 +61,7 @@ def validate_evidence(incident: dict, materials: dict[str, dict]) -> None:
             raise ValueError(f"{claim}: independent corroboration is not established")
         if declared == "confirmed_primary" and strength not in ("confirmed_primary", "corroborated"):
             raise ValueError(f"{claim}: primary confirmation is not established")
-    if incident.get('assessment_v03') or incident.get('official_warning'):
+    if incident.get('assessment_v03') or incident.get('assessment_v04') or incident.get('official_warning'):
         from .scoring_v03 import validate_assessment, validate_warning
         validate_assessment(incident)
         validate_warning(incident, materials)

@@ -215,3 +215,7 @@ Oryginały i wersje są archiwizowane lokalnie. Material URL wskazuje rzeczywist
 zestaw XML, bez zgadywania adresu szczegółów na podstawie ID. Są to źródła
 opcjonalne o zakresie current_official_state_only; poprawna bieżąca lista
 nie otwiera bramki 216 godzin historii. Ich awaria jest raportowana.
+
+## Aktualizacja 30.09.2026 — bezpośredni kanał ukraiński
+
+`ua_air_force_public` jest podłączony w `config/sources.json`: [publiczny podgląd oficjalnego kanału](https://t.me/s/kpszsu). Jedno żądanie na cykl, maksymalnie 20 ostatnich tekstowych wpisów; bez mediów, logowania, pełnej historii i surowej telemetrii. Zawsze status partial, także przy udanym pobraniu. Oryginalny tekst, tożsamość postu, data publikacji, przekazania i odnośniki do wcześniejszych komunikatów trafiają do przeglądu. Analityk łączy jeden epizod i tworzy polski opis; data publikacji nie zastępuje czasu zdarzenia. Dane nie pochodzą od agregatora Strażnik.

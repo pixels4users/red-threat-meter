@@ -10,9 +10,11 @@ from ..dashboard_commentary import MARKUP, META, _fold
 from ..review import validate_schema
 
 VERSION = "dashboard-v1"
-EXPORTER = "dashboard-export-v3"
+EXPORTER = "dashboard-export-v4"
 
 GAPS = {
+    'time_precision_limited': 'Część zdarzeń ma przybliżony czas; uwzględniamy najniższy uzasadniony wkład.',
+    "domain_not_observed": "Część obszarów zagrożeń nie jest jeszcze objęta systematyczną obserwacją.",
     'event_history_unverified': 'Brakuje pełnej oceny historii zdarzeń z ostatnich dziewięciu dni.',
     "source_unavailable_or_partial": "Część źródeł jest niedostępna lub niepełna.",
     "source_window_incomplete": "Dostępne publikacje nie obejmują całego okresu.",
@@ -96,8 +98,11 @@ def comparison(current: dict, previous: dict | None) -> dict:
     a, b = current["rtb"]["score"], previous["rtb"]["score"]
     if a is None or b is None:
         return empty
+    if current['provenance']['methodology_version'] == 'rtb-v0.4' and (
+            current['rtb']['confidence']['comparison_key'] != previous['rtb']['confidence']['comparison_key']):
+        return empty
     delta = a - b
-    return {"delta_points": delta, "percent": round(100 * delta / b, 1),
+    return {"delta_points": delta, "percent": round(100 * delta / b, 1) if b else None,
             "direction": "up" if delta > 0 else "down" if delta < 0 else "stable",
             "reference_report_id": previous["report_id"]}
 
@@ -110,7 +115,7 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
         raise ValueError("Use the source configuration frozen with this snapshot")
     cfg = {s["id"]: s for s in source_config["sources"] if s["enabled"]}
     checks = {s["source_id"]: s for s in snapshot["sources"]}
-    blockers = snapshot["rtb"]["blockers"]
+    blockers = snapshot["rtb"].get("quality_issues", snapshot["rtb"]["blockers"])
     gaps = []
     for code in dict.fromkeys(b.split(":", 1)[0] for b in blockers):
         gaps.append({"code": code if code in GAPS else "other", "message": GAPS.get(code, "Ocena sytuacji jest niepełna.")})
@@ -171,9 +176,9 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
                              "snapshot_sha256": digest(snapshot), "exporter_version": EXPORTER,
                              "exporter_sha256": digest([(p.name, digest(p.read_bytes())) for p in exporter_files])},
               "rtb": {"score": snapshot["rtb"]["score"],
-                      "status": "insufficient_data" if snapshot["rtb"]["score"] is None else "available",
+                      "status": "insufficient_data" if snapshot["rtb"]["score"] is None else "provisional" if snapshot["rtb"]["status"] == "provisional" else "available",
                       "components": deepcopy(snapshot["rtb"].get("components", {"hostile_activity": 0, "preparation": 0})),
-                      "confidence": {"percent": None, "method": "not_calibrated"},
+                      "confidence": deepcopy(snapshot["rtb"].get("confidence", {"percent": None, "method": "not_calibrated"})),
                       "review_required": snapshot["rtb"].get("alert", {}).get("status") == "analyst_review_required"},
               "coverage": {"required_sources": len(required), "usable_sources": usable,
                            "percent": round(100 * usable / len(required)) if required else None,
@@ -185,13 +190,13 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
                               "Obserwacja obejmuje skonfigurowane źródła, nie wszystkie zdarzenia w regionie."]}
     if commentary_record is not None:
         result["commentary"] = public_commentary(commentary_record, digest(snapshot), snapshot["run_id"], snapshot["rtb"]["score"])
-    if snapshot['methodology_version'] == 'rtb-v0.3':
+    if snapshot['methodology_version'] in ('rtb-v0.3', 'rtb-v0.4'):
         result['rtb']['red_priority'] = deepcopy(snapshot['rtb']['red_priority'])
         result['rtb']['regions'] = {k: {field: deepcopy(v[field]) for field in ('score','components','direct_points','propagated_points','red_priority')}
                                   for k,v in snapshot['rtb']['regions'].items()}
         result['rtb']['official_warnings'] = [{k:w[k] for k in ('alert_key','authority','level','status','effective_at','valid_until','area','instruction_pl')}
                                              for w in snapshot['rtb']['official_warnings']]
-    if bool(blockers) != (result["rtb"]["score"] is None):
+    if snapshot["methodology_version"] != "rtb-v0.4" and bool(blockers) != (result["rtb"]["score"] is None):
         raise ValueError("Inconsistent score/completeness state")
     result["rtb"]["trend"] = comparison(result, previous)
     result["report_id"] = "rpt_" + digest(result)

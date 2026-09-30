@@ -88,7 +88,7 @@ def load_config(path: Path | None = None) -> dict:
 
 def load_scoring(version: str | None = None) -> dict:
     version = version or read_json(ROOT / 'config/analysis.json')['methodology_version']
-    paths = {'rtb-v0.2': 'scoring-v0.json', 'rtb-v0.3': 'scoring-v0.3.json'}
+    paths = {'rtb-v0.2': 'scoring-v0.json', 'rtb-v0.3': 'scoring-v0.3.json', 'rtb-v0.4': 'scoring-v0.4.json'}
     if version not in paths:
         raise ValueError('Unsupported methodology version')
     config = read_json(ROOT / 'config' / paths[version])
@@ -96,4 +96,6 @@ def load_scoring(version: str | None = None) -> dict:
         raise ValueError('Scoring version mismatch')
     if version == 'rtb-v0.3':
         Draft202012Validator(read_json(ROOT / 'schemas/scoring-v03.schema.json')).validate(config)
+    elif version == 'rtb-v0.4':
+        Draft202012Validator(read_json(ROOT / 'schemas/scoring-v04.schema.json')).validate(config)
     return config

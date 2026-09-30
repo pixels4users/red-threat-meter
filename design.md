@@ -2,7 +2,7 @@
 
 Wersja: **0.2**, 27.09.2026. Żywy dokument: aktualizowany razem z interfejsem.
 Zakres: działający lokalnie frontend, wspólne tokeny i kontrakt publikacji.
-Stan połączenia z chmurą: `supabase/README.md`. Silnik pozostaje rtb-v0.2.
+Stan połączenia z chmurą: `supabase/README.md`. Silnik od 30.09.2026 wykonuje rtb-v0.4.
 
 ## Kierunek i decyzje
 
@@ -133,3 +133,7 @@ połączenia mają odrębne stany. Przeszły 204 testy Python, 5 testów JS/Post
 oraz build. Następnie sprawdzono pełny cykl na rzeczywistych raportach:
 Supabase → lokalne API → automatyczna aktualizacja otwartego ekranu.
 Witryna Sites pozostaje osobną wizualizacją do czasu wdrożenia aplikacji.
+
+## Ciągły wynik — 30.09.2026
+
+Układ B pozostaje bez zmian. Nowe raporty pokazują RTB 0–100 i liczbową pewność według jawnej heurystyki. Zero ma neutralne wyjaśnienie i nie komunikuje bezpieczeństwa. Rozwijana sekcja opisuje osiem obszarów obserwacji. Historia zachowuje null i przerwy pomiędzy nieporównywalnymi seriami. Oficjalne ostrzeżenia pozostają nad indeksem.

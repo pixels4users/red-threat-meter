@@ -15,7 +15,7 @@ Kontrole:
   Nie pominięto drugiego istotnego zdarzenia z tego samego materiału.
 - dates_and_locations: czas i miejsce wynikają z treści, a nie daty publikacji,
   daty pobrania, umownego centrum regionu ani własnej wiedzy modelu.
-- category_and_scope: spełnione są kryteria aktywnej konfiguracji v0.3, a wykluczenie nie usuwa
+- category_and_scope: spełnione są kryteria aktywnej konfiguracji v0.4, a wykluczenie nie usuwa
   niepewnego zagrożenia. Operator wojskowy nie dowodzi zamiaru ataku. Anomalia
   wymaga rzeczywistego odniesienia; doktryna nie jest dowodem incydentu.
 - polish_and_factual: tytuł, opis i uzasadnienia są po polsku, oddzielają
@@ -25,7 +25,7 @@ Nie traktuj własnego werdyktu jako drugiego niezależnego źródła OSINT ani
 kontroli człowieka. Decyzje defer zawsze otrzymują hold. Brak kontekstu do
 kontroli oznacza hold, nie domyślną akceptację.
 
-Dodatkowo sprawdź `assessment_v03`: niepewność czasu, fizyczną odrębność
+Dodatkowo sprawdź `assessment_v04` (lub zachowaną ocenę v0.3): niepewność czasu, fizyczną odrębność
 składowych, identyczność epizodu między źródłami i kategoriami, dowody zasięgu
 oraz brak zamiany planu PAŻP w aktywację. W `official_warning` sprawdź
 faktycznego nadawcę, treść polecenia, obszar, stan i wspólny alert_key.

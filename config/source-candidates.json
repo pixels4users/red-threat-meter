@@ -300,15 +300,15 @@
       "url": "https://t.me/kpszsu",
       "role": "primary_official_air_threat_statements",
       "priority": 1,
-      "status": "official_channel_identity_verified_adapter_not_connected",
+      "status": "connected_bounded_public_preview",
       "purpose": "Komunikaty Sił Powietrznych ZSU i odwołania. Priorytet odkrywania dla obwodów lwowskiego i wołyńskiego. Publikacje nie są automatycznie surowymi pomiarami radarowymi; kurs na Ukrainę nie dowodzi zagrożenia dla Polski.",
       "dependency_group": "authority:ua_air_force",
       "verification_urls": [
         "https://t.me/kpszsu",
         "https://cpd.gov.ua/announcement/spysok-bezpechnyh-kanaliv-otrymannya-informacziyi/"
       ],
-      "access_note": "25.09.2026: publiczny profil i urzędowy wykaz wskazują kanał. Dostęp automatyczny, historia, opóźnienie i dozwolone przetwarzanie wymagają ustalenia. Brak sesji, bota i kolektora.",
-      "checked_on": "2026-09-25",
+      "access_note": "Kolektor telegram_public: jedna publiczna strona, do 20 tekstowych postów, bez sesji i mediów. Zasięg częściowy, brak gwarancji historii; surowe treści i metadane przekazań archiwizowane. Bez automatycznej atrybucji i naliczania punktów.",
+      "checked_on": "2026-09-30",
       "proposal_status": "accepted_for_integration",
       "accepted_on": "2026-09-25"
     },

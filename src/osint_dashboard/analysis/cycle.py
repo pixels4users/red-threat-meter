@@ -172,7 +172,7 @@ def history_context(data_dir, cycle_id):
         context = {'inputs_sha256': history_fingerprint(inputs), 'required_window': window_for(inputs['as_of'], inputs['scoring']),
                    'source_checks': inputs['source_checks'], 'materials': inputs['materials'],
                    'incidents': inputs['incidents'], 'resolutions': inputs['resolutions'],
-                   'instruction': 'Zweryfikuj historię zdarzeń i rewizji z 216 godzin, nie sam wiek publikacji. Brak pokrycia oznacza brak history-review.json i niewyliczony RTB.'}
+                   'instruction': 'Zweryfikuj historię zdarzeń i rewizji z 216 godzin, nie sam wiek publikacji. Brak pokrycia oznacza brak history-review.json; w v0.4 obniża pewność danych, bez blokowania RTB. Wersje historyczne zachowują dawne bramki.'}
         path = folder / 'history-context.json'
         write_json(path, context)
     return {'history_context': str(path), 'inputs_sha256': context['inputs_sha256'], 'required_window': context['required_window']}
@@ -205,7 +205,9 @@ def calculate(data_dir, cycle_id):
         write_once(folder / "commentary-evidence.json", {"snapshot_id": cycle_id, "rtb": draft["snapshot"]["rtb"],
                                                         "mode": draft["snapshot"]["mode"], "evidence": catalog})
     return {"cycle_id": cycle_id, "score": draft["snapshot"]["rtb"]["score"],
-            "blockers": draft["snapshot"]["rtb"]["blockers"], "draft": str(folder / "draft.json"),
+            "blockers": draft["snapshot"]["rtb"]["blockers"],
+            "confidence": draft["snapshot"]["rtb"].get("confidence"),
+            "quality_issues": draft["snapshot"]["rtb"].get("quality_issues", []), "draft": str(folder / "draft.json"),
             "commentary_evidence": str(folder / "commentary-evidence.json")}
 
 

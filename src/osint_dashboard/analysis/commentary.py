@@ -13,6 +13,9 @@ def evidence_catalog(snapshot: dict, inputs: dict) -> dict:
     catalog = {}
     if snapshot["rtb"]["score"] is not None:
         catalog["rtb:score"] = {"score": snapshot["rtb"]["score"], "meaning": "Eksperymentalny indeks, bez oceny prawdopodobieństwa wojny ani bezpieczeństwa ludności."}
+    if snapshot['methodology_version'] == 'rtb-v0.4':
+        catalog['rtb:score']['confidence'] = snapshot['rtb']['confidence']
+        catalog['rtb:score']['meaning'] += ' Zero oznacza brak naliczonych sygnałów. Nie uzasadnia tezy o spokoju, normie, spadku zagrożenia ani bezpieczeństwie. Pewność to heurystyka pokrycia danych.'
     current = set(inputs["latest_material_ids"])
     materials = {m["material_id"]: m for m in inputs["materials"]}
     zone = ZoneInfo(snapshot["window"]["timezone"])

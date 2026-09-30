@@ -1,14 +1,13 @@
-# Metodologia RTB v0.4
+# Metodologia RTB v0.3
 
-**Wersja `rtb-v0.4`, 30.09.2026.** Ciągły indeks i niezależna pewność danych wynikają z decyzji użytkownika: luki nie blokują całego wyniku. Parametry pozostają eksperymentalne, bez kalibracji prognostycznej.
+**Wersja `rtb-v0.3`, zaakceptowana 25.09.2026.** To obowiązująca specyfikacja analityczna dla dalszego rozwoju projektu, eksperymentalna i bez kalibracji prognostycznej. Obliczenia wdrożono 29.09.2026; dostępność danych, kalibracja i poszczególne integracje zachowują osobne statusy.
 
 | Element | Wersja / stan |
 |---|---|
-| Obowiązująca metodologia | `rtb-v0.4`: wynik 0–100 i jawna pewność obserwacji |
-| Działający silnik | `config/scoring-v0.4.json`, wybierane przez `config/analysis.json` |
-| Historia | [v0.3](archive/methodology-v0.3.md) i [v0.2](archive/methodology-v0.2.md); stare wyniki i konfiguracje niezmienione |
-| Źródła | RCB, MON, OSW, PAŻP/AUP, RSO, wybrane dokumenty łotewskie, dwa konta X i ograniczony podgląd oficjalnego kanału Sił Powietrznych Ukrainy |
-
+| Obowiązująca metodologia | `rtb-v0.3`, zaakceptowana specyfikacja |
+| Działający silnik i wydania | `rtb-v0.3` w `config/scoring-v0.3.json`, wybierane przez `config/analysis.json`; wcześniejsze wydania pozostają v0.2 |
+| Reguły dotychczasowych obliczeń | [Metodologia v0.2](archive/methodology-v0.2.md) i `config/archive/scoring-v0.2.json` |
+| Rozszerzenie źródeł | PAŻP/AUP i RSO/ogólne podłączone; aktywacja stref, UA i Bałtyk nadal wymagają integracji |
 
 Źródła i status dostępu: [rejestr kandydatów](sources.md#rozszerzenie-zrodel-25-09-2026). Dane pozyskujemy bezpośrednio od instytucji i wydawców; Strażnik jest odniesieniem architektonicznym, nie dostawcą danych. ADS-B pozostaje w istniejącym strumieniu ADSB.lol. Wersja i hash reguł w każdym wydaniu opisują faktycznie użyty silnik; sama akceptacja dokumentacji nie zmienia etykiety wcześniejszych ani nowych wyników v0.2.
 
@@ -16,7 +15,7 @@
 
 RTB opisuje nasilenie potwierdzonych działań RU/BY oraz sygnałów przygotowań wojskowych istotnych dla Polski i wschodniej flanki NATO. Wspiera przegląd Indicators & Warnings. Nie mierzy prawdopodobieństwa wojny ani zamiaru ataku. Zdolność, intencja i wystąpienie zdarzenia są osobnymi ustaleniami. Baza i punkty nie mają empirycznej interpretacji procentowej.
 
-Wynik rozdziela dwa wkłady: `hostile_activity` (pozostałe kategorie) i `preparation` (logistyka/medycyna oraz aktywność lotnicza RU/BY). Wkłady pokazuje się po limitach kategorii, bez bazy. Przy limicie całego indeksu 100 suma wkładów plus baza może przewyższać wynik. Niekompletność nie usuwa zakwalifikowanych wkładów; pokazujemy ją w niezależnej pewności danych.
+Wynik rozdziela dwa wkłady: `hostile_activity` (pozostałe kategorie) i `preparation` (logistyka/medycyna oraz aktywność lotnicza RU/BY). Wkłady pokazuje się po limitach kategorii, bez bazy. Przy limicie całego indeksu 100 suma wkładów plus baza może przewyższać wynik. Przy niekompletnych danych wkłady służą wyłącznie diagnostyce.
 
 Podstawowy zakres punktacji obejmuje PL, LT, LV, EE, CZ, SK, HU, RO, BG, DE, FI, SE. Szczególne zakresy kategorii podano niżej. Obserwacje mogą obejmować szerszy region, w tym Ukrainę i zachodnią Rosję, bez automatycznego naliczania punktów. To roboczy zakres; obecne kolektory skupiają się na Polsce i nie zapewniają pełnego pokrycia tych państw.
 
@@ -30,7 +29,7 @@ Interpretacja strategiczna używa roboczego horyzontu 14–42 dni. Scenariusz za
 
 ## Punktacja i kryteria
 
-`RTB = min(100, suma wkładów po limitach kategorii)`. Baza wynosi 0; kontrola dowodów dotyczy pojedynczego epizodu, a nie blokowania pozostałych. W v0.3 wkład obejmuje wygaszanie i kwalifikowany mnożnik epizodu; wynik regionalny również współczynnik propagacji. Dokładna kolejność jest podana [niżej](#wygaszanie-regiony-i-korelacja). Brak zakwalifikowanych sygnałów daje 0, co nie dowodzi bezpieczeństwa. Awaria publikacji nie tworzy nowego zerowego raportu.
+`RTB = min(100, 10 + suma wkładów po limitach kategorii)`, wyłącznie po przejściu kontroli kompletności. W v0.3 wkład obejmuje wygaszanie i kwalifikowany mnożnik epizodu; wynik regionalny również współczynnik propagacji. Dokładna kolejność jest podana [niżej](#wygaszanie-regiony-i-korelacja). Zero zakwalifikowanych punktów daje bazę 10, co nie dowodzi bezpieczeństwa.
 
 W każdej kategorii wymagamy potwierdzenia wystąpienia, daty, kraju i atrybucji RU/BY. Dla przygotowań atrybucja identyfikuje operatora sił lub infrastruktury, a nie zamiar ataku. Nieustalony sprawca oznacza obserwację poza punktacją, nawet gdy samo zdarzenie zostało potwierdzone.
 
@@ -43,7 +42,6 @@ W każdej kategorii wymagamy potwierdzenia wystąpienia, daty, kraju i atrybucji
 | Anomalia lotnicza RU/BY / `air_activity` | 4 / 12 | Zakres podstawowy, Białoruś, obwód królewiecki; `baseline_anomaly`, `military_activity`; dla RU także `kaliningrad_oblast` |
 | Cyberatak / `cyberattack` | 3 / 12 | Wyłącznie Polska/Litwa; `large_scale`, `target_banking_or_government` |
 | Presja graniczna / `border_pressure` | 3 / 9 | Polska/Białoruś i granica PL–BY; `baseline_increase`, `pl_by_border` |
-| Rosyjski atak powietrzny na zachodnią Ukrainę / `cross_border_air_pressure` | 3 / 12 | UA; `air_attack`, `western_ukraine`; w pierwszym zakresie obwody lwowski, wołyński i rówieński; jeden epizod, nie liczba postów |
 | Zakłócenia GPS / `gps_jamming` | 2 / 8 | Zakres podstawowy; `duration_over_24h` |
 
 Każde spełnione kryterium wskazuje własne dowody typu `criterion`; jeden fragment może uzasadniać kilka kryteriów, jeśli rzeczywiście zawiera odpowiednie ustalenia. Sam szpital, transport lub pożar nie wystarcza. Uderzenie w obwodzie lwowskim nie jest naruszeniem przestrzeni NATO. Ćwiczenia lub loty obronne NATO pozostają kontekstem.
@@ -58,7 +56,7 @@ Wspólny `campaign_id` ogranicza punktowanie do jednego epizodu w danej kategori
 
 ## Próg i priorytet geograficzny
 
-Wynik **ściśle ponad 60** kieruje do pilnego przeglądu analitycznego. Czerwony priorytet v0.3 wymaga dodatkowo opisanej niżej bramki niezależnych, bezpośrednich dowodów. Próg pozostaje roboczy, z `calibrated=false`, bez przypisywania wysokiego prawdopodobieństwa wojny. Wynik 60 nie przekracza progu. W historycznych raportach przy `score: null` status wynosi `not_assessed`; brak oceny nie jest sygnałem uspokojenia. Archiwalny silnik v0.2 zapisuje samo `alert.status=analyst_review_required`, bez nowej bramki koloru. Nie działa wysyłanie powiadomień.
+Wynik **ściśle ponad 60** kieruje do pilnego przeglądu analitycznego. Czerwony priorytet v0.3 wymaga dodatkowo opisanej niżej bramki niezależnych, bezpośrednich dowodów. Próg pozostaje roboczy, z `calibrated=false`, bez przypisywania wysokiego prawdopodobieństwa wojny. Wynik 60 nie przekracza progu. Przy `score: null` status wynosi `not_assessed`; brak oceny nie jest sygnałem uspokojenia. Archiwalny silnik v0.2 zapisuje samo `alert.status=analyst_review_required`, bez nowej bramki koloru. Nie działa wysyłanie powiadomień.
 
 Obszary w `config/strategic-areas.json` nadają priorytet przeglądowi, bez własnego mnożnika punktów ani arbitralnego promienia bliskości. `strategic_context`, jeśli występuje, wymaga identyfikatorów obszarów, uzasadnienia i dowodów lokalizacji. Samo skojarzenie nazwy miejsca z ważną bazą nie wystarcza. Regionalna propagacja v0.3 ma osobne reguły 40% / 16% i nie nadaje punktów za samą obecność obiektu strategicznego. Wyniki regionalne v0.3 zawierają osobno wkład bezpośredni i przeniesiony.
 
@@ -82,25 +80,13 @@ Walidator sprawdza obecność cytatu w zapisanym materiale, identyfikatory i typ
 
 Biblioteka `data/doctrine_rag` ma osobny rejestr i indeks lokalny. Pomaga formułować hipotezy oraz kontrhipotezy. Nie jest podłączona do kolektora incydentów; walidator odrzuca materiał oznaczony `doctrine` lub `reference` jako dowód incydentu. Nie wolno obchodzić tej granicy przez zmianę etykiety dokumentu. Artykuły analityczne mogą dostarczać aktualnych ustaleń tylko po sprawdzeniu konkretnych faktów i ich pierwotnego pochodzenia. Zasady cytowania i katalog: `docs/doctrine.md`.
 
-## Ciągły wynik i pewność danych
+## Kompletność i brak odczytu
 
-Każdy prawidłowo wykonany nowy cykl v0.4 zapisuje liczbę 0–100. Niedostępne źródło, nieprzejrzany materiał, brak części historii lub niedokładna data nie wstrzymują całego RTB. Kod zapisuje `quality_issues`, a `blockers=[]`. Potwierdzone zdarzenia zachowują swój wkład; niezweryfikowane są indywidualnie wykluczane. `status=provisional` oznacza niepełną podstawę obserwacji, nie brak liczby. Awaria programu, uszkodzony pakiet lub odrzucona publikacja pozostawia ostatni poprawny raport z jego datą; nie generuje pozornego zera.
+Wynik pozostaje pusty, gdy wymagane źródło jest niedostępne, częściowe, nie obejmuje wymaganego horyzontu lub przekracza limit świeżości; gdy definicja źródła zmieniła się od pobrania; albo gdy pozostały nieprzejrzane aktualne wersje materiałów. Stara publikacja również może zawierać nową aktualizację. Archiwalny v0.2 sprawdza siedem dni kalendarzowych publikacji i osiem godzin od pobrania. V0.3 wymaga co najmniej 216 godzin historii zdarzeń i rewizji oraz osobnych limitów dla warstwy taktycznej; opisano je w warunkach wdrożenia. Akceptacja kandydata nie zmienia automatycznie listy źródeł wymaganych przez bieżący silnik.
 
-`confidence.method=coverage-review-history-v1`, `calibrated=false`:
+Nierozstrzygnięta data potencjalnego incydentu, błędne dowody i użycie nieaktualnej wersji materiału również mogą blokować odczyt. Zdarzenia kontekstowe, poza zakresem lub niespełniające kryteriów mają uzasadnienie wykluczenia. Nie przedstawiamy ich jako potwierdzonych punktów. Błąd źródła opcjonalnego jest widoczny, lecz nie blokuje liczby.
 
-```text
-Pewność = round(100 × V × R × H)
-V = średnia udziałów ośmiu stałych obszarów obserwacji
-R = udział aktualnych wersji materiałów z ukończonym przeglądem
-    × (1 − udział zdarzeń z nierozstrzygniętym dowodem/czasem)
-H = 1 przy zweryfikowanej historii 216 h; w przeciwnym razie 0,5
-```
-
-Dla każdego obszaru bierzemy największy dostępny udział źródła z `config/scoring-v0.4.json`, bez dodawania kopii. Osiem obszarów to ostrzeżenia, ataki powietrzne w regionie, sabotaż/infrastruktura, cyber, granice, GNSS, logistyka i aktywność powietrzna. Obszary bez podłączonego źródła mają 0. Kontekstowe analizy i wybrane komunikaty z jednego kraju mogą zapewnić najwyżej udział 0,25; bezpośrednie źródło odpowiednie dla obszaru najwyżej 1. Częściowe pobranie lub niepełne okno mnoży udział przez 0,5. Brak odczytu, zmiana definicji, odczyt z przyszłości lub starszy niż 8 h daje udział 0. Pełna dostępność krótkiego eksportu RSO/PAŻP nie dowodzi historii.
-
-Współczynniki są jawnie przyjętą heurystyką jakości, nie zmierzoną trafnością ani procentem geograficznego pokrycia. Nie ma podstaw do ustawienia 100% tylko dlatego, że działają trzy wymagane portale. Brak kandydatów sam w sobie nie obniża R; przy braku wszystkich źródeł V=0 i pewność=0 niezależnie od kolejki. Ukończony przegląd może wykluczyć materiał; `defer` pozostaje brakiem. Puste źródło nie dowodzi braku incydentów.
-
-Zero oznacza brak **naliczonych** sygnałów, nie brak realnych zagrożeń. Przy zerze dashboard pokazuje to wyjaśnienie obok pewności. Oficjalne ostrzeżenia zachowują osobny status i obszar; nie są ukrywane przez niski RTB ani automatycznie punktowane drugi raz. Historyczne raporty v0.2/v0.3 zachowują oryginalne `null` i zasady kompletności.
+Stan braku to `score: null`, `status: incomplete` i lista `blockers`. Suma przejrzanych punktów nie zastępuje RTB. „Pełne okno publikacji” jest kontrolą chronologicznej listy kolektora, nie dowodem pełnego pokrycia wydawcy ani regionu. Skrót RSS nie oznacza przeczytania artykułu. Nowe wydanie offline zachowuje prawdziwe daty pobrania.
 
 ## Historia, wersje i porównania
 
@@ -115,7 +101,7 @@ Akceptacja v0.3 zastępuje specyfikację v0.2 w tym dokumencie. Jej dokładny po
 <a id="projekt-v03--wygaszanie-regiony-i-korelacja"></a>
 <a id="wygaszanie-regiony-i-korelacja"></a>
 
-## Wygaszanie, regiony i korelacja — reguły v0.3 zachowane w v0.4
+## Wygaszanie, regiony i korelacja — v0.3
 
 **Status: specyfikacja zaakceptowana 25.09.2026, `calibrated=false`; obliczenia wdrożone 29.09.2026; bonus GNSS wyłączony do walidacji detektora.** Inspiracją są opisane przez [Strażnika](https://straznik.eu/) wygaszanie taktyczne i propagacja regionalna. Publiczna [konfiguracja autora](https://github.com/cukierrro/Straznik/blob/main/backend/app/config.py), sprawdzona 25.09.2026, wskazuje 30 minut pełnej wagi, koniec po 60 minutach i współczynnik sąsiedztwa 0,4. To sprawdzenie opublikowanych reguł, nie audyt działającego serwera ani dowód trafności modelu. Profil strukturalny, współczynniki korelacji i warunki poniżej są **naszymi roboczymi założeniami badawczymi**, nie potwierdzonymi parametrami Strażnika.
 
@@ -138,11 +124,11 @@ D(a; H, F) = 1                       dla 0 <= a <= H
 
 Siedem dni spadku w profilu strukturalnym liczymy **po** 48 godzinach pełnej wagi. Wariant taktyczny `F=60 min` daje zanik po 90 minutach; jest wariantem testu wrażliwości wymagającym osobnej wersji parametrów, bez przełączania go zależnie od pożądanego wyniku. Profil przypisuje analityk na podstawie charakteru i czasu trwania faktu, nie nazwy wydawcy. Ten sam fakt nie otrzymuje jednocześnie obu profili.
 
-Wiek ujemny wyklucza punktację. Nieznany czas wyklucza tylko dany epizod. Dla potwierdzonego przedziału v0.4 używa dolnej granicy wagi po wygaszeniu, zapisując przedział i obie granice w audycie. Początek dnia jest granicą przedziału, nigdy domniemaną godziną zdarzenia. Przedział wykraczający poza T pozostaje wykluczony. Nie podstawiamy czasu pobrania. Najnowsza rewizja tego samego zdarzenia zastępuje jego wkład. Ponowny post, odczyt lub potwierdzenie starego faktu nie zeruje wieku. Nowy udokumentowany pomiar trwającego zjawiska może zmienić `t_e`, ale wymaga dowodu nowego stanu i zachowania związku z tym samym epizodem.
+Wiek ujemny wyklucza punktację. Nieznany czas albo sama data dzienna, która nie pozwala jednoznacznie wyliczyć wagi, daje stan częściowy i brak pojedynczego odczytu; nie podstawiamy północy ani czasu pobrania. Najnowsza rewizja tego samego zdarzenia zastępuje jego wkład. Ponowny post, odczyt lub potwierdzenie starego faktu nie zeruje wieku. Nowy udokumentowany pomiar trwającego zjawiska może zmienić `t_e`, ale wymaga dowodu nowego stanu i zachowania związku z tym samym epizodem.
 
 Odwołanie alertu lub dezaktywacja strefy kończy ich aktywny wkład od znanego czasu zakończenia; późniejsza wiedza nie zmienia dawnych raportów. Zakończenie akcji ratowniczej nie usuwa historycznego faktu sabotażu — jego wkład nadal wygasa profilem strukturalnym. Wygaśnięcie wagi modelu nie jest odwołaniem oficjalnego ostrzeżenia: jego treść i status obowiązywania pokazujemy osobno.
 
-Przed obliczeniem dopuszczamy tylko wersje materiałów, pomiarów i ocen rzeczywiście znane systemowi do `T`. Obliczenia wieku używają czasu UTC i upływu sekund, niezależnie od zmiany czasu letniego. Odczyt dobowy i tygodniowy używa tego samego wzoru w chwili `T`; rytm raportu nie zmienia wagi i **nie sumujemy siedmiu dziennych indeksów**. Docelowa obserwacja obejmuje co najmniej 216 godzin historii istotnych zdarzeń oraz ich rewizji; jej niepełność obniża H, bez blokowania RTB; obecnej kontroli siedmiu dni publikacji nie uznajemy za spełnienie tego wymogu. Historyczne piki można zestawić tylko z zapisanych, kompletnych odczytów, z jawnymi lukami.
+Przed obliczeniem dopuszczamy tylko wersje materiałów, pomiarów i ocen rzeczywiście znane systemowi do `T`. Obliczenia wieku używają czasu UTC i upływu sekund, niezależnie od zmiany czasu letniego. Odczyt dobowy i tygodniowy używa tego samego wzoru w chwili `T`; rytm raportu nie zmienia wagi i **nie sumujemy siedmiu dziennych indeksów**. Proces musi zapewnić co najmniej 216 godzin historii istotnych zdarzeń oraz ich rewizji; obecnej kontroli siedmiu dni publikacji nie uznajemy za spełnienie tego wymogu. Historyczne piki można zestawić tylko z zapisanych, kompletnych odczytów, z jawnymi lukami.
 
 ### Wkład i kolejność obliczeń
 
@@ -150,10 +136,10 @@ Dla unikalnego zakwalifikowanego epizodu `e` z kategorii `c`:
 
 ```text
 w_e(T) = B_c * D_e(T) * S_e(T)
-RTB_v04(T) = min(100, sum_c min(L_c, sum_e_in_c w_e(T)))
+RTB_v03(T) = min(100, 10 + sum_c min(L_c, sum_e_in_c w_e(T)))
 ```
 
-`B_c` i `L_c` to wagi oraz limity z tabeli powyżej, przejęte z v0.2 jako punkt wyjścia do porównania modeli. Najpierw rozstrzygamy pochodzenie, tożsamość, bieżącą rewizję i kryteria, potem wygaszanie i synergię. Dla wspólnego `campaign_id` i kategorii wybieramy najwyższy aktualny `w_e`, z rozstrzyganiem remisu po `event_key`; to wspólny wybór przed projekcją regionalną. Sumy we wzorach obejmują już tylko epizody po tym ograniczeniu. Następnie stosujemy niezależnie limity kategorii dla indeksu ogólnego oraz dla każdego regionu, na końcu limit 100. Nie zaokrąglamy wkładów przed zsumowaniem. Niekompletność obniża pewność; mnożnik nie zastępuje dowodu ani brakujących danych.
+`B_c` i `L_c` to wagi oraz limity z tabeli powyżej, przejęte z v0.2 jako punkt wyjścia do porównania modeli. Najpierw rozstrzygamy pochodzenie, tożsamość, bieżącą rewizję i kryteria, potem wygaszanie i synergię. Dla wspólnego `campaign_id` i kategorii wybieramy najwyższy aktualny `w_e`, z rozstrzyganiem remisu po `event_key`; to wspólny wybór przed projekcją regionalną. Sumy we wzorach obejmują już tylko epizody po tym ograniczeniu. Następnie stosujemy niezależnie limity kategorii dla indeksu ogólnego oraz dla każdego regionu, na końcu limit 100. Nie zaokrąglamy wkładów przed zsumowaniem. Niekompletność nadal daje `null`; mnożnik nie zastępuje dowodu ani brakujących danych.
 
 ### Propagacja regionalna i widoki Warszawy oraz Łodzi
 
@@ -165,7 +151,7 @@ P(e,v) = 1       dla d = 0
          0.16    dla d = 2
          0       dla d > 2
 w_e,v(T) = w_e(T) * P(e,v)
-RTB_v04,v(T) = min(100, sum_c min(L_c, sum_e_in_c w_e,v(T)))
+RTB_v03,v(T) = min(100, 10 + sum_c min(L_c, sum_e_in_c w_e,v(T)))
 ```
 
 Jest to hipoteza regionalnej istotności, nie model toru lotu ani fizycznego rozchodzenia się zagrożenia. W pierwszym wariancie dwa kręgi stosujemy wyłącznie do **potwierdzonego, bezpośredniego zagrożenia kinetycznego**. Dla cyberataku, GNSS, sabotażu o lokalnych skutkach i logistyki liczymy udokumentowany zasięg oddziaływania (`P=1` w tym zasięgu), bez automatycznej dyfuzji; zależności sieciowe wymagają odrębnych dowodów. Alerty RCB/RSO zachowują oficjalny obszar adresatów. Strefa PAŻP nie rozszerza sama zasięgu zagrożenia kinetycznego.
@@ -199,11 +185,11 @@ Pełna triada bez fali daje `S=1,50`, sama fala `1,25`, oba warunki `1,75`. Bonu
 
 ### Poziom czerwony i oficjalne ostrzeżenia
 
-Roboczy próg liczbowy pozostaje ściśle ponad 60. W v0.4 czerwony **priorytet analityczny** wymaga co najmniej dwóch niezależnych grup pochodzenia dla punktowanych dowodów bezpośrednich oraz przynajmniej jednego bezpośredniego zdarzenia w ocenianym obszarze ze statusem wystąpienia `corroborated`. Samo przeniesienie punktów nie otwiera czerwonego. Przy przekroczeniu sumy bez bramki pokazujemy wartość i powód wstrzymania czerwonego; pozostaje przegląd analityczny. Jedna relacja medialna i dowolna liczba jej kopii nie przechodzą bramki.
+Roboczy próg liczbowy pozostaje ściśle ponad 60. W v0.3 czerwony **priorytet analityczny** dodatkowo wymaga kompletności, co najmniej dwóch niezależnych grup pochodzenia dla punktowanych dowodów bezpośrednich oraz przynajmniej jednego bezpośredniego zdarzenia w ocenianym obszarze ze statusem wystąpienia `corroborated`. Samo przeniesienie punktów nie otwiera czerwonego. Przy przekroczeniu sumy bez bramki pokazujemy wartość i powód wstrzymania czerwonego; pozostaje przegląd analityczny. Jedna relacja medialna i dowolna liczba jej kopii nie przechodzą bramki.
 
 Trzy klasy treści RCB/RSO z [rejestru źródeł](sources.md#rso-rcb-klasy) są osobnym statusem oficjalnego komunikatu, bez przelicznika 1:1 na RTB. Autentyczne polecenie szukania bezpiecznego miejsca jest prezentowane wraz z obszarem i czasem także wtedy, gdy RTB jest `null` lub brakuje drugiego źródła. Model nie odwołuje, nie rozszerza i nie zastępuje zaleceń służb. Brak alertu nie jest dowodem braku zagrożenia.
 
-### Pochodzenie reguł i przypadki kontrolne
+### Warunki wdrożenia i przypadki kontrolne
 
 Zaakceptowano specyfikację z identyfikatorem `rtb-v0.3`; parametry pozostają nieskalibrowane. Wdrożenie wymaga konfiguracji obliczeń i schematów v0.3, wersji grafu oraz rejestru źródeł, tłumaczeń, reguł grupowania i bramek jakości. Nie wystarczy zmiana pola `version` w konfiguracji v0.2. Uruchomić najpierw obliczenia porównawcze na osobnych danych, zachowując v0.2 i replay. Osiem godzin świeżości źródeł RTB i 36 godzin pilotażu GNSS nie są dopuszczalnymi limitami dla minutowego ostrzegania. Dla taktycznej korelacji przyjęto wymóg kontroli PAŻP i RCB/RSO nie starszej niż 5 minut względem `T`; jej osiągalność musi zostać zmierzona przed użyciem.
 
@@ -217,7 +203,7 @@ Zaakceptowano specyfikację z identyfikatorem `rtb-v0.3`; parametry pozostają n
 | Dobowe GPSJAM + PAŻP + OSINT w bieżącej godzinie | Bonus korelacji wyłączony; brak rozdzielczości czasowej / detektora |
 | Pełna, niezależna triada z dopuszczonym pomiarem GNSS; baza 10, `D=0,5`, bez fali | Wkład 7,5 przed limitami i propagacją, `S=1,5` |
 | Suma >60 z jednej grupy pochodzenia albo wyłącznie z propagacji | Czerwony wstrzymany; powód widoczny |
-| Dane pobrane dopiero po czasie odcięcia, brak lub błąd źródła | Bez późniejszej wiedzy; pojedynczy epizod wykluczony, pewność obniżona, RTB nadal liczbowy |
+| Dane pobrane dopiero po czasie odcięcia, brak lub błąd źródła | Bez późniejszej wiedzy; brak nie staje się zerem |
 
 Wyniki trzeba sprawdzić na odseparowanym okresie historycznym, z ćwiczeniami, odwołaniami, awariami odbioru, przedrukami i rzeczywistymi incydentami. Samo przejście przypadków syntetycznych potwierdza rachunek, nie jakość ostrzegania.
 
@@ -228,9 +214,3 @@ Po komentarzu użytkownika wdrożono osobne pilotaże GNSS/logistyki, API ADSB.l
 Przyjęte w v0.3: Polska i flanka NATO jako cel; wygaszanie według profilu zdarzenia; 14–42 dni dla scenariuszy; propagacja regionalna 40% / 16%; korelacja i fala z ograniczonym mnożnikiem; ponad 60 jako wezwanie do przeglądu z osobną bramką czerwonego; biblioteka doktryny oddzielona od zdarzeń. Żadna nowa integracja nie korzysta z danych agregowanych przez Strażnika.
 
 Dalsze dane są potrzebne do kalibracji wag, limitów i progu, pomiaru fałszywych alarmów, zbudowania baz odniesienia dla anomalii oraz oceny pokrycia państw. „Wiarygodność” oznacza obecnie status dowodowy, bez pozornie precyzyjnego procentu. Pierwszy krok to opisane historyczne przypadki wraz z kontrprzykładami i późniejszymi sprostowaniami; dopiero potem porównanie wariantów wag i alarmów. Te luki nie wymagają zgadywania liczb przez użytkownika.
-
-## Zmiana v0.4 i porównywalność
-
-Dokładna poprzednia metoda jest w `docs/archive/methodology-v0.3.md`. Nowe oceny używają `assessment_v04`; silnik v0.4 zachowuje obsługę uprzednich, nadal aktualnych ocen v0.3. Nie zmieniamy starych materiałów i rewizji. Osobna kategoria ukraińska nie oznacza naruszenia przestrzeni NATO ani automatycznej dyfuzji do Polski. Dziennik zachowuje komunikaty spoza punktacji. Waga 3 i limit 12 są ostrożnym założeniem pilotażu, nie wynikiem kalibracji.
-
-Delta i wykres wymagają tej samej metodologii, konfiguracji, kodu i profilu pokrycia/przeglądu (`confidence.comparison_key`). Spadek dostępności źródeł nie jest pokazywany jako deeskalacja. Przy punkcie odniesienia 0 można pokazać zmianę punktową; zmiana procentowa pozostaje nieokreślona. Szczegóły: [wdrożenie v0.4](v0.4-implementation.md).

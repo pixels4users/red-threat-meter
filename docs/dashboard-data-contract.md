@@ -41,24 +41,11 @@ raportów z wynikiem: nowszy brak oceny jest istotnym stanem do pokazania.
 
 ## RTB, pewność i braki
 
-`rtb.score` to liczba 1–100 albo `null`. `status=insufficient_data` wymaga `null`;
-`status=available` wymaga liczby. Komponenty `hostile_activity` i `preparation`
-zachowują rozdzielenie wkładów działań i przygotowań. Wynik ponad 60 oznacza
-przegląd analityczny. Nie jest prawdopodobieństwem wojny.
+Dla v0.4 `rtb.score` to zawsze liczba 0–100, a `status` to available lub provisional. Zero oznacza brak naliczonych sygnałów; nie zastępuje awarii odczytu ani nie potwierdza bezpieczeństwa. Historyczne v0.2/v0.3 zachowują zakres 1–100 albo null ze statusem insufficient_data.
 
-`rtb.confidence.percent` pozostaje `null`, `method=not_calibrated`. Nie mamy
-podstaw do nadania procentu pewności. Osobna `coverage` opisuje liczbę wymaganych
-i gotowych źródeł oraz materiały oczekujące na ocenę; jej procent nie zastępuje
-pewności i nie mierzy całego regionu.
+`rtb.confidence` v0.4 zawiera obliczony percent 0–100, metodę coverage-review-history-v1, calibrated=false, osiem domains i coverage_percent, review_percent, history_percent. Wzór jest w metodologii. Starsze wersje zachowują percent=null i method=not_calibrated. Osobne coverage z liczbą wymaganych źródeł nie jest już podstawą do prezentowania pełności obserwacji.
 
-`gaps` zawiera kontrolowane kody i krótkie polskie objaśnienia. `sources`
-przekazuje czas ostatniego sprawdzenia i stan `current`, `stale`, `partial` lub
-`unavailable`. Utrata źródła nie jest dowodem deeskalacji. Frontend pokazuje
-datę analizy, opóźnienie odczytu i brak połączenia jako trzy odrębne informacje.
-
-`rtb.trend` porównuje wcześniejszy kompletny odczyt tego samego rodzaju i trybu,
-metodologii oraz skrótów konfiguracji, źródeł i kodu. Nieporównywalne wartości
-dają `unavailable`, bez strzałki i procentowej delty. Wykres pozostawia przerwę.
+`gaps` opisuje quality_issues. Braki nie blokują całego indeksu. Oficjalne ostrzeżenia i ich status są oddzielne od liczby; nie wolno z niskiego RTB wyprowadzić odwołania instrukcji służb. Trend wymaga również równego confidence.comparison_key; przy poprzednim RTB=0 procentowa delta pozostaje null. Historia API zawiera confidence_key.
 
 ## Incydenty, źródła i mapa
 
@@ -94,7 +81,7 @@ Sam status accepted i filtr językowy nie wystarczają. Cykl Codexa rozwiązuje
 odnośniki do konkretnych, aktualnych dowodów i zapisuje osobny przegląd
 znaczenia trzech zdań. To pochodzenie i ocena agenta, nie gwarancja prawdziwości
 ani kontrola człowieka. Surowy kontekst i audyt nie są eksportowane.
-Niepełny RTB lub brak podstaw do komentarza daje `text=null` bez obiektu review.
+Historyczny brak RTB lub brak podstaw do komentarza daje `text=null` bez obiektu review.
 Starsze publikacje z `text=null` zachowują zgodność z kontraktem.
 
 Zmiana schematu o niezgodnym znaczeniu wymaga nowej wersji kontraktu. Zmiana

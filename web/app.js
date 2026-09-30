@@ -47,10 +47,10 @@ function renderMetric() {
   $('[data-as-of]').textContent = r ? `Stan na ${fullTime(r.as_of)}` : failed ? 'Odczyt chwilowo niedostępny' : loaded ? 'Brak opublikowanego raportu' : 'Ładowanie raportu…';
   $('.r-metric .r-eyebrow').textContent = 'Indeks RTB · raport dobowy';
   $('[data-confidence]').textContent = r?.rtb.confidence.percent == null ? 'Nieokreślona' : `${r.rtb.confidence.percent}%`;
-  $('.r-confidence').title = 'Pewność danych nie jest prawdopodobieństwem eskalacji. W pilotażu nie wyliczamy jej liczbowo.';
+  $('.r-confidence').title = 'Pewność opisuje zakres obserwacji, ukończony przegląd i dostępność historii. Nie jest prawdopodobieństwem eskalacji.';
   let status = $('[data-score-status]');
   if (!status) { status = el('p', 'r-small'); status.dataset.scoreStatus = ''; $('.r-metric').append(status); }
-  status.textContent = r && score === null ? 'Za mało danych do wyliczenia indeksu' : r?.rtb.review_required ? 'Wzrost indeksu wymaga pogłębionej oceny sytuacji' : '';
+  status.textContent = r && score === null ? 'Za mało danych do wyliczenia indeksu' : r?.rtb.review_required ? 'Wzrost indeksu wymaga pogłębionej oceny sytuacji' : score === 0 ? 'Brak naliczonych sygnałów. Sprawdź pewność danych — zero nie oznacza braku zagrożenia.' : r?.rtb.status === 'provisional' ? 'Ocena oparta na częściowych obserwacjach' : '';
   if (score > 60 && r.rtb.red_priority?.eligible === false) status.textContent += ' Brakuje niezależnych potwierdzeń bezpośrednich zdarzeń, by nadać najwyższy priorytet.';
   for (const b of $$('[data-component]')) b.textContent = score === null ? '—' : `${scoreLabel(r.rtb.components[b.dataset.component])} pkt`;
   official.replaceChildren(); official.hidden = !visibleWarnings(r?.rtb).length;
@@ -70,9 +70,10 @@ function renderMetric() {
   $('[data-commentary]').textContent = r?.commentary.text ?? 'Podsumowanie niedostępne';
   coverage.replaceChildren(); coverage.hidden = !r;
   if (r) {
-    coverage.append(el('summary', '', `Dostępność danych · ${r.coverage.usable_sources} z ${r.coverage.required_sources} wymaganych źródeł gotowych`));
+    coverage.append(el('summary', '', r.rtb.confidence.percent == null ? 'Zakres obserwacji i źródła' : `Pewność danych: ${r.rtb.confidence.percent}% · zobacz zakres obserwacji`));
     const content = el('div', 'r-coverage-content');
     content.append(el('p', 'r-small', 'Dotyczy obserwowanych źródeł, nie wszystkich zdarzeń w regionie.'));
+    for (const domain of r.rtb.confidence.domains ?? []) content.append(el('p', 'r-small', `${domain.label}: ${domain.percent}% pokrycia`));
     for (const gap of r.gaps) content.append(el('p', '', gap.message));
     for (const source of r.sources) {
       const row = el('p', 'r-source-state'); row.append(el('strong', '', source.name), el('span', '', sourceStatuses[source.status]), el('span', 'r-small', source.checked_at ? `Sprawdzono ${fullTime(source.checked_at)}` : 'Jeszcze nie sprawdzono')); content.append(row);
@@ -85,7 +86,7 @@ function renderMetric() {
 function drawTrend() {
   const r = report(), target = $('.r-spark'), svg = select(target); svg.selectAll('*').remove();
   const all = dailyHistory.slice(0, 14).reverse();
-  const compatible = all.map(row => ({ ...row, valid: r && comparable(row, r.provenance) && row.score !== null }));
+  const compatible = all.map(row => ({ ...row, valid: r && comparable(row, r.provenance) && (r.provenance.methodology_version !== 'rtb-v0.4' || row.confidence_key === r.rtb.confidence.comparison_key) && row.score !== null }));
   const values = compatible.filter(p => p.valid);
   target.hidden = values.length < 2;
   $('[data-history-note]').textContent = values.length < 2 ? 'Brak porównywalnego trendu' : 'Historia RTB · przerwy oznaczają brak porównywalnego wyniku';
@@ -153,7 +154,7 @@ function renderTimeline() {
       open.dataset.group = group; open.setAttribute('aria-expanded', String(expanded)); open.setAttribute('aria-controls', `group-${group}`);
       open.append(el('span', 'r-time-title', title), el('span', 'r-time-subtitle', state.scale === 'month' ? 'Dominujące: ' + counts.filter(c => c.count === counts[0]?.count).map(c => c.label).join(', ') : counts.map(c => `${c.count}× ${c.label}`).join(' · ')), el('span', 'r-time-action', expanded ? 'Zwiń' : 'Rozwiń'));
       const items = el('div', 'r-time-items'); items.id = `group-${group}`; items.hidden = !expanded;
-      for (const event of events) { const b = button('', () => selectSignals([event.id]), ''); b.dataset.signalId = event.id; b.append(el('time', '', state.scale === 'day' ? `${parts(event.published_at).hour}:${parts(event.published_at).minute}` : fullTime(event.published_at)), el('span', '', event.title), el('span', 'r-small', event.sources.map(s => s.publisher).join(' · '))); items.append(b); }
+      for (const event of events) { const b = button('', () => selectSignals([event.id]), ''); b.dataset.signalId = event.id; b.append(el('time', '', state.scale === 'day' ? `${parts(event.published_at).hour}:${parts(event.published_at).minute}` : fullTime(event.published_at)), el('span', '', event.title), el('span', 'r-small', [...new Set(event.sources.map(s => s.publisher))].join(' · '))); items.append(b); }
       content.append(open, items); row.append(content);
     }
     rail.append(row);

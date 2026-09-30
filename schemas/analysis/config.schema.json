@@ -22,7 +22,8 @@
     "methodology_version": {
       "enum": [
         "rtb-v0.2",
-        "rtb-v0.3"
+        "rtb-v0.3",
+        "rtb-v0.4"
       ]
     },
     "max_candidates_per_packet": {

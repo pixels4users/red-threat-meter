@@ -9,7 +9,7 @@ Wejście: kolejka review_queue.json i zapisane wersje materiałów. Wyjście: pl
 5. Każdy dowód podaje material_id i dosłowny krótki quote z title/text zapisanej wersji. Nie traktuj dowodu wystąpienia jako dowodu sprawcy. Cytat musi faktycznie uzasadniać przypisane twierdzenie; walidator sprawdza obecność tekstu, nie jego znaczenie.
 6. claim przyjmuje occurrence, attribution, criterion, timing, location, context. stance=supports lub contradicts. W origin_id identyfikuj pierwotne źródło; origin_reason uzasadnia niezależność. Dwa portale cytujące MON mają wspólne pochodzenie.
 7. confirmed_primary wymaga potwierdzającego dowodu źródła pierwotnego. corroborated wymaga różnych źródeł i różnego pierwotnego pochodzenia. Sprzeczności nie dają potwierdzenia. Rozdziel potwierdzony komunikat organu od udowodnienia wszystkich opisanych w nim zarzutów.
-8. Kryteria kategorii w config/scoring-v0.3.json muszą mieć własne dowody criterion. Nie nazywaj ćwiczeń anomalią; anomalia wymaga opisanego poziomu odniesienia.
+8. Kryteria kategorii w config/scoring-v0.4.json muszą mieć własne dowody criterion. Nie nazywaj ćwiczeń anomalią; anomalia wymaga opisanego poziomu odniesienia.
 9. Data zdarzenia potrzebuje dowodu timing. Lokalizacja punktowa wymaga location i jawnej dokładności. Jeśli tego nie ustalono, stosuj null oraz precision=unknown.
 10. `military_preparation` wymaga zmiany logistyki lub zaplecza medycznego, anomalii względem udokumentowanego odniesienia, znaczenia operacyjnego i sprawdzenia rutynowego wyjaśnienia. W Rosji konieczny jest osobny dowód kryterium `kaliningrad_oblast`. Operator RU/BY nie jest dowodem zamiaru ataku. Lotnictwo obronne NATO pozostaje kontekstem.
 11. Dla anomalii zapisz miarę, okres, wartości porównania i źródło. Uwzględnij ćwiczenia, sezonowość i zmianę pokrycia obserwacji. Bez odniesienia kryterium nie jest spełnione. To samo zdarzenie ma jeden event_key i jedną kategorię; nie dubluj lotu transportowego jako logistyki i aktywności lotniczej.
@@ -22,10 +22,10 @@ osobny przegląd propozycji, kontrolę dowodów, obliczenie, komentarz i publika
 Nie wywołuje osobnego API modelu. Drugi przegląd agenta nie jest niezależnym
 źródłem ani kontrolą człowieka. Harmonogram wymaga osobnego uruchomienia.
 
-## Kontrakt v0.3
+## Kontrakt v0.4
 
-Dla punktowanego zdarzenia dodaj `assessment_v03` według
-`schemas/assessment-v03.schema.json` i [mapowania pól](../docs/v0.3-implementation.md).
+Dla punktowanego zdarzenia dodaj `assessment_v04` według
+`schemas/assessment-v04.schema.json` i [mapowania pól](../docs/v0.4-implementation.md).
 Czas oznacza wystąpienie, nie publikację. Jawnie udokumentuj profil,
 `episode_key`, fizyczne składowe, zasięg i bezpośrednie zagrożenie kinetyczne.
 Brak szczegółów pozostaje brakiem; nie uzupełniaj ocen v0.2 samymi domyślnymi polami.
@@ -38,3 +38,5 @@ Przeczytaj wszystkie rekordy. Oficjalne zalecenie można zapisać jako
 ćwiczenia; nie wystawiaj realnego L3 z testu syren. `rso_alarm` nie wyznacza L1–L3.
 Zniknięcie rekordu nie jest odwołaniem. GNSS w rozdzielczości dobowej
 nie zasila triady; lista dopuszczonych detektorów jest obecnie pusta.
+
+W v0.4 decyzja defer nie blokuje RTB; nie wymuszaj kwalifikacji ani wykluczenia dla podniesienia pewności. Komunikaty kpszsu łącz według epizodu, zachowuj przekazania i daty publikacji osobno. Kategoria `cross_border_air_pressure` wymaga dowodów rosyjskiego ataku na obwód lwowski, wołyński lub rówieński; sama obecność drona bez ustalonego operatora nie spełnia atrybucji. Potwierdzony przedział czasu może dać konserwatywny wkład; kod zachowuje jego granice.

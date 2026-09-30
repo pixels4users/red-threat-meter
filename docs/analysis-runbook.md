@@ -55,7 +55,7 @@ Przycisk na stronie odświeża tylko opublikowane wyniki.
    publikacji nie zwiększa liczby niezależnych potwierdzeń. Kilka zdarzeń
    w jednym artykule przechodzi razem kontrolę kompletności.
 5. Domyślna punktacja to `rtb-v0.3` z kontrolą 216 godzin historii; patrz [kontrakt](v0.3-implementation.md). Braki dają
-   `RTB=null`. Pilotaże GNSS, logistyki i ADS-B nie zasilają punktacji.
+   `RTB=null` we wcześniejszych wersjach. W v0.4 nowy wynik jest liczbowy, a niepełność obniża confidence. Pilotaże GNSS, logistyki i ADS-B nie zasilają punktacji.
 6. Komentarz wymaga ustaleń dotyczących sytuacji, działań i skutków oraz
    przeglądu dokładnie tych trzech zdań. Nie wystarczy sam indeks. Przy braku
    podstaw komentarz jest pomijany; nie powstaje zapewnienie o bezpieczeństwie.

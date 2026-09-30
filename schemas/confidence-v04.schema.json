@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "method": {
+      "const": "coverage-review-history-v1"
+    },
+    "calibrated": {
+      "const": false
+    },
+    "coverage_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "review_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "history_percent": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "comparison_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "domains": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "percent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "percent"
+        ]
+      }
+    }
+  },
+  "required": [
+    "percent",
+    "method",
+    "calibrated",
+    "coverage_percent",
+    "review_percent",
+    "history_percent",
+    "comparison_key",
+    "domains"
+  ]
+}

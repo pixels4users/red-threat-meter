@@ -1,4 +1,5 @@
 export const categories = {
+  cross_border_air_pressure: { label: 'Ataki w zachodniej Ukrainie', icon: 'plane' },
   sabotage: { label: 'Sabotaż', icon: 'flame' },
   arms_explosion: { label: 'Infrastruktura', icon: 'landmark' },
   military_preparation: { label: 'Logistyka wojskowa', icon: 'train-front' },
@@ -54,8 +55,8 @@ export function checkEnvelope(value) {
   if (!r || r.contract_version !== 'dashboard-v1' || !/^rpt_[a-f0-9]{64}$/.test(r.report_id) ||
       !['live', 'fixture'].includes(r.mode) || !Number.isFinite(Date.parse(r.as_of)) ||
       !Array.isArray(r.incidents) || !Array.isArray(r.sources) || !r.provenance?.methodology_version ||
-      !r.rtb || !['available', 'insufficient_data'].includes(r.rtb.status) ||
-      (r.rtb.status === 'insufficient_data' ? r.rtb.score !== null : !Number.isFinite(r.rtb.score) || r.rtb.score < 1 || r.rtb.score > 100)) throw new Error('invalid_report');
+      !r.rtb || !['available', 'provisional', 'insufficient_data'].includes(r.rtb.status) ||
+      (r.rtb.status === 'insufficient_data' ? r.rtb.score !== null : !Number.isFinite(r.rtb.score) || r.rtb.score < (r.provenance?.methodology_version === 'rtb-v0.4' ? 0 : 1) || r.rtb.score > 100)) throw new Error('invalid_report');
   // Full JSON Schema and content hash validation happen on the server. The UI
   // additionally refuses conflicting numeric states instead of displaying them.
   if (new Set(r.incidents.map(i => i.id)).size !== r.incidents.length) throw new Error('duplicate_incidents');
@@ -68,7 +69,7 @@ export function safeLink(url) {
 
 export function reportText(report) {
   const score = report.rtb.score === null ? 'Za mało danych do wyliczenia indeksu' : `${report.rtb.score}/100`;
-  return [`Red Threat Meter · ${fullTime(report.as_of)}`, `RTB: ${score}`, `Metodologia: ${report.provenance.methodology_version}`, '',
+  return [`Red Threat Meter · ${fullTime(report.as_of)}`, `RTB: ${score}`, `Pewność danych: ${report.rtb.confidence.percent == null ? 'nieokreślona' : report.rtb.confidence.percent + '%'}`, 'Zero RTB nie potwierdza bezpieczeństwa.', `Metodologia: ${report.provenance.methodology_version}`, '',
     ...report.limitations, '', ...report.gaps.map(g => g.message), '',
     ...report.incidents.flatMap(i => [i.title, i.summary, `Opublikowano: ${fullTime(i.published_at)}`, `Data zdarzenia: ${i.occurred_on ?? 'nieustalona'}`, statuses[i.status], ...i.sources.map(s => `${s.publisher}: ${s.url}`), ''])].join('\n');
 }

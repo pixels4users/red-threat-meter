@@ -82,7 +82,8 @@
             "rso",
             "x_browser_import",
             "curated_documents",
-            "x_api_import"
+            "x_api_import",
+            "telegram_public"
           ]
         },
         "url": {
@@ -324,6 +325,40 @@
               },
               "max_requests": {
                 "maximum": 12
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "adapter": {
+                "const": "telegram_public"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "const": "ua_air_force_public"
+              },
+              "url": {
+                "const": "https://t.me/s/kpszsu"
+              },
+              "max_requests": {
+                "const": 1
+              },
+              "max_pages": {
+                "const": 1
+              },
+              "max_items": {
+                "maximum": 20
+              },
+              "fetch_articles": {
+                "const": false
+              },
+              "required": {
+                "const": false
               }
             }
           }

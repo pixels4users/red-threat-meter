@@ -104,7 +104,7 @@ class SupabasePublications:
                 return {"items": [], "anchor": now(), "next_offset": None}
             anchor = newest[0]["published_at"]
         instant(anchor)
-        params = {"select": "report_id,report_type,as_of,published_at,methodology_version,config_hash,source_config_hash,code_hash,score,supersedes",
+        params = {"select": "report_id,report_type,as_of,published_at,methodology_version,config_hash,source_config_hash,code_hash,score,supersedes,confidence_key",
                   "report_type": "eq." + report_type, "published_at": "lte." + anchor,
                   "order": "as_of.desc,published_at.desc,report_id.desc", "limit": "31", "offset": str(offset)}
         rows = self._request("dashboard_reports?" + urlencode(params))
@@ -176,5 +176,6 @@ class LocalPublications:
             items.append({"report_id": r["report_id"], "report_type": r["report_type"], "as_of": r["as_of"],
                           "published_at": stamp, "methodology_version": r["provenance"]["methodology_version"],
                           "score": r["rtb"]["score"], "supersedes": r["supersedes"],
+                          "confidence_key": r["rtb"]["confidence"].get("comparison_key"),
                           **{k:r["provenance"][k] for k in ("config_hash", "source_config_hash", "code_hash")}})
         return {"items": items, "anchor": anchor, "next_offset": offset + 30 if len(rows) > 30 else None}

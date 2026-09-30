@@ -162,6 +162,9 @@ def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher
         from .x_sources import collect_captures
         return collect_captures(source, data_dir)
     fetcher = fetcher or Fetcher(data_dir, source)
+    if source['adapter'] == 'telegram_public':
+        from .telegram_sources import collect_air_force
+        return collect_air_force(source, fetcher)
     if source['adapter'] == 'curated_documents':
         from .curated_sources import collect_documents
         return collect_documents(source, fetcher)

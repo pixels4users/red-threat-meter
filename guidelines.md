@@ -40,7 +40,7 @@ zaakceptowany układ: **B — Chronologia**.
 - `null` wyniku oznacza „—” i krótki opis braku oceny; nigdy 0 ani ostatnią
   kompletną wartość udającą bieżący wynik. Awaria odczytu zachowuje ostatni
   raport z jego datą i informacją o braku odświeżenia.
-- Nie wymyślaj procentu pewności. Dostępność wymaganych źródeł to osobna miara.
+- Nie wymyślaj procentu pewności. W v0.4 odczytuj go z confidence.percent; jest heurystyką jakości danych. Zero RTB to poprawna liczba; wyjaśnij, że brak naliczonych sygnałów nie potwierdza bezpieczeństwa. Historyczny null i brak odpowiedzi serwera nadal nie mogą być zastępowane zerem.
 - Wykres i delta łączą tylko wyniki tej samej metodologii i konfiguracji.
 
 ## Interakcje i dostępność

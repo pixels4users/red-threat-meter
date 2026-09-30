@@ -55,5 +55,28 @@ test('real PostgreSQL: atomic publication, history, RLS, fixture rejection and i
   assert.equal(Number((await db.query('select score from public.dashboard_reports where report_id=$1', [fractional.report_id])).rows[0].score), 12.5);
   await db.exec('reset role; set role anon');
   await assert.rejects(publish(fractional), /permission denied/);
+  await db.exec('reset role');
+  await db.exec(readFileSync('supabase/migrations/20260930110000_rtb_v04_confidence.sql', 'utf8'));
+  assert.deepEqual((await db.query('select payload from public.dashboard_reports where report_id=$1', [live.report_id])).rows[0].payload, live);
+  const continuous = structuredClone(live);
+  continuous.report_id = 'rpt_' + 'c'.repeat(64);
+  continuous.provenance.methodology_version = 'rtb-v0.4';
+  continuous.rtb.score = 0; continuous.rtb.status = 'provisional';
+  continuous.rtb.confidence = {percent:0, method:'coverage-review-history-v1', calibrated:false, comparison_key:'d'.repeat(64)};
+  await db.exec('set role service_role');
+  assert.equal((await publish(continuous)).created, true);
+  assert.equal((await publish(continuous)).created, false);
+  const zero = (await db.query('select score,confidence_key from public.dashboard_reports where report_id=$1', [continuous.report_id])).rows[0];
+  assert.equal(Number(zero.score), 0); assert.equal(zero.confidence_key, 'd'.repeat(64));
+  for (const bad of [null,-1,101,0.5,'50']) {
+    const invalid=structuredClone(continuous); invalid.rtb.confidence.percent=bad;
+    await assert.rejects(publish(invalid), /Invalid v0.4/);
+  }
+  const missing=structuredClone(continuous); missing.rtb.score=null; missing.rtb.status='insufficient_data';
+  await assert.rejects(publish(missing), /Invalid v0.4/);
+  const oldZero=structuredClone(live); oldZero.report_id='rpt_'+'e'.repeat(64); oldZero.rtb.score=0;
+  await assert.rejects(publish(oldZero), /check constraint/);
+  await db.exec('reset role; set role anon');
+  await assert.rejects(publish(continuous), /permission denied/);
   await db.close();
 });

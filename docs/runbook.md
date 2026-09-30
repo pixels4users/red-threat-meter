@@ -1,8 +1,12 @@
+# Ciągły RTB v0.4 — aktualizacja 30.09.2026
+
+Bieżące polecenia wykonują v0.4. Dane niepełne i decyzje defer obniżają pewność; nie wstrzymują liczby. Wynik 0 oznacza brak naliczonych sygnałów. Przed publikacją sprawdź osobno zakres danych, status oficjalnych ostrzeżeń i świeżość. Awaria procesu pozostawia ostatni poprawny raport. [Metodologia](methodology.md) i [wdrożenie](v0.4-implementation.md). Wzmianki o v0.3 poniżej opisują wprowadzenie wygaszania; jej tryb można wybrać jawnie do odtworzenia.
+
 # Obsługa lokalnego procesu
 
-Zaakceptowana specyfikacja: `docs/methodology.md`, rtb-v0.3. Działające polecenia domyślnie wykonują rtb-v0.3; poprzednie reguły zachowano w `docs/archive/methodology-v0.2.md`. Rejestr źródeł do pobrania: `config/sources.json`. Kandydaci i biblioteka doktryny nie uruchamiają dodatkowych kolektorów.
+Zaakceptowana specyfikacja: `docs/methodology.md`, rtb-v0.3. Działające polecenia domyślnie wykonują rtb-v0.4; poprzednie reguły zachowano w `docs/archive/methodology-v0.2.md`. Rejestr źródeł do pobrania: `config/sources.json`. Kandydaci i biblioteka doktryny nie uruchamiają dodatkowych kolektorów.
 
-Akceptacja z 25.09.2026 obejmuje procedury PAŻP/RCB/RSO i sanity check przed odczytem dobowym lub tygodniowym. Heurystyki v0.3 są zatwierdzoną specyfikacją w [metodologii](methodology.md#wygaszanie-regiony-i-korelacja); polecenia poniżej wykonują v0.3. Ręczne sprawdzenie nowego źródła nie oznacza działającego adaptera ani zmiany konfiguracji live.
+Akceptacja z 25.09.2026 obejmuje procedury PAŻP/RCB/RSO i sanity check przed odczytem dobowym lub tygodniowym. Heurystyki v0.3 są zatwierdzoną specyfikacją w [metodologii](methodology.md#wygaszanie-regiony-i-korelacja); polecenia poniżej wykonują v0.4. Ręczne sprawdzenie nowego źródła nie oznacza działającego adaptera ani zmiany konfiguracji live.
 
 Ten dokument dotyczy procesu RTB. Działająca osobno warstwa GNSS/logistyki używa `config/early-warning.json`, własnej bazy i polecenia `scripts/early_warning.py`. Jej uruchamianie, przegląd, kopie i metodologia: [instrukcja sygnałów wczesnych](early-warning-runbook.md). `scripts/backup.py` opisany poniżej nie obejmuje nowej bazy obserwacji.
 

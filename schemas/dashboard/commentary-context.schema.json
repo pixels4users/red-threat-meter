@@ -39,7 +39,7 @@
             "number",
             "null"
           ],
-          "minimum": 1,
+          "minimum": 0,
           "maximum": 100
         },
         "delta_points": {
@@ -47,8 +47,8 @@
             "number",
             "null"
           ],
-          "minimum": -99,
-          "maximum": 99
+          "minimum": -100,
+          "maximum": 100
         },
         "methodology_version": {
           "type": "string",

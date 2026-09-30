@@ -121,13 +121,14 @@
             "number",
             "null"
           ],
-          "minimum": 1,
+          "minimum": 0,
           "maximum": 100
         },
         "status": {
           "enum": [
             "available",
-            "insufficient_data"
+            "insufficient_data",
+            "provisional"
           ]
         },
         "components": {
@@ -149,20 +150,96 @@
           "additionalProperties": false
         },
         "confidence": {
-          "type": "object",
-          "properties": {
-            "percent": {
-              "type": "null"
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "percent": {
+                  "type": "null"
+                },
+                "method": {
+                  "const": "not_calibrated"
+                }
+              },
+              "required": [
+                "percent",
+                "method"
+              ],
+              "additionalProperties": false
             },
-            "method": {
-              "const": "not_calibrated"
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "percent": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "method": {
+                  "const": "coverage-review-history-v1"
+                },
+                "calibrated": {
+                  "const": false
+                },
+                "coverage_percent": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "review_percent": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "history_percent": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "comparison_key": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "domains": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "percent": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "label",
+                      "percent"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "percent",
+                "method",
+                "calibrated",
+                "coverage_percent",
+                "review_percent",
+                "history_percent",
+                "comparison_key",
+                "domains"
+              ]
             }
-          },
-          "required": [
-            "percent",
-            "method"
-          ],
-          "additionalProperties": false
+          ]
         },
         "review_required": {
           "type": "boolean"
@@ -175,8 +252,8 @@
                 "number",
                 "null"
               ],
-              "minimum": -99,
-              "maximum": 99
+              "minimum": -100,
+              "maximum": 100
             },
             "percent": {
               "type": [
@@ -327,7 +404,9 @@
               "stale_event_review",
               "no_required_sources_configured",
               "other",
-              "event_history_unverified"
+              "event_history_unverified",
+              "domain_not_observed",
+              "time_precision_limited"
             ]
           },
           "message": {
@@ -445,7 +524,8 @@
               "cyberattack",
               "border_pressure",
               "gps_jamming",
-              "context"
+              "context",
+              "cross_border_air_pressure"
             ]
           },
           "status": {
@@ -831,5 +911,127 @@
     "commentary",
     "limitations"
   ],
-  "additionalProperties": false
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "provenance": {
+            "properties": {
+              "methodology_version": {
+                "const": "rtb-v0.4"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "rtb": {
+            "properties": {
+              "score": {
+                "type": "number"
+              },
+              "confidence": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "percent": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "method": {
+                    "const": "coverage-review-history-v1"
+                  },
+                  "calibrated": {
+                    "const": false
+                  },
+                  "coverage_percent": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "review_percent": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "history_percent": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "comparison_key": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "domains": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "percent": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 100
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "label",
+                        "percent"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "percent",
+                  "method",
+                  "calibrated",
+                  "coverage_percent",
+                  "review_percent",
+                  "history_percent",
+                  "comparison_key",
+                  "domains"
+                ]
+              }
+            },
+            "required": [
+              "confidence"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "rtb": {
+            "properties": {
+              "score": {
+                "minimum": 1
+              },
+              "confidence": {
+                "properties": {
+                  "percent": {
+                    "type": "null"
+                  },
+                  "method": {
+                    "const": "not_calibrated"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

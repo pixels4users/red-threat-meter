@@ -1,0 +1,458 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "const": {
+    "version": "rtb-v0.4",
+    "validation_status": "experimental_unvalidated",
+    "base": 0,
+    "maximum": 100,
+    "timezone": "Europe/Warsaw",
+    "window_definition": "Wiek zdarzeń: 216 godzin do chwili odcięcia; indywidualne wygaszanie, bez sumowania odczytów dobowych.",
+    "interpretation": "Indeks zakwalifikowanych działań RU/BY i przygotowań istotnych dla Polski i wschodniej flanki NATO. Zero oznacza brak naliczonych sygnałów, nie brak zagrożenia. Pewność opisuje pokrycie danych, nie prawdopodobieństwo wojny.",
+    "scope_countries": [
+      "PL",
+      "LT",
+      "LV",
+      "EE",
+      "CZ",
+      "SK",
+      "HU",
+      "RO",
+      "BG",
+      "DE",
+      "FI",
+      "SE"
+    ],
+    "attributed_actors": [
+      "RU",
+      "BY"
+    ],
+    "accepted_statuses": [
+      "confirmed_primary",
+      "corroborated"
+    ],
+    "thresholds": [
+      {
+        "id": "analyst_review",
+        "above": 60,
+        "action": "analyst_review_required",
+        "calibrated": false
+      }
+    ],
+    "strategic_priority_policy": "review_order_only_no_point_multiplier",
+    "outlook_days": {
+      "minimum": 14,
+      "maximum": 42,
+      "mode": "conditional_scenarios_without_numeric_probabilities"
+    },
+    "categories": {
+      "military_preparation": {
+        "label": "Zmiana logistyki lub zabezpieczenia medycznego RU/BY",
+        "weight": 15,
+        "cap": 30,
+        "family": "preparation",
+        "scope_countries": [
+          "BY",
+          "RU"
+        ],
+        "country_criteria": {
+          "RU": [
+            "kaliningrad_oblast"
+          ]
+        },
+        "criteria": [
+          "logistics_or_medical_change",
+          "baseline_anomaly",
+          "operational_relevance",
+          "routine_explanation_checked"
+        ]
+      },
+      "sabotage": {
+        "label": "Sabotaż infrastruktury",
+        "weight": 10,
+        "cap": 30,
+        "criteria": [
+          "intentional_action",
+          "critical_infrastructure"
+        ]
+      },
+      "arms_explosion": {
+        "label": "Eksplozja w zakładzie zbrojeniowym",
+        "weight": 8,
+        "cap": 24,
+        "criteria": [
+          "explosion_confirmed",
+          "arms_facility"
+        ]
+      },
+      "airspace_breach": {
+        "label": "Naruszenie przestrzeni NATO",
+        "weight": 5,
+        "cap": 25,
+        "criteria": [
+          "nato_airspace_breach"
+        ]
+      },
+      "air_activity": {
+        "label": "Anomalia aktywności lotniczej RU/BY",
+        "weight": 4,
+        "cap": 12,
+        "family": "preparation",
+        "scope_countries": [
+          "PL",
+          "LT",
+          "LV",
+          "EE",
+          "CZ",
+          "SK",
+          "HU",
+          "RO",
+          "BG",
+          "DE",
+          "FI",
+          "SE",
+          "BY",
+          "RU"
+        ],
+        "country_criteria": {
+          "RU": [
+            "kaliningrad_oblast"
+          ]
+        },
+        "criteria": [
+          "baseline_anomaly",
+          "military_activity"
+        ]
+      },
+      "cyberattack": {
+        "label": "Atak cybernetyczny na infrastrukturę PL/LT",
+        "weight": 3,
+        "cap": 12,
+        "scope_countries": [
+          "PL",
+          "LT"
+        ],
+        "criteria": [
+          "large_scale",
+          "target_banking_or_government"
+        ]
+      },
+      "border_pressure": {
+        "label": "Wzrost presji na granicy PL–BY",
+        "weight": 3,
+        "cap": 9,
+        "scope_countries": [
+          "PL",
+          "BY"
+        ],
+        "criteria": [
+          "baseline_increase",
+          "pl_by_border"
+        ]
+      },
+      "gps_jamming": {
+        "label": "Długotrwałe zakłócenia GPS",
+        "weight": 2,
+        "cap": 8,
+        "criteria": [
+          "duration_over_24h"
+        ]
+      },
+      "cross_border_air_pressure": {
+        "label": "Rosyjski atak powietrzny na zachodnią Ukrainę",
+        "weight": 3,
+        "cap": 12,
+        "scope_countries": [
+          "UA"
+        ],
+        "criteria": [
+          "air_attack",
+          "western_ukraine"
+        ]
+      }
+    },
+    "limitations": [
+      "Wagi i limity są jawnymi założeniami pilotażu, bez kalibracji prognostycznej.",
+      "RTB 0–100 obejmuje tylko zakwalifikowane sygnały. Zero nie potwierdza bezpieczeństwa.",
+      "Braki źródeł, przeglądu i historii obniżają pewność, bez blokowania wyniku. Niezweryfikowane zdarzenia nie dodają punktów.",
+      "Pewność jest heurystyką pokrycia obserwacji, przeglądu i historii; nie jest statystycznym przedziałem ufności ani prawdopodobieństwem eskalacji.",
+      "Ukraińskie ataki powietrzne są osobną kategorią regionalną; nie oznaczają naruszenia przestrzeni NATO. Alerty RCB/RSO pozostają widoczne niezależnie od RTB.",
+      "Doktryna i analogie historyczne służą hipotezom, nie potwierdzeniu zdarzenia, sprawcy ani intencji.",
+      "Próg ponad 60 oznacza przegląd analityczny. Czerwony priorytet wymaga dodatkowo niezależnych dowodów bezpośrednich. Nie porównuj z wcześniejszymi metodologiami."
+    ],
+    "window_hours": 216,
+    "profiles": {
+      "tactical": {
+        "hold_seconds": 1800,
+        "fade_seconds": 1800
+      },
+      "structural": {
+        "hold_seconds": 172800,
+        "fade_seconds": 604800
+      }
+    },
+    "spatial": {
+      "graph": {
+        "version": "prg-20260929-v1",
+        "nodes": {
+          "PL-32": "zachodniopomorskie",
+          "PL-08": "lubuskie",
+          "PL-02": "dolnośląskie",
+          "PL-30": "wielkopolskie",
+          "PL-22": "pomorskie",
+          "PL-16": "opolskie",
+          "PL-04": "kujawsko-pomorskie",
+          "PL-24": "śląskie",
+          "PL-10": "łódzkie",
+          "PL-12": "małopolskie",
+          "PL-28": "warmińsko-mazurskie",
+          "PL-14": "mazowieckie",
+          "PL-26": "świętokrzyskie",
+          "PL-18": "podkarpackie",
+          "PL-20": "podlaskie",
+          "PL-06": "lubelskie"
+        },
+        "edges": [
+          [
+            "PL-02",
+            "PL-08"
+          ],
+          [
+            "PL-02",
+            "PL-16"
+          ],
+          [
+            "PL-02",
+            "PL-30"
+          ],
+          [
+            "PL-04",
+            "PL-10"
+          ],
+          [
+            "PL-04",
+            "PL-14"
+          ],
+          [
+            "PL-04",
+            "PL-22"
+          ],
+          [
+            "PL-04",
+            "PL-28"
+          ],
+          [
+            "PL-04",
+            "PL-30"
+          ],
+          [
+            "PL-06",
+            "PL-14"
+          ],
+          [
+            "PL-06",
+            "PL-18"
+          ],
+          [
+            "PL-06",
+            "PL-20"
+          ],
+          [
+            "PL-06",
+            "PL-26"
+          ],
+          [
+            "PL-08",
+            "PL-30"
+          ],
+          [
+            "PL-08",
+            "PL-32"
+          ],
+          [
+            "PL-10",
+            "PL-14"
+          ],
+          [
+            "PL-10",
+            "PL-16"
+          ],
+          [
+            "PL-10",
+            "PL-24"
+          ],
+          [
+            "PL-10",
+            "PL-26"
+          ],
+          [
+            "PL-10",
+            "PL-30"
+          ],
+          [
+            "PL-12",
+            "PL-18"
+          ],
+          [
+            "PL-12",
+            "PL-24"
+          ],
+          [
+            "PL-12",
+            "PL-26"
+          ],
+          [
+            "PL-14",
+            "PL-20"
+          ],
+          [
+            "PL-14",
+            "PL-26"
+          ],
+          [
+            "PL-14",
+            "PL-28"
+          ],
+          [
+            "PL-16",
+            "PL-24"
+          ],
+          [
+            "PL-16",
+            "PL-30"
+          ],
+          [
+            "PL-18",
+            "PL-26"
+          ],
+          [
+            "PL-20",
+            "PL-28"
+          ],
+          [
+            "PL-22",
+            "PL-28"
+          ],
+          [
+            "PL-22",
+            "PL-30"
+          ],
+          [
+            "PL-22",
+            "PL-32"
+          ],
+          [
+            "PL-24",
+            "PL-26"
+          ],
+          [
+            "PL-30",
+            "PL-32"
+          ]
+        ],
+        "provenance": {
+          "authority": "GUGiK PRG",
+          "url": "https://mapy.geoportal.gov.pl/wss/service/PZGIK/PRG/WFS/AdministrativeBoundaries?service=WFS&version=2.0.0&request=GetFeature&typeNames=ms%3AA01_Granice_wojewodztw&count=16&srsName=EPSG%3A2180",
+          "retrieved_on": "2026-09-29",
+          "sha256": "cf7d31b14a3f489b22c3fbb71982fa6885a5dfdf599ed5da18b8403cf84afaf2",
+          "method": "Wspólne odcinki pierścieni PRG EPSG:2180; współrzędne do 0,001 m; wspólny punkt nie jest krawędzią.",
+          "features": 16,
+          "edges": 34
+        }
+      },
+      "factors": [
+        1,
+        0.4,
+        0.16
+      ],
+      "views": {
+        "warszawa": "PL-14",
+        "lodz": "PL-10"
+      }
+    },
+    "correlation": {
+      "window_seconds": 1800,
+      "bonus": 0.5,
+      "approved_gnss_methods": [],
+      "required_fresh_sources": [
+        "pansa_airspace",
+        "rcb",
+        "rso_public"
+      ],
+      "fresh_seconds": 300
+    },
+    "swarm": {
+      "window_seconds": 900,
+      "minimum_components": 3,
+      "bonus": 0.25
+    },
+    "source_fresh_seconds": 28800,
+    "history_review_required": true,
+    "confidence": {
+      "method": "coverage-review-history-v1",
+      "unverified_history_factor": 0.5,
+      "partial_source_factor": 0.5,
+      "domains": [
+        {
+          "id": "official_alerts",
+          "label": "Ostrzeżenia dla ludności",
+          "sources": {
+            "rcb": 1,
+            "rso_public": 1
+          }
+        },
+        {
+          "id": "regional_air_pressure",
+          "label": "Ataki powietrzne w regionie",
+          "sources": {
+            "ua_air_force_public": 1,
+            "mon": 0.25,
+            "osw": 0.25,
+            "x_osinttechnical": 0.25,
+            "x_sentdefender": 0.25
+          }
+        },
+        {
+          "id": "hybrid_infrastructure",
+          "label": "Sabotaż i infrastruktura",
+          "sources": {
+            "lv_vdd": 0.25,
+            "lv_mod": 0.25,
+            "osw": 0.25,
+            "naval_news": 0.25
+          }
+        },
+        {
+          "id": "cyber",
+          "label": "Cyberbezpieczeństwo",
+          "sources": {
+            "cert_pl": 1
+          }
+        },
+        {
+          "id": "border",
+          "label": "Presja na granice",
+          "sources": {}
+        },
+        {
+          "id": "gnss",
+          "label": "Zakłócenia nawigacji",
+          "sources": {}
+        },
+        {
+          "id": "military_logistics",
+          "label": "Przygotowania i logistyka",
+          "sources": {
+            "osw": 0.25
+          }
+        },
+        {
+          "id": "air_activity",
+          "label": "Aktywność w przestrzeni powietrznej",
+          "sources": {
+            "pansa_airspace": 0.25
+          }
+        }
+      ]
+    }
+  }
+}

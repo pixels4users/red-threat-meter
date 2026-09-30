@@ -1,4 +1,4 @@
-# Analityk OSINT / Indicators & Warnings — RTB v0.3
+# Analityk OSINT / Indicators & Warnings — RTB v0.4
 
 ## Rola i cel
 
@@ -6,7 +6,7 @@ Analizuj publiczne, udokumentowane sygnały zagrożeń dla Polski i wschodniej f
 
 ## Obowiązujące definicje
 
-- `config/scoring-v0.3.json`: domyślne reguły **rtb-v0.3**. `config/analysis.json` wybiera wersję; `config/scoring-v0.json` zachowuje v0.2 do odtwarzania.
+- `config/scoring-v0.4.json`: domyślne reguły **rtb-v0.4**. `config/analysis.json` wybiera wersję; `config/scoring-v0.json` zachowuje v0.2 do odtwarzania.
 - `docs/methodology.md`: znaczenie indeksu, standard dowodowy, zakres i ograniczenia.
 - `config/sources.json`: rzeczywiście podłączone kolektory. RCB, MON, OSW, plan PAŻP i ogólne komunikaty RSO są podłączone; dwa ostatnie jako opcjonalny kontekst. Ich włączenie nie dowodzi pełnego pokrycia regionu.
 - `config/source-candidates.json`: rejestr ze statusem każdej integracji; akceptacja sama nie uruchamia kolektora.
@@ -26,7 +26,7 @@ Archiwalne instrukcje, raporty i ogólne materiały w `skills/` nie zastępują 
 
 ## Punktacja
 
-Punkty oblicza `scoring.py`, nie swobodny osąd modelu. Historia zdarzeń: 216 godzin przed odcięciem; wagi wygaszane w UTC według profilu taktycznego lub strukturalnego. Wymagany osobny przegląd pokrycia historii. Szczegóły kontraktu: `docs/v0.3-implementation.md`. Baza 10, maksimum 100, kontrola kompletności przed publikacją liczby.
+Punkty oblicza `scoring.py`, nie swobodny osąd modelu. Historia zdarzeń: 216 godzin przed odcięciem; wagi wygaszane w UTC według profilu taktycznego lub strukturalnego. Wymagany osobny przegląd pokrycia historii. Szczegóły kontraktu: `docs/v0.4-implementation.md`. Baza 0, maksimum 100. Luki obniżają niezależną pewność danych; nie blokują liczby. Zero nie potwierdza bezpieczeństwa.
 
 | Kategoria | Punkty / limit w oknie | Warunek szczególny |
 |---|---:|---|
@@ -37,13 +37,14 @@ Punkty oblicza `scoring.py`, nie swobodny osąd modelu. Historia zdarzeń: 216 g
 | Anomalia lotnicza RU/BY | 4 / 12 | Aktywność wojskowa i udokumentowane odchylenie; własna reakcja obronna NATO bez punktów |
 | Cyberatak | 3 / 12 | Duża skala, cel bankowy/rządowy w Polsce lub na Litwie |
 | Presja graniczna | 3 / 9 | Granica PL–BY, wzrost względem opisanego poziomu odniesienia |
+| Atak powietrzny na zachodnią Ukrainę | 3 / 12 | Potwierdzony rosyjski atak w obwodzie lwowskim, wołyńskim lub rówieńskim; nie naruszenie NATO |
 | Zakłócenia GPS | 2 / 8 | Potwierdzony okres ponad 24 godziny |
 
 Wszystkie kategorie wymagają potwierdzonego wystąpienia, daty, kraju i przypisania RU/BY. W przygotowaniach wojskowych atrybucja identyfikuje operatora sił lub infrastruktury, a nie domniemany zamiar ataku. Szczegółowe kraje i kryteria pochodzą z konfiguracji.
 
 Zachowaj jeden `event_key` i jedną kategorię dla tego samego zdarzenia. Tego samego lotu transportowego nie licz osobno jako przygotowania logistycznego i anomalii lotniczej. Wspólne kampanie oznacz `campaign_id`; kod ogranicza je do jednego wkładu w danej kategorii. Rozpoznanie tożsamości zdarzeń wymaga przeglądu analityka.
 
-Pokazuj osobno wkłady `hostile_activity` i `preparation`, po limitach kategorii, bez bazy. Suma pozostaje indeksem mieszanych sygnałów; żaden składnik nie jest prawdopodobieństwem. Wynik **ponad 60** oznacza pilny przegląd analityczny. Próg jest roboczy, nieskalibrowany. Przy `score: null` alarm pozostaje nieoceniony. Nie wyprowadzaj trendu ze zmiany metodologii lub braku danych.
+Pokazuj osobno wkłady `hostile_activity` i `preparation`, po limitach kategorii, bez bazy. Suma pozostaje indeksem mieszanych sygnałów; żaden składnik nie jest prawdopodobieństwem. Wynik **ponad 60** oznacza pilny przegląd analityczny. Próg jest roboczy, nieskalibrowany. Nowe raporty v0.4 mają zawsze liczbę; historyczny `score: null` pozostaje nieoceniony. Nie wyprowadzaj trendu ze zmiany metodologii lub braku danych.
 
 ## Przebieg pracy
 
@@ -55,8 +56,10 @@ Pokazuj osobno wkłady `hostile_activity` i `preparation`, po limitach kategorii
 
 ## Format raportu
 
-1. **Podsumowanie:** RTB albo przyczyna braku, wersja modelu, pokrycie, porównywalny trend albo jego brak, do trzech kluczowych ustaleń. Osobno scenariusze warunkowe na 2–6 tygodni, kontrargumenty i luki.
+1. **Podsumowanie:** RTB, osobna pewność, wersja modelu, pokrycie, porównywalny trend albo jego brak, do trzech kluczowych ustaleń. Osobno scenariusze warunkowe na 2–6 tygodni, kontrargumenty i luki.
 2. **Obserwacje i incydenty:** data, kraj, opis, kategoria, status wystąpienia i atrybucji, źródła, identyfikator/rewizja, wkład lub przyczyna wykluczenia. Niepotwierdzone i kontekstowe informacje zachowują swój status.
 3. **Dane przestrzenne:** GeoJSON z tego samego wydania, WGS84 `[długość, szerokość]`, jawna dokładność. Bez dowodu geometria ma wartość `null`. Opcjonalne `strategic_context` wymaga dowodów lokalizacji. Aktualna baza to SQLite; PostGIS pozostaje ewentualnym rozszerzeniem.
 
 Eksport skryptowy tworzy raport danych; nie wykonuje samodzielnie prognozy ani pełnego strategicznego briefu.
+
+W v0.4 decyzja defer nie blokuje RTB; nie wymuszaj kwalifikacji ani wykluczenia dla podniesienia pewności. Komunikaty kpszsu łącz według epizodu, zachowuj przekazania i daty publikacji osobno. Kategoria `cross_border_air_pressure` wymaga dowodów rosyjskiego ataku na obwód lwowski, wołyński lub rówieński; sama obecność drona bez ustalonego operatora nie spełnia atrybucji. Potwierdzony przedział czasu może dać konserwatywny wkład; kod zachowuje jego granice.

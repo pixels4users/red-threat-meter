@@ -30,3 +30,11 @@ test('fractional RTB is rounded only for display; shelter instructions survive a
   assert.equal(checkEnvelope({report}).report.rtb.score,12.375);
   assert.equal(visibleWarnings({score:null,official_warnings:[{status:'active',level:'L3_shelter'},{status:'cancelled'},{status:'unknown'}]}).length,2);
 });
+
+test('continuous v0.4 displays zero and does not enable it for legacy reports', () => {
+  const report={contract_version:'dashboard-v1',report_id:'rpt_'+'a'.repeat(64),mode:'fixture',as_of:'2026-09-30T09:00:00Z',incidents:[],sources:[],provenance:{methodology_version:'rtb-v0.4'},rtb:{status:'provisional',score:0}};
+  assert.equal(checkEnvelope({report}).report.rtb.score,0);
+  assert.equal(scoreLabel(0),'0');
+  report.provenance.methodology_version='rtb-v0.3';
+  assert.throws(()=>checkEnvelope({report}), /invalid_report/);
+});

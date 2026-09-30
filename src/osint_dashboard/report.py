@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 REASONS = {
-    'v03_assessment_missing': 'Brak oceny czasu i zasięgu według v0.3',
+    'v03_assessment_missing': 'Brak oceny czasu i zasięgu zdarzenia',
     'occurrence_time_unknown': 'Nieustalony czas zdarzenia',
     'occurrence_after_cutoff': 'Czas zdarzenia wykracza poza odcięcie',
     'decay_time_ambiguous': 'Dokładność czasu nie pozwala wyznaczyć jednej wagi',
@@ -48,9 +48,13 @@ def build_report(snapshot: dict) -> str:
         lines += ["**Próg roboczy przekroczony: wymagany pilny przegląd analityczny.** Nie oznacza to wysokiego prawdopodobieństwa wojny.", ""]
     if "components" in rtb:
         lines += [f"Wkłady po limitach: działania przeciw państwom regionu — {rtb['components']['hostile_activity']} pkt; sygnały przygotowań — {rtb['components']['preparation']} pkt. Baza nie jest częścią tych sum.", ""]
-    if rtb["blockers"]:
+    issues = rtb.get("quality_issues", rtb["blockers"])
+    if "confidence" in rtb:
+        c = rtb["confidence"]
+        lines += [f"**Pewność danych: {c['percent']}%**. Pokrycie obserwacji: {c['coverage_percent']}%; przegląd: {c['review_percent']}%; historia: {c['history_percent']}%. Jest to jawna heurystyka jakości danych, nie prawdopodobieństwo wojny.", ""]
+    if issues:
         lines += ["**Co ogranicza odczyt:**", ""]
-        for blocker in rtb["blockers"]:
+        for blocker in issues:
             if blocker.startswith("unreviewed_candidates:"):
                 message = "Doniesienia oczekujące na przegląd: " + blocker.split(":")[-1]
             elif blocker.startswith("source_window_incomplete:"):
@@ -65,6 +69,10 @@ def build_report(snapshot: dict) -> str:
                 message = "Zdarzenie wymaga uzupełnienia daty lub dowodów: " + blocker.split(":")[-1]
             elif blocker.startswith("stale_event_review:"):
                 message = "Ocena zdarzenia dotyczy starszej wersji źródła: " + blocker.split(":")[-1]
+            elif blocker.startswith("domain_not_observed:"):
+                message = "Nieobjęty systematyczną obserwacją obszar: " + blocker.split(":")[-1]
+            elif blocker.startswith("time_precision_limited:"):
+                message = "Przybliżony czas: użyto dolnej granicy wkładu dla " + blocker.split(":")[-1]
             else:
                 message = 'Nie zakończono przeglądu 216 godzin historii zdarzeń i ich korekt.' if blocker == 'event_history_unverified' else blocker
             lines.append("- " + safe(message))
@@ -86,7 +94,7 @@ def build_report(snapshot: dict) -> str:
         for error in source["errors"]:
             lines.append(f"\n- {safe(source['publisher'])}: {safe(error)}")
     if rtb["score"] is not None and not rtb["contributions"]:
-        lines += ["", "Odczyt równy bazie 10 oznacza brak zakwalifikowanych punktów w zebranym pakiecie. Nie potwierdza niskiego zagrożenia ani braku incydentów poza monitorowanymi źródłami."]
+        lines += ["", f"Odczyt {rtb['score']} oznacza brak zakwalifikowanych punktów w zebranym pakiecie. Nie potwierdza niskiego zagrożenia ani braku incydentów poza monitorowanymi źródłami."]
     lines += ["", snapshot["coverage"]["note"], "", "Wnioski o intencjach, szczeblu eskalacji i scenariuszach na 2–6 tygodni wymagają osobnego przeglądu analityka. Ten eksport nie wyprowadza ich automatycznie z punktów.", "", "## 2. Zestawienie obserwacji i incydentów", ""]
     sources = {m["material_id"]: m for m in snapshot["materials"]}
     contribution = {c["incident_id"]: c["points"] for c in rtb["contributions"]}

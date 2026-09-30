@@ -9,7 +9,7 @@ from .review import validate_evidence
 
 
 def window_for(as_of: str, config: dict) -> dict:
-    if config['version'] == 'rtb-v0.3':
+    if config['version'] in ('rtb-v0.3', 'rtb-v0.4'):
         end = instant(as_of)
         return {'start': (end - timedelta(hours=config['window_hours'])).isoformat(), 'end': end.isoformat(),
                 'timezone': config['timezone'], 'definition': config['window_definition']}
@@ -31,6 +31,9 @@ def alert_for(value: int | None, config: dict) -> dict:
 
 
 def score(inputs: dict) -> tuple[dict, dict]:
+    if inputs['scoring']['version'] == 'rtb-v0.4':
+        from .scoring_v04 import score_v04
+        return score_v04(inputs)
     if inputs['scoring']['version'] == 'rtb-v0.3':
         from .scoring_v03 import score_v03
         return score_v03(inputs)

@@ -32,10 +32,12 @@ def bounds(event, assessment, zone):
 
 
 def validate_assessment(event):
-    a = event.get('assessment_v03')
+    if event.get('assessment_v03') and event.get('assessment_v04'):
+        raise ValueError('Only one temporal assessment is allowed')
+    a = event.get('assessment_v04') or event.get('assessment_v03')
     if a is None:
         return
-    validate_schema('assessment-v03', a)
+    validate_schema('assessment-v04' if event.get('assessment_v04') else 'assessment-v03', a)
     evidence = {e['id']: e for e in event['evidence']}
     def refs(ids, claims):
         if any(k not in evidence or evidence[k]['claim'] not in claims or evidence[k]['stance'] != 'supports' for k in ids):
@@ -267,7 +269,9 @@ def score_v03(inputs):
             exclude(event,'hostile_attribution_not_confirmed'); continue
         if any(not event['criteria'].get(k) for k in rule['criteria']+rule.get('country_criteria',{}).get(event['country'],[])):
             exclude(event,'category_criteria_not_met'); continue
-        a=event.get('assessment_v03')
+        a=event.get('assessment_v04') or event.get('assessment_v03')
+        if cfg['version'] == 'rtb-v0.3' and event.get('assessment_v04'):
+            exclude(event,'methodology_assessment_mismatch',True); continue
         if not a:
             exclude(event,'v03_assessment_missing',True); continue
         if any(instant(component['time']['latest']) > cutoff for component in a['components']):
@@ -282,9 +286,11 @@ def score_v03(inputs):
         if hi > cutoff or lo > hi:
             exclude(event,'occurrence_after_cutoff',True); continue
         values=[decay((cutoff-t).total_seconds(),cfg['profiles'][a['profile']]) for t in (lo,hi)]
-        if not isclose(*values,abs_tol=1e-12):
+        if not isclose(*values,abs_tol=1e-12) and cfg['version'] != 'rtb-v0.4':
             exclude(event,'decay_time_ambiguous',True); continue
-        d=values[0]
+        # v0.4 uses the lower bound over a evidenced interval, not an invented
+        # exact occurrence time. The legacy v0.3 gate is unchanged.
+        d=min(values)
         if a['active_until'] and instant(a['active_until']) <= cutoff: d=0
         if d==0:
             exclude(event,'expired_weight'); continue
@@ -295,12 +301,15 @@ def score_v03(inputs):
         synergy=1+cfg['correlation']['bonus']*c+cfg['swarm']['bonus']*wave
         rows.append({'event':event,'weight':rule['weight']*d*synergy,'factor':1.0,'decay':d,'synergy':synergy,
                      'correlation_status':cstatus,'correlation_reason':creason,'swarm':bool(wave),'time_used':lo.isoformat()})
+        if cfg['version'] == 'rtb-v0.4':
+            rows[-1]['time_interval'] = {'earliest':lo.isoformat(),'latest':hi.isoformat()}
+            rows[-1]['decay_bounds'] = [min(values),max(values)]
     # All representations of one episode must agree; never add its component rows again.
     episodes=defaultdict(list)
-    for r in rows: episodes[r['event']['assessment_v03']['episode_key']].append(r)
+    for r in rows: episodes[(r['event'].get('assessment_v04') or r['event'].get('assessment_v03'))['episode_key']].append(r)
     unique=[]
     for key, group in sorted(episodes.items()):
-        signatures={digest([r['event']['category'],r['event']['assessment_v03']]) for r in group}
+        signatures={digest([r['event']['category'],(r['event'].get('assessment_v04') or r['event'].get('assessment_v03'))]) for r in group}
         if len(signatures)>1:
             for r in group: exclude(r['event'],'episode_conflict',True)
             continue
@@ -308,15 +317,15 @@ def score_v03(inputs):
         for r in group[1:]: exclude(r['event'],'same_episode')
     owners=defaultdict(set)
     for r in unique:
-        e=r['event'];a=e['assessment_v03']
+        e=r['event'];a=(e.get('assessment_v04') or e.get('assessment_v03'))
         for key in {e['event_key'],*(c['key'] for c in a['components'])}: owners[key].add(a['episode_key'])
     conflict={ep for group in owners.values() if len(group)>1 for ep in group}
     groups=defaultdict(list)
     for r in unique:
         e=r['event']
-        if e['assessment_v03']['episode_key'] in conflict:
+        if (e.get('assessment_v04') or e.get('assessment_v03'))['episode_key'] in conflict:
             exclude(e,'component_in_multiple_episodes',True);continue
-        groups[(e['category'],e['campaign_id'] or e['assessment_v03']['episode_key'])].append(r)
+        groups[(e['category'],e['campaign_id'] or (e.get('assessment_v04') or e.get('assessment_v03'))['episode_key'])].append(r)
     selected=[]
     for group in groups.values():
         group.sort(key=lambda r:(-r['weight'],r['event']['event_key']));selected.append(group[0])
@@ -324,10 +333,10 @@ def score_v03(inputs):
     total,weighted=aggregate(selected,cfg,blockers)
     regions={}
     for region in cfg['spatial']['graph']['nodes']:
-        unknown=[r['event']['incident_id'] for r in selected if not r['event']['assessment_v03']['regional_scope_known']]
+        unknown=[r['event']['incident_id'] for r in selected if not (r['event'].get('assessment_v04') or r['event'].get('assessment_v03'))['regional_scope_known']]
         rr=[]
         for r in selected:
-            a=r['event']['assessment_v03']
+            a=(r['event'].get('assessment_v04') or r['event'].get('assessment_v03'))
             factor=propagation(a['region_ids'],region,a['direct_kinetic'],cfg['spatial']['graph'],cfg['spatial']['factors'])
             if factor: rr.append({**r,'factor':factor})
         value,_=aggregate(rr,cfg,blockers or unknown)
@@ -338,7 +347,9 @@ def score_v03(inputs):
         contributions.append({k:e[k] for k in ('incident_id','revision_id','title','category')} |
                              {k:r[k] for k in ('points','decay','synergy','correlation_status','correlation_reason','swarm','time_used')} |
                              {'nominal_points':rule['weight'],'family':rule.get('family','hostile_activity'),
-                              'episode_key':e['assessment_v03']['episode_key'],'evidence_ids':[v['id'] for v in e['evidence']]})
+                              'episode_key':(e.get('assessment_v04') or e.get('assessment_v03'))['episode_key'],'evidence_ids':[v['id'] for v in e['evidence']]})
+        if cfg['version'] == 'rtb-v0.4':
+            contributions[-1].update(time_interval=r['time_interval'],decay_bounds=r['decay_bounds'])
     dedup={}
     for w in sorted(warnings,key=lambda w:(instant(w['effective_at']),instant(w['recorded_at']),w['incident_id'])):
         dedup[w['alert_key']]=w

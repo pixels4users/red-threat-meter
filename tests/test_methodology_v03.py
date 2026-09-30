@@ -266,11 +266,11 @@ def test_v03_frozen_export_publication_and_replay(case, store, tmp_path):
     assert replay(store.data_dir,case['run_id'])['identical']
 
 
-def test_active_cycle_uses_v03_without_inventing_history(tmp_path,fixture_file):
+def test_explicit_v03_cycle_preserves_historical_completeness_semantics(tmp_path,fixture_file):
     from osint_dashboard.analysis import cycle
     from osint_dashboard.pipeline import run
     from osint_dashboard.dashboard.contract import load_snapshot
-    result=run(tmp_path/'new',fixture=fixture_file)
+    result=run(tmp_path/'new',fixture=fixture_file,methodology='rtb-v0.3')
     snap,cfg=load_snapshot(__import__('pathlib').Path(result['snapshot']).parent)
     assert snap['methodology_version']=='rtb-v0.3'
     assert 'event_history_unverified' in snap['rtb']['blockers']

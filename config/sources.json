@@ -601,6 +601,27 @@
         "https://vdd.gov.lv/en/news/press-releases/vdd-detains-three-latvian-citizens-on-suspicion-of-arson-in-estonia"
       ],
       "notes": "Wybrane komunikaty pierwotne do wyjaśnienia wzmianki OSW o Łotwie i retrospektywy z X. Kontrola zmian treści wskazanych dokumentów; nie jest to pełny strumień aktualności ani potwierdzenie horyzontu zdarzeń."
+    },
+    {
+      "id": "ua_air_force_public",
+      "publisher": "Siły Powietrzne Ukrainy",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "telegram_public",
+      "url": "https://t.me/s/kpszsu",
+      "allowed_hosts": [
+        "t.me"
+      ],
+      "path_prefix": "/s/kpszsu",
+      "additional_path_prefixes": [
+        "/kpszsu/"
+      ],
+      "max_pages": 1,
+      "max_items": 20,
+      "max_requests": 1,
+      "fetch_articles": false,
+      "notes": "Bezpośrednia publiczna strona oficjalnego kanału, maksymalnie 20 tekstowych wpisów. Nie jest surową telemetrią ani pełną historią. Data publikacji nie jest automatycznie datą zdarzenia. Przekazania i odpowiedzi zachowują pochodzenie; analityk łączy wpisy jednej fali."
     }
   ]
 }

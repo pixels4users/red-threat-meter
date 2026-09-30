@@ -4,6 +4,7 @@ import re
 from .common import canonical_json, digest
 
 KEYWORDS = {
+    "cross_border_air_pressure": r"бпла|шахед|ракет|міг-31|львів|волин|рівнен",
     "military_preparation": r"szpital.*polow|zapas.*amunic|logistyk.*wojsk|field hospital|military logistics|полев.*госпитал|военн.*логист",
     "sabotage": r"sabota|dywers|sabotage",
     "arms_explosion": r"eksploz|wybuch|explosion",
