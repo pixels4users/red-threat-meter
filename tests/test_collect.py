@@ -65,3 +65,29 @@ def test_future_publication_is_partial_not_a_clear_empty_window(source, tmp_path
     assert result['status'] == 'partial'
     assert any('future' in error for error in result['errors'])
     assert len(result['items']) == 1
+
+
+def test_connection_reset_is_retried_once_and_rate_limit_is_not(source,tmp_path,monkeypatch):
+    import io
+    import urllib.error
+    from osint_dashboard.collect import Fetcher
+    monkeypatch.setattr('osint_dashboard.collect.time.sleep',lambda _:None)
+    class Response(io.BytesIO):
+        url=source['url'];headers={'Content-Type':'text/html'}
+    class Opener:
+        calls=0
+        def open(self,*args,**kwargs):
+            self.calls+=1
+            if self.calls==1:raise ConnectionResetError('Synthetic connection reset')
+            return Response(b'Synthetic response')
+    fetch=Fetcher(tmp_path,{**source,'max_requests':2});fetch.opener=Opener()
+    assert fetch.get(source['url'])[0]==b'Synthetic response'
+    assert fetch.opener.calls==fetch.request_count==2
+    class Limited(Opener):
+        def open(self,*args,**kwargs):
+            self.calls+=1
+            raise urllib.error.HTTPError(source['url'],429,'Synthetic limit',{'Retry-After':'600'},None)
+    fetch=Fetcher(tmp_path,{**source,'max_requests':2});fetch.opener=Limited()
+    with pytest.raises(urllib.error.HTTPError):fetch.get(source['url'])
+    with pytest.raises(RuntimeError,match='cooldown'):fetch.get(source['url'])
+    assert fetch.opener.calls==1 and fetch.retry_at

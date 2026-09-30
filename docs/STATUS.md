@@ -1,5 +1,55 @@
 # Stan realizacji — 30.09.2026
 
+## Źródła pierwotne i cykl v0.4 — 30.09.2026, 13:58
+
+Włączono `sources-pilot-7`: bezpośrednie biuletyny CERT/NASK i Podlaskiej
+Straży Granicznej oraz szerszy odczyt oficjalnego kanału Sił Powietrznych
+Ukrainy. Rzeczywiste pobranie obejmuje 20 artykułów CERT, 18 artykułów SG,
+20 materiałów RCB, 28 MON oraz 60 wpisów ukraińskich. Publiczne podsumowania
+ukraińskie zawierają datowane bilanse z 15–30 września. To ograniczony odczyt,
+nie kompletne archiwum kanału. Kolektory nie korzystają z interfejsu Strażnika.
+
+RCB i MON odzyskały pełne treści; obsługa chwilowego zerwania połączenia ma
+jedną ograniczoną próbę ponowienia i respektuje limit żądań oraz Retry-After.
+403 nie jest omijane. CERT korzysta z własnego publicznego serwisu biuletynów,
+a nie z niedostępnego archiwum `cert.pl/posts`. Datę bez godziny zachowujemy
+osobno; nie tworzymy fikcyjnej północy ani czasu zdarzenia. Regionalne
+biuletyny SG mają maksymalnie 50% pokrycia domeny granicznej i nie zastępują
+statystyk potrzebnych do rozpoznania wzrostu presji.
+
+Cykl `2026-09-30T114359Z-efc75e41` objął **105 materiałów do przeglądu**.
+Rozstrzygnięto 99, sześć pozostawiono do wyjaśnienia: zbiorcze wzmianki
+OSW/VDD oraz cztery ukraińskie bilanse z niejasnym rozdzieleniem epizodów
+lub nakładającymi się oknami. Wpis X o akademii nauk w Kijowie połączono
+z pierwotnym komunikatem ukraińskim, zachowując tożsamość zdarzenia.
+Aktualizacje tego samego nalotu, plan PAŻP i ćwiczenia syren nie tworzą
+dodatkowych punktów. Przejrzano wszystkie 42 rekordy bieżącej listy RSO.
+
+**RTB: 0/100; pewność: 22%; brak globalnych blokad.** Wynik oznacza brak
+zakwalifikowanych wkładów według przyjętych kryteriów, nie ocenę bezpieczeństwa.
+Ogólnokrajowe bilanse Ukrainy nie ustalają lokalizacji wszystkich trafień
+w obwodach lwowskim, wołyńskim i rówieńskim. Ostrzeżenia o podatnościach CERT
+nie dowodzą dużego cyberataku RU/BY na polską lub litewską infrastrukturę.
+GNSS nadal pozostaje poza pokryciem indeksu; historia zdarzeń nie została
+poświadczona jako kompletna. Nie dodano komentarza zapewniającego o spokoju.
+
+Raport `rpt_0b513c71de73fa5627ec6007644f28512f3ead40ef0ad9c203058ef3cfe018d9`
+zapisano w Supabase z `verified_readback=true`. Eksport i lokalne API są
+identyczne. Przeglądarka potwierdza datę 13:58 i pewność 22%; publikacja
+zawiera 58 zdarzeń i obserwacji kontekstowych, nie 58 naliczonych zagrożeń.
+Replay ze 139 zamrożonych plików daje identyczny wynik bez żądań sieciowych.
+Baza i klucze obce przeszły kontrolę integralności. Dowód:
+`data/analysis/cycles/2026-09-30T114359Z-efc75e41/verification.json`.
+
+Poprawiono też oznaczanie lokalnego pominięcia X z powodu budżetu: zachowuje
+ostatni rzeczywisty odczyt i jego datę, bez udawania awarii lub odświeżenia.
+Etap nie wykonał żadnego płatnego żądania X; limity kosztowe są bez zmian.
+Kontrola pełnej ścieżki oceny wykryła brak dwóch kryteriów zachodniej Ukrainy
+w schemacie propozycji. Poprawka została sprawdzona po zamrożeniu raportu,
+w izolowanym pełnym cyklu; nie zmienia opublikowanego obliczenia.
+**347 testów Python przeszło.** Harmonogram, produkcyjny hosting dashboardu
+i domena pozostają kolejnymi etapami.
+
 ## Przegląd historii i pełny cykl — 30.09.2026, 11:33
 
 Wykonano cykl `2026-09-30T091940Z-3171f42e`: pobranie źródeł, przegląd

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import http.client
 import re
 import time
 import urllib.error
@@ -119,7 +120,7 @@ class Fetcher:
                     time.sleep(1)
                     continue
                 raise
-            except (urllib.error.URLError, TimeoutError):
+            except (urllib.error.URLError, TimeoutError, ConnectionError, http.client.IncompleteRead):
                 if attempt == 0:
                     time.sleep(1)
                     continue
@@ -165,6 +166,9 @@ def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher
     if source['adapter'] == 'telegram_public':
         from .telegram_sources import collect_air_force
         return collect_air_force(source, fetcher)
+    if source['adapter'] == 'public_bulletins':
+        from .bulletin_sources import collect_bulletins
+        return collect_bulletins(source, window_start, fetcher)
     if source['adapter'] == 'curated_documents':
         from .curated_sources import collect_documents
         return collect_documents(source, fetcher)
@@ -218,10 +222,14 @@ def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher
                 # Retain a small overlap, including older entries, to detect corrections.
                 if source["fetch_articles"]:
                     try:
-                        article, _, _, article_ref = fetcher.get(item["url"])
+                        article, article_type, article_url, article_ref = fetcher.get(item["url"])
                         item["text"] = parse_article(article)
                         item["text_kind"] = "article_body"
                         item["raw_ref"] = article_ref
+                        item["content_provenance"] = {
+                            "responses": [{"url": final, "raw_ref": raw_ref, "content_type": content_type},
+                                          {"url": article_url, "raw_ref": article_ref, "content_type": article_type}],
+                            "extraction": {"method": "govpl-editor-content-v1"}}
                     except Exception as exc:
                         outcome["errors"].append(f"Article unavailable ({type(exc).__name__}): {item['url']}")
                 items.append(item)
@@ -239,4 +247,5 @@ def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher
     outcome["items"] = items
     outcome["raw_refs"] = list(dict.fromkeys(fetcher.raw_refs))
     outcome["checked_at"] = now()
+    outcome["request_count"] = getattr(fetcher, "request_count", None)
     return outcome

@@ -1,5 +1,5 @@
 {
-  "version": "sources-pilot-6",
+  "version": "sources-pilot-7",
   "description": "Aktywne kolektory bieżących publikacji o bezpieczeństwie Polski i wschodniej flanki NATO. Kontekst doktrynalny jest w doctrine-sources.json, kandydaci do rozbudowy w source-candidates.json.",
   "policy": "Jedyną listą automatycznie pobieranych źródeł są poniższe wpisy enabled=true. Strony referencyjne i doktryna nie stają się incydentami. Pierwotne pochodzenie należy ustalić dla konkretnego twierdzenia, nie tylko wydawcy.",
   "sources": [
@@ -18,7 +18,8 @@
       "max_pages": 3,
       "max_items": 30,
       "fetch_articles": true,
-      "notes": "Komunikaty i odwołania ostrzeżeń; ćwiczenia to osobny rodzaj informacji."
+      "notes": "Komunikaty i odwołania ostrzeżeń; ćwiczenia to osobny rodzaj informacji. Do 40 żądań łącznie; jedna próba ponowienia po przejściowym zerwaniu połączenia, bez omijania Retry-After.",
+      "max_requests": 40
     },
     {
       "id": "mon",
@@ -35,7 +36,8 @@
       "max_pages": 3,
       "max_items": 30,
       "fetch_articles": true,
-      "notes": "Aktualności ministerstwa; nie stanowią pełnego rejestru incydentów ani osobnego źródła dla każdego cytowanego organu."
+      "notes": "Aktualności ministerstwa; nie stanowią pełnego rejestru incydentów ani osobnego źródła dla każdego cytowanego organu. Do 40 żądań łącznie; jedna próba ponowienia po przejściowym zerwaniu połączenia, bez omijania Retry-After.",
+      "max_requests": 40
     },
     {
       "id": "osw",
@@ -83,18 +85,24 @@
       "id": "cert_pl",
       "publisher": "CERT Polska",
       "kind": "primary",
-      "enabled": false,
+      "enabled": true,
       "required": false,
-      "adapter": "rss",
-      "url": "https://cert.pl/posts/",
+      "adapter": "public_bulletins",
+      "url": "https://moje.cert.pl/komunikaty/",
       "allowed_hosts": [
-        "cert.pl"
+        "moje.cert.pl"
       ],
-      "path_prefix": "/",
-      "max_pages": 1,
+      "path_prefix": "/komunikaty/",
+      "max_pages": 2,
       "max_items": 20,
-      "fetch_articles": false,
-      "notes": "Wyłączone: próba dostępu 22.09.2026 zwróciła HTTP 403. Adres kanału i dostęp wymagają osobnej weryfikacji."
+      "fetch_articles": true,
+      "notes": "Publiczne komunikaty CERT/NASK, pełna treść z aktualizacjami. RSS dostarcza precyzyjne daty, archiwum do 2 stron i 20 publikacji. Podatność lub phishing nie dowodzą ataku RU/BY na infrastrukturę państwa; brak automatycznej atrybucji.",
+      "additional_path_prefixes": [
+        "/advisories/feed/"
+      ],
+      "max_requests": 25,
+      "bulletin_parser": "cert_pl",
+      "publication_feed_url": "https://moje.cert.pl/advisories/feed/"
     },
     {
       "id": "pansa_airspace",
@@ -617,11 +625,31 @@
       "additional_path_prefixes": [
         "/kpszsu/"
       ],
-      "max_pages": 1,
-      "max_items": 20,
-      "max_requests": 1,
+      "max_pages": 3,
+      "max_items": 60,
+      "max_requests": 3,
       "fetch_articles": false,
-      "notes": "Bezpośrednia publiczna strona oficjalnego kanału, maksymalnie 20 tekstowych wpisów. Nie jest surową telemetrią ani pełną historią. Data publikacji nie jest automatycznie datą zdarzenia. Przekazania i odpowiedzi zachowują pochodzenie; analityk łączy wpisy jednej fali."
+      "notes": "Do 2 stron najnowszych tekstowych wpisów i 1 strony wyszukiwarki wydawcy dla ЗБИТО (podsumowania przechwyceń); do 60 unikalnych wpisów i 3 żądań łącznie. Jedno pochodzenie, niepełna historia, media nie są odczytywane. Czas publikacji nie zastępuje czasu zdarzenia; datowane podsumowania dostarczają oddzielnego dowodu.",
+      "summary_query": "ЗБИТО"
+    },
+    {
+      "id": "sg_podlaski",
+      "publisher": "Podlaski Oddział Straży Granicznej",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "public_bulletins",
+      "url": "https://podlaski.strazgraniczna.pl/pod/aktualnosci",
+      "allowed_hosts": [
+        "podlaski.strazgraniczna.pl"
+      ],
+      "path_prefix": "/pod/aktualnosci",
+      "max_pages": 3,
+      "max_items": 27,
+      "max_requests": 32,
+      "fetch_articles": true,
+      "bulletin_parser": "sg_podlaski",
+      "notes": "Publiczne komunikaty regionalnego oddziału SG: pełne teksty z maksymalnie 3 stron. Nie stanowią pełnej serii dobowej ani pełnego pokrycia granicy PL–BY. Doniesienia o migracji poza granicą z Białorusią nie dowodzą presji białoruskiej; baseline wymaga odrębnego przeglądu."
     }
   ]
 }

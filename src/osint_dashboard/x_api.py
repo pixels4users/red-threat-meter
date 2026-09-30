@@ -328,6 +328,12 @@ def collect(data_dir=ROOT / "data", *, config=None, transport=None, synthetic=Fa
                 # A failed paid read is not a successful refresh. Preserve the
                 # previous material but expose the latest failed access to import.
                 code = str(exc) if isinstance(exc, XError) else "invalid_api_data"
+                if code == "budget_limit":
+                    # No request was made: this is a local scheduling decision,
+                    # not a new observation of an unavailable remote source.
+                    summary["status"] = "incomplete"
+                    summary["sources"].append({"source_id": source["id"], "error": code})
+                    continue
                 capture = {"schema_version": "x-api-v1", "synthetic": synthetic, "account": account,
                            "captured_at": now(), "access_status": "unavailable", "user_id": current.get("user_id"),
                            "coverage_note": "Nie wykonano pełnego odczytu API X: " + code,
@@ -337,8 +343,7 @@ def collect(data_dir=ROOT / "data", *, config=None, transport=None, synthetic=Fa
                 write_json(data_dir / "social" / source["id"] / (digest(capture) + ".json"), capture)
                 summary["status"] = "incomplete"
                 summary["sources"].append({"source_id": source["id"], "error": code})
-                if code != "budget_limit":
-                    break  # Auth, rate or parser failure: never probe another account.
+                break  # Auth, rate or parser failure: never probe another account.
         summary["budget"] = budget_status(folder, config)
         write_json(folder / "runs" / (run_id + ".json"), summary)
         return summary

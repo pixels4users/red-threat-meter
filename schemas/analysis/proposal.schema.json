@@ -177,6 +177,7 @@
                       "properties": {
                         "key": {
                           "enum": [
+                            "air_attack",
                             "arms_facility",
                             "baseline_anomaly",
                             "baseline_increase",
@@ -192,7 +193,8 @@
                             "operational_relevance",
                             "pl_by_border",
                             "routine_explanation_checked",
-                            "target_banking_or_government"
+                            "target_banking_or_government",
+                            "western_ukraine"
                           ]
                         },
                         "evidence_ids": {

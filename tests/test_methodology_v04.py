@@ -60,11 +60,23 @@ def test_missing_feed_does_not_erase_still_qualified_evidence(case):
 def test_unconfigured_capabilities_never_count_as_complete(case):
     r,_ = score(case)
     domains = {d['id']:d['percent'] for d in r['confidence']['domains']}
-    assert domains['gnss'] == domains['border'] == 0
+    assert domains['gnss'] == 0 and domains['border'] <= 50
     assert r['confidence']['coverage_percent'] < 100
     original = r['confidence']['percent']
     case.pop('history_review')
     assert score(case)[0]['confidence']['percent'] <= round(original / 2) + 1
+
+
+def test_regional_border_bulletins_have_capped_coverage_not_full_border_observation(case):
+    source=next(s for s in case['source_config']['sources'] if s['id']=='sg_podlaski')
+    check=next(s for s in case['source_checks'] if s['source_id']==source['id'])
+    check.update(status='ok',window_complete=True,checked_at=case['as_of'],source_definition_hash=digest(source))
+    def border():return next(d['percent'] for d in score(case)[0]['confidence']['domains'] if d['id']=='border')
+    assert border()==50
+    check['window_complete']=False
+    assert border()==25
+    check['status']='error'
+    assert border()==0
 
 
 def test_stale_or_changed_source_lowers_confidence(case):
@@ -105,6 +117,58 @@ def test_v04_temporal_assessment_and_ukraine_scope(case):
     assert score(case)[0]['score']==0
     e['attribution']['actor']='RU';e['country']='PL'
     assert score(case)[0]['score']==0
+
+
+@pytest.mark.parametrize('attributed,expected', [(True, 3), (False, 0)])
+def test_western_ukraine_criteria_survive_full_agent_review_cycle(tmp_path, fixture_file, attributed, expected):
+    from osint_dashboard.analysis import cycle
+    from osint_dashboard.common import now, write_json
+    from osint_dashboard.pipeline import replay
+    from test_analysis_cycle import audit_for
+
+    stamp = now()
+    day = instant(stamp).date().isoformat()
+    text = (f'TEST SYNTHETYCZNY. Dnia {day}, o {stamp}, rosyjski dron uderzył '
+            'w obwodzie lwowskim w Ukrainie. To fikcyjny atak powietrzny, nie rzeczywiste zdarzenie.')
+    fixture = read_json(fixture_file)
+    source = next(s for s in fixture['source_results'] if s['source_id'] == 'ua_air_force_public')
+    source['items'][0].update(text=text, url='https://t.me/kpszsu/9000000', published_at=stamp)
+    write_json(fixture_file, fixture)
+    data = tmp_path / 'synthetic-ua-cycle'
+    cid = cycle.prepare(data, fixture=fixture_file)['cycle_id']
+    packet = cycle.load_cycle(data, cid)[1]['packet']
+    decisions = []
+    for candidate in packet['candidates']:
+        decision = {'kind': 'exclude', 'candidate_ids': [candidate['candidate_id']],
+                    'previous_revision': 0, 'reason': 'Izolowany materiał syntetyczny poza testowanym zdarzeniem.',
+                    'incident': None}
+        if candidate['source_id'] == 'ua_air_force_public':
+            evidence = [{'id': claim, 'claim': claim, 'material_id': candidate['material_id'],
+                         'stance': 'supports', 'quote': text, 'origin_id': 'synthetic-authority',
+                         'origin_reason': 'Fikcyjne źródło wyłącznie w katalogu tymczasowym testu.'}
+                        for claim in ('occurrence', 'attribution', 'timing', 'location', 'criterion')]
+            decision.update(kind='incident', incident={
+                'event_key': 'synthetic-western-ukraine', 'title': 'TEST SYNTHETYCZNY — atak na zachodzie Ukrainy',
+                'summary': 'Fikcyjny atak powietrzny na obwód lwowski służący sprawdzeniu pełnego cyklu oceny.',
+                'category': 'cross_border_air_pressure', 'status': 'confirmed_primary',
+                'occurred_on': day, 'date_evidence_ids': ['timing'], 'country': 'UA',
+                'attribution': {'actor': 'RU' if attributed else 'unknown',
+                                'status': 'confirmed_primary' if attributed else 'unverified',
+                                'reason': 'Syntetyczny wariant z ustalonym lub nieustalonym sprawcą.'},
+                'location': {'label': 'Obwód lwowski', 'geometry': None, 'precision': 'region', 'evidence_ids': ['location']},
+                'criteria': [{'key': key, 'evidence_ids': ['criterion']} for key in ('air_attack', 'western_ukraine')],
+                'campaign_id': None, 'evidence': evidence,
+                'assessment_v04': {'version': 'rtb-v0.4', 'profile': 'tactical',
+                    'time': {'earliest': stamp, 'latest': stamp, 'evidence_ids': ['timing']},
+                    'episode_key': 'synthetic-western-ukraine', 'components': [], 'direct_kinetic': False,
+                    'kinetic_evidence_ids': [], 'region_ids': [], 'region_evidence_ids': [],
+                    'regional_scope_known': True, 'active_until': None, 'end_evidence_ids': [], 'correlation': None}})
+        decisions.append(decision)
+    checked = cycle.check(data, cid, {'decisions': decisions}, 'Codex — synthetic test')
+    assert cycle.apply(data, cid, checked['proposal_sha256'], audit_for(checked))['held'] == 0
+    assert cycle.calculate(data, cid)['score'] == expected
+    cycle.finish(data, cid)
+    assert replay(data, cid)['identical']
 
 
 def test_zero_comparison_never_divides_by_zero_and_coverage_changes_hide_trend(case):

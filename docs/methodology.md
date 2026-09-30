@@ -102,6 +102,8 @@ Współczynniki są jawnie przyjętą heurystyką jakości, nie zmierzoną trafn
 
 Zero oznacza brak **naliczonych** sygnałów, nie brak realnych zagrożeń. Przy zerze dashboard pokazuje to wyjaśnienie obok pewności. Oficjalne ostrzeżenia zachowują osobny status i obszar; nie są ukrywane przez niski RTB ani automatycznie punktowane drugi raz. Historyczne raporty v0.2/v0.3 zachowują oryginalne `null` i zasady kompletności.
 
+Od rewizji konfiguracji z 30.09.2026 (sources-pilot-7) publiczne biuletyny Podlaskiej SG dają najwyżej udział 0,5 w domenie granicznej: dotyczą części granicy i komunikatów, nie pełnej statystyki dobowej. CERT/NASK jest odczytywany bezpośrednio z moje.cert.pl. Sam komunikat o podatności nie potwierdza cyberataku RU/BY. Wagi zdarzeń pozostają bez zmian; poprzednią konfigurację v0.4 zachowano w config/archive/scoring-v0.4-initial.json. Nowy hash konfiguracji uniemożliwia łączenie obu wariantów w trend.
+
 ## Historia, wersje i porównania
 
 Materiały, oceny i wydania dopisujemy. Aktualizacja publikacji wymaga oceny nowej wersji; korekta incydentu tworzy rewizję. Raportów historycznych nie przepisujemy. SQLite blokuje aktualizacje/usunięcia tabel audytu; pliki mają manifesty hashy. Kopie pozostają potrzebne, ponieważ administrator dysku może zmienić pliki.

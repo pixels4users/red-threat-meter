@@ -1,6 +1,6 @@
-# Przegląd dowodów, wersja 2 — RTB v0.2
+# Przegląd dowodów, wersja 3 — RTB v0.4
 
-Wejście: kolejka review_queue.json i zapisane wersje materiałów. Wyjście: plik JSON zgodny z schemas/review.schema.json, zapisany w data/reviews/. Przejrzyj każde twierdzenie na podstawie treści, nie tytułu ani sugerowanej kategorii.
+Wejście: zamrożony packet.json i zapisane wersje materiałów. Wyjście cyklu Codexa: proposal.json zgodny z schemas/analysis/proposal.schema.json, a następnie osobny audit.json. Skrypt przekształca zaakceptowane decyzje do schemas/review.schema.json. Przejrzyj każde twierdzenie na podstawie treści, nie tytułu ani sugerowanej kategorii.
 
 1. Podaj reviewer.type=agent, jeśli oceniasz jako AI, oraz rzeczywistą nazwę wykonawcy. Nie podszywaj się pod ludzką kontrolę.
 2. Jedno zdarzenie może obejmować wiele candidate_ids. Jedna publikacja może uzasadniać kilka odrębnych zdarzeń; użyj różnych event_key. Nie łącz wykluczenia publikacji z jej przypisaniem do zdarzenia w jednym pakiecie.
@@ -15,7 +15,7 @@ Wejście: kolejka review_queue.json i zapisane wersje materiałów. Wyjście: pl
 11. Dla anomalii zapisz miarę, okres, wartości porównania i źródło. Uwzględnij ćwiczenia, sezonowość i zmianę pokrycia obserwacji. Bez odniesienia kryterium nie jest spełnione. To samo zdarzenie ma jeden event_key i jedną kategorię; nie dubluj lotu transportowego jako logistyki i aktywności lotniczej.
 12. Opcjonalne `strategic_context` zawiera area_ids z config/strategic-areas.json, uzasadnienie i evidence_ids typu location. Bliskość nadaje priorytet przeglądowi; nie zwiększa punktacji. Nie wymyślaj promienia ani współrzędnych.
 13. Biblioteka doctrine_rag i materiały referencyjne nie są dowodami incydentów. Ich tezy i alternatywne wyjaśnienia cytuj w briefie z identyfikatorem dokumentu, stroną PDF i hashem albo adresem URL. Data dodania książki lub raportu rocznego nie jest datą zdarzenia.
-14. Scenariusze i domysły pozostają poza rekordem faktów. Po przygotowaniu pakietu zastosuj scripts/review_incidents.py i odśwież raport scripts/run_pipeline.py --offline. Interpretację uzupełnij osobno według docs/templates/analytical-brief.md.
+14. Scenariusze i domysły pozostają poza rekordem faktów. Cykl Codexa wykonuj przez check/apply/calculate/finish według agents/analysis-cycle.md; nie uruchamiaj równolegle starszej ścieżki review_incidents.py/run_pipeline.py. Interpretację scenariuszową uzupełnij osobno według docs/templates/analytical-brief.md.
 
 Pełny cykl wykonywany przez Codexa opisuje `agents/analysis-cycle.md`. Obejmuje
 osobny przegląd propozycji, kontrolę dowodów, obliczenie, komentarz i publikację.

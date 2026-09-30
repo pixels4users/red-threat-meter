@@ -77,11 +77,35 @@ def test_interval_daily_and_total_budget_survive_restarts(tmp_path, clock):
     blocked = x_api.collect(tmp_path, transport=fake, synthetic=True)
     assert blocked['requests'] == 0 and all(s['error'] == 'budget_limit' for s in blocked['sources'])
     assert not fake.calls
+    for source in sources():
+        cached = collect_captures(source, tmp_path)
+        assert cached['status'] == 'partial' and cached['checked_at'] == STAMP
+        assert len(cached['items']) == 10
+    assert len(list((tmp_path / 'social').glob('*/*.json'))) == 2
     clock[0] = '2026-10-01T14:00:00+00:00'
     config = x_api.load_settings(); config['total_limit_mill_usd'] = 120
     assert x_api.collect(tmp_path, config=config, transport=fake, synthetic=True)['requests'] == 0
     assert not fake.calls
     assert first['budget']['total_accounted_mill_usd'] == 120
+
+
+def test_legacy_budget_only_capture_cannot_replace_real_observation(tmp_path, clock):
+    x_api.collect(tmp_path, transport=Fake(), synthetic=True)
+    source = sources()[0]
+    clock[0] = '2026-09-30T14:00:00+00:00'
+    skipped = {'schema_version':'x-api-v1','synthetic':True,'account':source['account'],
+        'captured_at':clock[0],'access_status':'unavailable','user_id':'1',
+        'coverage_note':'Nie wykonano pełnego odczytu API X: budget_limit',
+        'posts':[],'response':None,'raw_ref':None,'request_params':{},'pagination_pending':False}
+    folder = tmp_path / 'social' / source['id']
+    write_json(folder / (digest(skipped)+'.json'), skipped)
+    cached = collect_captures(source,tmp_path)
+    assert cached['status']=='partial' and cached['checked_at']==STAMP and len(cached['items'])==10
+    assert cached['local_skip_at']==clock[0]
+    assert (folder / (digest(skipped)+'.json')).exists()
+    failed = {**skipped,'captured_at':'2026-09-30T14:01:00+00:00','coverage_note':'Nie wykonano pełnego odczytu API X: http_403'}
+    clock[0] = failed['captured_at']; write_json(folder / (digest(failed)+'.json'),failed)
+    assert collect_captures(source,tmp_path)['status']=='error'
 
 
 def test_incremental_cursor_and_cached_user_ids(tmp_path, clock):

@@ -116,6 +116,19 @@ def collect_captures(source, data_dir):
                         raw["params"] != capture["request_params"] or raw["synthetic"] != capture["synthetic"]):
                     raise ValueError("API request archive mismatch")
             captures.append((capture, path))
+        # Compatibility with archived pre-fix budget-only captures. Keep their
+        # audit files, but never call a local skip a fresh source observation.
+        skipped = [(c,p) for c,p in captures if c.get('schema_version') == 'x-api-v1' and
+                   c['access_status'] == 'unavailable' and c['response'] is None and
+                   c['raw_ref'] is None and c['request_params'] == {} and c['posts'] == [] and
+                   c['coverage_note'] == 'Nie wykonano pełnego odczytu API X: budget_limit']
+        if skipped:
+            result['local_skip_at'] = max(c['captured_at'] for c,p in skipped)
+            result['local_skip_reason'] = 'budget_limit'
+            captures = [(c,p) for c,p in captures if (c,p) not in skipped]
+        if not captures:
+            result['errors'] = ['Limit budżetu; brak wcześniejszego odczytu profilu X.']
+            return result
         captures.sort(key=lambda pair: (instant(pair[0]["captured_at"]),
                                        pair[0]["access_status"] == "unavailable", pair[1].name))
         latest, latest_path = captures[-1]

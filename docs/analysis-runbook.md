@@ -1,14 +1,14 @@
 # Silnik analityczny — cykl Codexa
 
-Stan: 29.09.2026. Wykonawcą analizy jest **Codex w tym projekcie**. Nie potrzeba
+Stan: 30.09.2026. Wykonawcą analizy jest **Codex w tym projekcie**. Nie potrzeba
 osobnego klucza do API modelu. Python pobiera materiały, sprawdza kontrakty i
 dowody, liczy RTB, zamraża raport oraz publikuje go do Supabase. Codex podejmuje
 decyzje analityczne i pisze komentarz na podstawie zapisanych materiałów.
 
 ## Uruchomienie
 
-Od 30.09.2026 krok przed `prepare` obejmuje odczyt wskazanych kont X przez
-Codexa i import transkrypcji według [instrukcji X](x-sources.md). Dostarczony
+Od 30.09.2026 krok przed `prepare` obejmuje ograniczony kosztowo odczyt API wskazanych kont X przez
+`scripts/collect_x.py collect` według [instrukcji X](x-sources.md). Dostarczony
 skill `x-research` pomaga w doborze i ocenie źródeł; nie zapewnia dostępu do
 API. Niepełna historia pozostaje niepełna także po poprawnym imporcie.
 OSW korzysta z RSS oraz paginowanego archiwum wydawcy. Dodatkowe wybrane
@@ -46,7 +46,7 @@ Przycisk na stronie odświeża tylko opublikowane wyniki.
 ## Kontrole przed publikacją
 
 1. Pakiet obejmuje wszystkie nierozstrzygnięte materiały. Obecny limit to
-   100 kandydatów i 2 MB. Przekroczenie zatrzymuje cykl, bez cichego pomijania.
+   150 kandydatów i 2 MB; limit zwiększono dla nowych strumieni CERT, SG i podsumowań ukraińskich. Przekroczenie zatrzymuje cykl, bez cichego pomijania.
 2. Każda decyzja wskazuje konkretne wersje źródeł. Cytaty muszą występować
    w zapisanym materiale; daty, miejsce, atrybucja i kryteria mają osobne dowody.
 3. Po propozycji Codex wykonuje drugi, jawny przegląd jej znaczenia. To kontrola
@@ -54,8 +54,7 @@ Przycisk na stronie odświeża tylko opublikowane wyniki.
 4. Wstrzymana decyzja pozostawia materiał nierozstrzygnięty. Wspólne pochodzenie
    publikacji nie zwiększa liczby niezależnych potwierdzeń. Kilka zdarzeń
    w jednym artykule przechodzi razem kontrolę kompletności.
-5. Domyślna punktacja to `rtb-v0.3` z kontrolą 216 godzin historii; patrz [kontrakt](v0.3-implementation.md). Braki dają
-   `RTB=null` we wcześniejszych wersjach. W v0.4 nowy wynik jest liczbowy, a niepełność obniża confidence. Pilotaże GNSS, logistyki i ADS-B nie zasilają punktacji.
+5. Domyślna punktacja to `rtb-v0.4` z kontrolą 216 godzin historii; patrz [kontrakt](v0.4-implementation.md). Nowy wynik jest liczbowy, a niepełność obniża confidence. `RTB=null` zachowują wyłącznie wcześniejsze wersje. Pilotaże GNSS, logistyki i ADS-B nie zasilają punktacji.
 6. Komentarz wymaga ustaleń dotyczących sytuacji, działań i skutków oraz
    przeglądu dokładnie tych trzech zdań. Nie wystarczy sam indeks. Przy braku
    podstaw komentarz jest pomijany; nie powstaje zapewnienie o bezpieczeństwie.

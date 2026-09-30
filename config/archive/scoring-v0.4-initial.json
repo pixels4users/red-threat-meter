@@ -429,9 +429,7 @@
       {
         "id": "border",
         "label": "Presja na granice",
-        "sources": {
-          "sg_podlaski": 0.5
-        }
+        "sources": {}
       },
       {
         "id": "gnss",

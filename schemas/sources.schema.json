@@ -83,7 +83,8 @@
             "x_browser_import",
             "curated_documents",
             "x_api_import",
-            "telegram_public"
+            "telegram_public",
+            "public_bulletins"
           ]
         },
         "url": {
@@ -233,6 +234,18 @@
               }
             }
           }
+        },
+        "bulletin_parser": {
+          "enum": [
+            "cert_pl",
+            "sg_podlaski"
+          ]
+        },
+        "publication_feed_url": {
+          "const": "https://moje.cert.pl/advisories/feed/"
+        },
+        "summary_query": {
+          "const": "ЗБИТО"
         }
       },
       "allOf": [
@@ -346,19 +359,55 @@
                 "const": "https://t.me/s/kpszsu"
               },
               "max_requests": {
-                "const": 1
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
               },
               "max_pages": {
-                "const": 1
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 3
               },
               "max_items": {
-                "maximum": 20
+                "maximum": 60
               },
               "fetch_articles": {
                 "const": false
               },
               "required": {
                 "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "adapter": {
+                "const": "public_bulletins"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "bulletin_parser",
+              "max_requests"
+            ],
+            "properties": {
+              "kind": {
+                "const": "primary"
+              },
+              "fetch_articles": {
+                "const": true
+              },
+              "max_pages": {
+                "maximum": 3
+              },
+              "max_items": {
+                "maximum": 30
+              },
+              "max_requests": {
+                "maximum": 35
               }
             }
           }

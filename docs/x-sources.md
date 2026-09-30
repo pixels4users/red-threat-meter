@@ -36,6 +36,10 @@ Domyślne ograniczenia pilotażu:
   konserwatywnym oszacowaniem według cennika, bez zakładania rabatu za powtórny
   odczyt. Rozliczenie dostawcy potwierdza jego konsola. Nie kasuj dziennika
   kosztów ani nie uruchamiaj pobierania w drugim katalogu live.
+- Pominięcie żądania z powodu budżetu nie jest awarią X ani nowym odczytem.
+  Import zachowuje poprzednią rzeczywistą datę obserwacji. Dawne paczki
+  oznaczające wyłącznie taki lokalny limit pozostają w audycie, ale nie
+  zastępują ostatniej obserwacji. Błąd HTTP/uwierzytelnienia nadal daje niedostępność.
 - Brak ponowień, przekierowań i automatycznego doładowania. Błąd dostępu lub
   parsera zatrzymuje kolejne zapytania. HTTP 429 / Retry-After zachowuje termin
   blokady także po restarcie. Odpowiedź ma limit 500 KB i 20 sekund.

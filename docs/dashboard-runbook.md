@@ -1,6 +1,6 @@
 # Dashboard — publikowanie i obsługa
 
-Stan: 29.09.2026. Interfejs **B — Chronologia**, kontrakt `dashboard-v1`.
+Stan: 30.09.2026. Interfejs **B — Chronologia**, kontrakt `dashboard-v1`.
 Stan chmurowej migracji i połączenia: `supabase/README.md`.
 
 ## Co uruchamia raport
@@ -18,9 +18,11 @@ Na tym Macu dostęp jest skonfigurowany. **`Opublikuj raport.command`**
 wykonuje pobranie i publikację bez przeglądu Codexa. Dotychczasowy
 `Zbierz dane.command` nadal tworzy wyłącznie raport lokalny.
 
-Proces RTB nadal wymaga przeglądu nowych materiałów. Po pobraniu bez ocen może
-opublikować poprawny raport z niewyliczonym RTB. Nie podstawiamy starej liczby.
-Od 29.09 domyślny silnik i nowe odczyty używają `rtb-v0.3`. Wymagany jest przegląd 216 godzin historii; poprzednie wydania zachowują v0.2. Szczegóły: `docs/v0.3-implementation.md`.
+Proces RTB nadal wymaga przeglądu nowych materiałów. Od 30.09 domyślny silnik
+używa `rtb-v0.4`: wynik jest liczbowy 0–100, a braki ocen, źródeł i historii
+216 godzin obniżają osobną pewność. Zero nie oznacza bezpieczeństwa.
+Historyczne wydania v0.2/v0.3 zachowują własne wyniki, także null.
+Awaria programu nie publikuje zastępczego zera. Szczegóły: [v0.4](v0.4-implementation.md).
 
 ## Przygotowanie
 

@@ -1,6 +1,17 @@
-# Źródła bieżące i materiały referencyjne — v0.3
+# Źródła bieżące i materiały referencyjne — RTB v0.4
 
-### Archiwum OSW i źródła do przeglądu — 30.09.2026
+### Biuletyny pierwotne i podsumowania ukraińskie — 30.09.2026
+
+Aktualny rejestr wykonawczy: `sources-pilot-7` w `config/sources.json`.
+
+- **RCB/MON:** maksymalnie 40 żądań na źródło, z jedną próbą ponowienia przejściowego zerwania połączenia lub niepełnego transferu. HTTP 403 nie jest obchodzony, a 429/Retry-After zatrzymuje żądania. Pełna treść i lista odkrycia mają odrębne odnośniki do surowych odpowiedzi.
+- **CERT/NASK:** [publiczne komunikaty](https://moje.cert.pl/komunikaty/) i [RSS wskazany przez wydawcę](https://moje.cert.pl/advisories/feed/). Dwie strony archiwum, 20 pełnych tekstów z aktualizacjami, do 25 żądań. Główna strona cert.pl/posts nadal odpowiadała 403; osobny publiczny serwis nie wymaga logowania. Podatności i oszustwa nie oznaczają automatycznie cyberataku na państwo ani rosyjskiej atrybucji.
+- **Podlaska SG:** [archiwum aktualności](https://podlaski.strazgraniczna.pl/pod/aktualnosci), do 3 kolejnych stron, 27 artykułów i 32 żądań. Nagłówek, wstęp i właściwa treść; galerie i elementy strony są pomijane. To ograniczony strumień regionalny, bez pełnej serii dziennej. Udział w domenie granicznej ma limit 0,5; porównanie presji nadal wymaga zgodnej miary, okresów i obszaru.
+- **Siły Powietrzne Ukrainy:** do 2 stron ostatnich wpisów i 1 strony publicznego wyszukiwania `ЗБИТО` w [oficjalnym kanale](https://t.me/s/kpszsu), łącznie do 60 unikalnych tekstowych wpisów i 3 żądań. Podsumowania dostarczają dat i parametrów konkretnych ataków; filtr nie gwarantuje historii wszystkich zdarzeń. Wszystkie wpisy mają wspólne pierwotne pochodzenie. Stan źródła pozostaje partial.
+
+Adapter `public_bulletins` sprawdza ciągłość paginacji i kolejność dat. Data dzienna jest zapisana jako `source_record.published_on`; `published_at=null` zamiast wymyślonej godziny. CERT może uzupełnić ją rzeczywistym znacznikiem RSS, gdy obie daty się zgadzają. Czas publikacji nadal nie zastępuje czasu wystąpienia. Stan ok/window_complete dotyczy tylko sprawdzonego archiwum publikacji, nie kompletności zjawisk.
+
+### Archiwum OSW i źródła do przeglądu — wcześniejsze rozszerzenie 30.09.2026
 
 `sources-pilot-5` rozszerza OSW o maksymalnie trzy kolejne strony
 [archiwum publikacji](https://www.osw.waw.pl/pl/publikacje), czytane aż do
@@ -27,7 +38,7 @@ Nie odkrywa nowych wiadomości i nie poświadcza
 kompletności historii wydawcy. Listy URL są jawne w konfiguracji; wspólne
 pochodzenie komunikatów wymaga deduplikacji w przeglądzie.
 
-Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (obecnie sources-pilot-6; od 30.09 także archiwum OSW, odczyty X i dokumenty łotewskie). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
+Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (obecnie sources-pilot-7; od 30.09 także archiwum OSW, odczyty X i dokumenty łotewskie). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
 
 | Źródło | Dostęp i zakres | Rola | Wynik pilotażu |
 |---|---|---|---|

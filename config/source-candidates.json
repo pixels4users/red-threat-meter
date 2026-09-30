@@ -1,6 +1,6 @@
 {
   "version": "source-candidates-11",
-  "checked_on": "2026-09-25",
+  "checked_on": "2026-09-30",
   "policy": "Rejestr integracji i kandydatów. Działający pilotaż GNSS/belzhd jest w config/early-warning.json, pilotaż jakości ADSB.lol w config/aviation.json, audyt historii w config/aviation-history.json, kolektory RTB w config/sources.json. Pozostałe wpisy nie uruchamiają adapterów. Daty wcześniejszych ocen dostępu zachowano w opisach. Kalibracja i niezależna weryfikacja są odrębną pracą. Rozszerzenie z 25.09.2026: kandydaci pierwotni PAŻP, kanały UA, RSO, media i siły zbrojne LT/LV/EE oraz semantyka istniejącego RCB zostały zaakceptowane do integracji 25.09.2026; nie uruchamiają nowych kolektorów. Strażnik jest wyłącznie odniesieniem architektonicznym. Grupa wydawcy nie zastępuje ustalenia pochodzenia każdego dowodu. proposal_status=accepted_for_integration i accepted_on oznaczają akceptację zakresu, nie gotowość adaptera; pole status nadal opisuje dostęp i wdrożenie. Akceptacja nie zmienia dat checked_on ani wyników oceny dostępu. Aktualizacja 29.09.2026: pansa_airspace i rso_public mają działające adaptery ograniczonego zakresu; szczegóły w ich statusach.",
   "candidates": [
     {
@@ -300,14 +300,14 @@
       "url": "https://t.me/kpszsu",
       "role": "primary_official_air_threat_statements",
       "priority": 1,
-      "status": "connected_bounded_public_preview",
+      "status": "connected_bounded_public_pages_and_summaries",
       "purpose": "Komunikaty Sił Powietrznych ZSU i odwołania. Priorytet odkrywania dla obwodów lwowskiego i wołyńskiego. Publikacje nie są automatycznie surowymi pomiarami radarowymi; kurs na Ukrainę nie dowodzi zagrożenia dla Polski.",
       "dependency_group": "authority:ua_air_force",
       "verification_urls": [
         "https://t.me/kpszsu",
         "https://cpd.gov.ua/announcement/spysok-bezpechnyh-kanaliv-otrymannya-informacziyi/"
       ],
-      "access_note": "Kolektor telegram_public: jedna publiczna strona, do 20 tekstowych postów, bez sesji i mediów. Zasięg częściowy, brak gwarancji historii; surowe treści i metadane przekazań archiwizowane. Bez automatycznej atrybucji i naliczania punktów.",
+      "access_note": "Adapter telegram_public: do dwóch stron najnowszych wpisów oraz jedna strona publicznej wyszukiwarki kanału dla ЗБИТО. Do 60 wpisów, 3 żądania, bez sesji i mediów. Jedno pochodzenie, niepełna historia, deduplikacja po URL. Datowane podsumowania nie są automatycznie atakami na zachodnią Ukrainę.",
       "checked_on": "2026-09-30",
       "proposal_status": "accepted_for_integration",
       "accepted_on": "2026-09-25"
@@ -527,6 +527,30 @@
       "dependency_group": "authority:lv_vdd",
       "checked_on": "2026-09-30",
       "runtime_config": "config/sources.json"
+    },
+    {
+      "id": "cert_public_bulletins",
+      "url": "https://moje.cert.pl/komunikaty/",
+      "role": "primary_cybersecurity_bulletins",
+      "priority": 1,
+      "status": "connected_bounded_public_archive",
+      "purpose": "Biuletyny z aktualizacjami, odróżnienie podatności od potwierdzonego ataku. Działający adapter public_bulletins; do 2 stron, 20 publikacji, 25 żądań.",
+      "dependency_group": "authority:cert_pl",
+      "checked_on": "2026-09-30",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-30"
+    },
+    {
+      "id": "sg_podlaski",
+      "url": "https://podlaski.strazgraniczna.pl/pod/aktualnosci",
+      "role": "primary_regional_border_statements",
+      "priority": 1,
+      "status": "connected_bounded_public_archive",
+      "purpose": "Regionalne komunikaty z granicy PL–BY/PL–LT; do 3 stron, 27 publikacji, 32 żądań. Nie jest to pełna seria dobowa ani samodzielny baseline. Działający adapter public_bulletins.",
+      "dependency_group": "authority:polish_border_guard",
+      "checked_on": "2026-09-30",
+      "proposal_status": "accepted_for_integration",
+      "accepted_on": "2026-09-30"
     }
   ],
   "design_status": "integration_registry_runtime_configs_are_separate"
