@@ -1,5 +1,51 @@
 # Stan realizacji — 30.09.2026
 
+## Przegląd historii i pełny cykl — 30.09.2026, 11:33
+
+Wykonano cykl `2026-09-30T091940Z-3171f42e`: pobranie źródeł, przegląd
+dowodów, drugi przegląd tego samego agenta, dopisanie ocen, obliczenie,
+archiwizacja i publikacja do Supabase. To **ósme rzeczywiste wydanie**.
+Wszystkie oceny mają `reviewer.type=agent`; drugi przegląd nie oznacza
+niezależnego potwierdzenia źródeł.
+
+Przegląd objął pełne teksty **59 materiałów**: 32 znane materiały RCB,
+16 publikacji MON od 21 września oraz 11 publikacji OSW od 21 września.
+Porównano zapisane rewizje zdarzeń i 32 przejścia między wersjami materiałów.
+Uzupełnienie skrótu RSS pełnym tekstem nie jest automatycznie korektą wydawcy
+ani nowym incydentem. Lista przejrzanych wersji, dowody i dalsze zadania są
+w prywatnym `data/analysis/cycles/2026-09-30T091940Z-3171f42e/history-gap-audit.json`.
+
+Nowy odczyt PAŻP zawiera identyczny multizbiór 541 wierszy; zmienił się tylko
+znacznik aktualizacji. RSO dodało jeden komunikat o zakończeniu ataku na
+Ukrainę, bez zmian pozostałych 42 rekordów. Dopisano trzy rewizje istniejących
+wpisów i jeden zapis komunikatu, zachowując wspólne pochodzenie RCB/RSO.
+Komunikatu nie potraktowano jako dowodu nowego ataku. Baza zawiera teraz
+35 zdarzeń i 47 rewizji, także kontekstowych; nie są to liczniki zagrożeń.
+
+**RTB pozostaje niewyliczony.** Dwa wstrzymane materiały to zbiorcze wzmianki
+OSW o incydentach na Łotwie oraz komunikat VDD o pojedynczych próbach
+dezinformacji. Brakuje identyfikacji i dat poszczególnych zdarzeń.
+Przejrzane dokumenty łotewskie opisują konkretne starsze sprawy, ale nie
+poświadczają kompletności tych wzmianek. Nie utworzono `history-review.json`
+ani komentarza zapewniającego o bezpieczeństwie. Dalsza praca dotyczy
+konkretnych komunikatów i sprostowań, a nie ponownego odczytu tego samego RSS.
+
+X: dwa żądania, cztery nowe wpisy poza zakresem regionalnym, bez nowych
+kandydatów. Szacowany koszt odczytu **0,020 USD**, łącznie **0,075 USD**
+w lokalnym rejestrze; kwoty wymagają porównania z rozliczeniem dostawcy.
+
+Publikacja ma `verified_readback=true`. Supabase, lokalne API i pobierany
+JSON są identyczne, a przeglądarka pokazuje datę **30.09.2026, 11:33**.
+Replay z osobnej kopii 131 plików kodu, obejmującej parser RSS, dał identyczny
+wynik przy zablokowanej sieci. Baza, klucze obce i kopia sprzed cyklu przeszły
+kontrolę integralności. Dowód:
+`data/analysis/cycles/2026-09-30T091940Z-3171f42e/verification.json`.
+Harmonogram pozostaje wyłączony; nie zmieniano hostingu, domeny ani UI.
+
+Ikonę strony wyeksportowano do `artifacts/branding/`: PNG 1024 × 1024
+na białym i przezroczystym tle, z marginesem do okrągłego kadrowania na X.
+Zachowano kształt znaku Lucide Radar, kolor z `theme.css` oraz licencję.
+
 ## API X — 30.09.2026, 09:19
 
 Podłączono token aplikacji i bezpośrednie pobieranie OSINT Defender / OSINT
