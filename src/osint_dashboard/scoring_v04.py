@@ -24,6 +24,10 @@ def confidence(inputs, quality_issues):
             elif c['status'] in ('ok', 'partial'):
                 share = rule['partial_source_factor']
         availability[sid] = share
+        if source['adapter'] == 'gnss_review_import' and share:
+            from .gnss_bridge import reviewed_current_day
+            if not reviewed_current_day(inputs, sid):
+                availability[sid] = 0.0
     domains = []
     for domain in rule['domains']:
         # More copies of a source never improve coverage of a mission domain.

@@ -1,5 +1,52 @@
 # Stan realizacji — 30.09.2026
 
+## Zachodnia Ukraina i zweryfikowane pomiary GNSS — 30.09.2026, 15:11
+
+`sources-pilot-8` dodaje publiczne kanały administracji obwodów wołyńskiego,
+lwowskiego i rówieńskiego, z tożsamością potwierdzoną w serwisach instytucji.
+Pobrano odpowiednio 20, 11 i 20 tekstów w czterech żądaniach. Odczyt jest
+ograniczony, a przekazania zachowują pierwotnego autora i URL. Alarm,
+odwołanie alarmu i potwierdzone trafienie są rozpatrywane osobno.
+
+Lokalny komunikat Wołynia potwierdził odrzutowy dron Shahed i uszkodzenie
+punktu kontrolnego przy Jagodzinie 28 września. Uzupełniono istniejący wpis
+OSW, bez drugiego incydentu i bez automatycznego potwierdzania sprawcy.
+Przekazany przez administrację rówieńską komunikat prezydenta Ukrainy
+potwierdził rosyjski nalot i uderzenia w infrastrukturę Rówieńszczyzny.
+Uzupełnia on jeden istniejący epizod nocy 29/30 września. Liczba 188 dronów
+dotyczy całego nalotu na Ukrainę, nie tego obwodu. Późniejsze doniesienie
+lokalne pozostaje do dopasowania, aby nie podwoić liczby zdarzeń.
+
+GPSJAM odświeżono raz: siedem nowych dób, łącznie **30/30 od 31.08 do 29.09**.
+Główny cykl importuje zamrożoną obserwację bez kolejnego pobrania, odtwarza
+liczby z CSV i kontroluje pochodzenie. Dla 29.09: 111 z 550 kwalifikujących
+się komórek ma podwyższony udział niskiej dokładności; na wspólnej siatce
+490 komórek jest to 15,71%, wobec mediany 16,53% z poprzednich 29 dób.
+To porównanie opisowe, bez kalibrowanego progu, sprawcy ani dowodu ciągłości
+zakłóceń. Zaakceptowany pomiar daje **50% pokrycia domeny GNSS i 0 punktów
+RTB**. Samo pobranie, odroczenie oceny lub nieaktualna doba nie poprawiają
+pewności. [Kontrakt i obsługa](gnss-review-integration.md).
+
+Cykl `2026-09-30T125639Z-e3352267`: 100 materiałów do przeglądu, 93
+rozstrzygnięte i siedem pozostawionych do wyjaśnienia. **RTB 3/100,
+pewność 25%, bez blokad indeksu**. Trzy punkty pochodzą z jednego epizodu
+na zachodniej Ukrainie; GNSS, plan PAŻP i serie alarmów nie dodają punktów.
+Publikacja zawiera 63 zdarzenia i obserwacje kontekstowe, nie 63 zagrożenia.
+Nie poświadczono pełnej historii. Zmiana konfiguracji pokrycia rozdziela
+serie porównawcze; nie pokazujemy jej jako trendu zagrożenia.
+
+Raport `rpt_cf911e27f78cbd90dff98f808a4ca39a68005e4504220d355f22a2ec02b4f917`
+zapisano w Supabase z `verified_readback=true`. Lokalny odczyt i pobierany
+JSON są identyczne z eksportem. Przeglądarka pokazuje datę 15:11, wynik,
+pewność oraz polski komentarz; pełne siatki pomiarowe pozostają prywatne.
+Replay ze 142 zamrożonych plików daje identyczny wynik bez żądań sieciowych.
+Baza i klucze obce są poprawne. Dowód:
+`data/analysis/cycles/2026-09-30T125639Z-e3352267/verification.json`.
+
+**351 testów Python przeszło.** Nie wykonano płatnego żądania X, nie zmieniono
+limitów kosztów, UI ani wag punktacji. Harmonogram, hosting produkcyjnego
+dashboardu i domena pozostają niewłączone.
+
 ## Źródła pierwotne i cykl v0.4 — 30.09.2026, 13:58
 
 Włączono `sources-pilot-7`: bezpośrednie biuletyny CERT/NASK i Podlaskiej

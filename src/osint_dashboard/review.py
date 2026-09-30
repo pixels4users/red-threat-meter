@@ -38,6 +38,12 @@ def validate_evidence(incident: dict, materials: dict[str, dict]) -> None:
             raise ValueError("Evidence references a material outside reviewed candidates")
         if material.get("source_kind") not in ("primary", "secondary", "analysis"):
             raise ValueError("Doctrinal or reference material cannot serve as incident evidence")
+        if 'measurement' in evidence:
+            from .gnss_bridge import validate_numeric_evidence
+            validate_numeric_evidence(evidence, material, incident)
+            continue
+        if material.get('text_kind') == 'measurement':
+            raise ValueError('Measurements require numeric evidence, not generated quotes')
         haystack = clean_text(material["title"] + " " + material["text"])
         if clean_text(evidence["quote"]) not in haystack:
             raise ValueError(f"Evidence quote is not present in saved source: {evidence['id']}")

@@ -84,7 +84,8 @@
             "curated_documents",
             "x_api_import",
             "telegram_public",
-            "public_bulletins"
+            "public_bulletins",
+            "gnss_review_import"
           ]
         },
         "url": {
@@ -245,7 +246,21 @@
           "const": "https://moje.cert.pl/advisories/feed/"
         },
         "summary_query": {
-          "const": "ЗБИТО"
+          "enum": [
+            "ЗБИТО",
+            "Ягодин"
+          ]
+        },
+        "channel": {
+          "enum": [
+            "volynskaODA",
+            "kozytskyy_maksym_official",
+            "ODA_RV"
+          ]
+        },
+        "identity_url": {
+          "type": "string",
+          "format": "uri"
         }
       },
       "allOf": [
@@ -352,12 +367,6 @@
           },
           "then": {
             "properties": {
-              "id": {
-                "const": "ua_air_force_public"
-              },
-              "url": {
-                "const": "https://t.me/s/kpszsu"
-              },
               "max_requests": {
                 "type": "integer",
                 "minimum": 1,
@@ -377,7 +386,84 @@
               "required": {
                 "const": false
               }
-            }
+            },
+            "oneOf": [
+              {
+                "properties": {
+                  "id": {
+                    "const": "ua_air_force_public"
+                  },
+                  "url": {
+                    "const": "https://t.me/s/kpszsu"
+                  }
+                },
+                "not": {
+                  "required": [
+                    "channel"
+                  ]
+                }
+              },
+              {
+                "required": [
+                  "channel",
+                  "identity_url"
+                ],
+                "properties": {
+                  "id": {
+                    "const": "ua_volyn_ova"
+                  },
+                  "url": {
+                    "const": "https://t.me/s/volynskaODA"
+                  },
+                  "channel": {
+                    "const": "volynskaODA"
+                  },
+                  "identity_url": {
+                    "const": "https://decentralization.gov.ua/news/14609"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "channel",
+                  "identity_url"
+                ],
+                "properties": {
+                  "id": {
+                    "const": "ua_lviv_ova"
+                  },
+                  "url": {
+                    "const": "https://t.me/s/kozytskyy_maksym_official"
+                  },
+                  "channel": {
+                    "const": "kozytskyy_maksym_official"
+                  },
+                  "identity_url": {
+                    "const": "https://loda.gov.ua/news/152667"
+                  }
+                }
+              },
+              {
+                "required": [
+                  "channel",
+                  "identity_url"
+                ],
+                "properties": {
+                  "id": {
+                    "const": "ua_rivne_ova"
+                  },
+                  "url": {
+                    "const": "https://t.me/s/ODA_RV"
+                  },
+                  "channel": {
+                    "const": "ODA_RV"
+                  },
+                  "identity_url": {
+                    "const": "https://www.rv.gov.ua/"
+                  }
+                }
+              }
+            ]
           }
         },
         {
@@ -408,6 +494,37 @@
               },
               "max_requests": {
                 "maximum": 35
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "adapter": {
+                "const": "gnss_review_import"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "id": {
+                "const": "gpsjam_reviewed"
+              },
+              "url": {
+                "const": "https://gpsjam.org/"
+              },
+              "kind": {
+                "const": "primary"
+              },
+              "required": {
+                "const": false
+              },
+              "fetch_articles": {
+                "const": false
+              },
+              "max_items": {
+                "const": 1
               }
             }
           }

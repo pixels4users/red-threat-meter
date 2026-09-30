@@ -406,10 +406,7 @@
           "mon": 0.25,
           "osw": 0.25,
           "x_osinttechnical": 0.25,
-          "x_sentdefender": 0.25,
-          "ua_volyn_ova": 0.5,
-          "ua_lviv_ova": 0.5,
-          "ua_rivne_ova": 0.5
+          "x_sentdefender": 0.25
         }
       },
       {
@@ -439,9 +436,7 @@
       {
         "id": "gnss",
         "label": "Zakłócenia nawigacji",
-        "sources": {
-          "gpsjam_reviewed": 1
-        }
+        "sources": {}
       },
       {
         "id": "military_logistics",

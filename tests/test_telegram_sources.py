@@ -70,3 +70,21 @@ def test_summary_failure_does_not_erase_recent_posts():
             return post().encode(),'text/html',url,self.raw_refs[0]
     r=collect_air_force(source,Fetch())
     assert len(r['items'])==1 and r['status']=='partial' and r['errors']
+
+
+def test_regional_identity_window_and_shared_forwarded_origin():
+    from osint_dashboard.common import instant
+    source=next(s for s in read_json(ROOT/'config/sources.json')['sources'] if s['id']=='ua_volyn_ova')
+    body=post('volynskaODA/123', extra='<div class="tgme_widget_message_forwarded_from"><a href="https://t.me/ODA_RV/100">Another authority</a></div>')
+    parsed=parse_air_force(body, channel='volynskaODA')[0]
+    assert parsed['source_record']['channel']=='volynskaODA'
+    assert parsed['source_record']['forwarded_from']=='Another authority'
+    assert parsed['source_record']['forwarded_url']=='https://t.me/ODA_RV/100'
+    with pytest.raises(ValueError):parse_air_force(body, channel='ODA_RV')
+    class Fetch:
+        raw_refs=['raw/synthetic'];request_count=0
+        def get(self,url):
+            self.request_count+=1
+            return body.encode(),'text/html',url,self.raw_refs[0]
+    r=collect_air_force(source, Fetch(), instant('2099-01-01T00:00:00Z'))
+    assert not r['items'] and not r['window_complete']

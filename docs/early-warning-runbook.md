@@ -4,6 +4,8 @@ Stan: 23.09.2026. Działa lokalny moduł z konfiguracją `early-warning-1`: dwa 
 
 Aktualizacja dokumentacji 25.09.2026: zaakceptowano kontrolę PAŻP/RCB/RSO przed odczytem dobowym i tygodniowym oraz procedurę łączenia dowodów jako część metodologii v0.3. Poniższe polecenia nadal obsługują istniejący pilotaż; nie pobierają nowych rodzin i nie wykonują mnożników RTB. Główny `analysis_cycle.py` od 29.09 pobiera PAŻP/AUP i RSO oraz wykonuje v0.3 po przeglądzie.
 
+Aktualizacja 30.09.2026: domyślny RTB używa v0.4. `gpsjam_reviewed` importuje zweryfikowany pomiar dobowy do głównego przeglądu, bez dodatkowego pobrania. Dopiero akceptacja daje wpis kontekstowy i częściowe pokrycie confidence; sam pomiar nie nalicza punktów. [Instrukcja integracji](gnss-review-integration.md).
+
 ## Uruchomienie
 
 Na tym Macu uruchom **`Zbierz sygnały wczesne.command`**. Przy pierwszym przebiegu zbiera 30 dni GNSS, później odświeża trzy ostatnie dni; w obu przypadkach czyta aktualny RSS belzhd. Otwiera raport w domyślnej aplikacji macOS. Dwukliku w Finderze nie testowano; sprawdzono polecenia i składnię skryptu.

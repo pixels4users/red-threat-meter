@@ -104,6 +104,14 @@ Zero oznacza brak **naliczonych** sygnałów, nie brak realnych zagrożeń. Przy
 
 Od rewizji konfiguracji z 30.09.2026 (sources-pilot-7) publiczne biuletyny Podlaskiej SG dają najwyżej udział 0,5 w domenie granicznej: dotyczą części granicy i komunikatów, nie pełnej statystyki dobowej. CERT/NASK jest odczytywany bezpośrednio z moje.cert.pl. Sam komunikat o podatności nie potwierdza cyberataku RU/BY. Wagi zdarzeń pozostają bez zmian; poprzednią konfigurację v0.4 zachowano w config/archive/scoring-v0.4-initial.json. Nowy hash konfiguracji uniemożliwia łączenie obu wariantów w trend.
 
+Rewizja sources-pilot-8 dodaje regionalne administracje Wołynia, Lwowa i Równego
+(limit źródła 0,5, częściowe pobranie 0,5; domena nadal używa maksimum, nie sumy)
+oraz `gpsjam_reviewed`. GNSS daje udział dopiero po zaakceptowaniu bieżącego
+pomiaru w głównym cyklu; limit 1 × częściowy zasięg 0,5. Pomiar jest kontekstem,
+nie punktowanym atakiem. Nie dodajemy domniemanej atrybucji, ciągłości ani bonusu
+korelacji. Poprzedni wariant zachowuje `config/archive/scoring-v0.4-source-coverage.json`.
+Szczegóły dowodów liczbowych i świeżości: [integracja GNSS](gnss-review-integration.md).
+
 ## Historia, wersje i porównania
 
 Materiały, oceny i wydania dopisujemy. Aktualizacja publikacji wymaga oceny nowej wersji; korekta incydentu tworzy rewizję. Raportów historycznych nie przepisujemy. SQLite blokuje aktualizacje/usunięcia tabel audytu; pliki mają manifesty hashy. Kopie pozostają potrzebne, ponieważ administrator dysku może zmienić pliki.

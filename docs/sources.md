@@ -2,12 +2,14 @@
 
 ### Biuletyny pierwotne i podsumowania ukraińskie — 30.09.2026
 
-Aktualny rejestr wykonawczy: `sources-pilot-7` w `config/sources.json`.
+Aktualny rejestr wykonawczy: `sources-pilot-8` w `config/sources.json`.
 
 - **RCB/MON:** maksymalnie 40 żądań na źródło, z jedną próbą ponowienia przejściowego zerwania połączenia lub niepełnego transferu. HTTP 403 nie jest obchodzony, a 429/Retry-After zatrzymuje żądania. Pełna treść i lista odkrycia mają odrębne odnośniki do surowych odpowiedzi.
 - **CERT/NASK:** [publiczne komunikaty](https://moje.cert.pl/komunikaty/) i [RSS wskazany przez wydawcę](https://moje.cert.pl/advisories/feed/). Dwie strony archiwum, 20 pełnych tekstów z aktualizacjami, do 25 żądań. Główna strona cert.pl/posts nadal odpowiadała 403; osobny publiczny serwis nie wymaga logowania. Podatności i oszustwa nie oznaczają automatycznie cyberataku na państwo ani rosyjskiej atrybucji.
 - **Podlaska SG:** [archiwum aktualności](https://podlaski.strazgraniczna.pl/pod/aktualnosci), do 3 kolejnych stron, 27 artykułów i 32 żądań. Nagłówek, wstęp i właściwa treść; galerie i elementy strony są pomijane. To ograniczony strumień regionalny, bez pełnej serii dziennej. Udział w domenie granicznej ma limit 0,5; porównanie presji nadal wymaga zgodnej miary, okresów i obszaru.
 - **Siły Powietrzne Ukrainy:** do 2 stron ostatnich wpisów i 1 strony publicznego wyszukiwania `ЗБИТО` w [oficjalnym kanale](https://t.me/s/kpszsu), łącznie do 60 unikalnych tekstowych wpisów i 3 żądań. Podsumowania dostarczają dat i parametrów konkretnych ataków; filtr nie gwarantuje historii wszystkich zdarzeń. Wszystkie wpisy mają wspólne pierwotne pochodzenie. Stan źródła pozostaje partial.
+- **Administracje zachodniej Ukrainy:** [Wołyń](https://t.me/s/volynskaODA), [Lwów](https://t.me/s/kozytskyy_maksym_official), [Równe](https://t.me/s/ODA_RV). Wołyń: jedna strona ostatnich wpisów i jedna wyszukiwania `Ягодин`, do 40 tekstowych postów / 2 żądań; pozostałe: po jednej stronie / 20 postów / 1 żądaniu. Publikacje starsze niż okno przeglądu są pomijane; stan zawsze partial. Kanały wskazują odpowiednio [rządowy wykaz](https://decentralization.gov.ua/news/14609), [witryna Lwowskiej OWA](https://loda.gov.ua/news/152667) i [witryna Rówieńskiej OWA](https://www.rv.gov.ua/). Przekazany post zachowuje autora pierwotnego. Alarm i jego odwołanie nie dowodzą trafienia; miejsce siedziby wydawcy nie określa miejsca opisanego zdarzenia.
+- **GPSJAM — import do przeglądu:** istniejący kolektor manifest/CSV, bez drugiego pobrania przez RTB. Weryfikacja liczb, surowych plików, oczekiwanej doby i porównania wspólnych komórek. Dopiero zaakceptowany przegląd daje kontekst w raporcie i częściowe pokrycie domeny GNSS; sam pomiar nie daje punktów ani atrybucji. [Kontrakt i obsługa](gnss-review-integration.md).
 
 Adapter `public_bulletins` sprawdza ciągłość paginacji i kolejność dat. Data dzienna jest zapisana jako `source_record.published_on`; `published_at=null` zamiast wymyślonej godziny. CERT może uzupełnić ją rzeczywistym znacznikiem RSS, gdy obie daty się zgadzają. Czas publikacji nadal nie zastępuje czasu wystąpienia. Stan ok/window_complete dotyczy tylko sprawdzonego archiwum publikacji, nie kompletności zjawisk.
 
@@ -38,7 +40,7 @@ Nie odkrywa nowych wiadomości i nie poświadcza
 kompletności historii wydawcy. Listy URL są jawne w konfiguracji; wspólne
 pochodzenie komunikatów wymaga deduplikacji w przeglądzie.
 
-Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (obecnie sources-pilot-7; od 30.09 także archiwum OSW, odczyty X i dokumenty łotewskie). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
+Źródła procesu RTB sprawdzono przez rzeczywiste pobrania 22.09.2026. Ich rejestr wykonywalny: `config/sources.json` (obecnie sources-pilot-8; od 30.09 także archiwum OSW, odczyty X i dokumenty łotewskie). Tabela zachowuje wynik pierwszego pilotażu. Osobny pilotaż GPSJAM i RSS belzhd uruchomiono 23.09.2026 według `config/early-warning.json`, a regionalny kolektor ADSB.lol — 24.09 według `config/aviation.json`. Ograniczony audyt historii z tego samego dnia ma osobną konfigurację `config/aviation-history.json`. Każdy przebieg zachowuje własny wynik dostępu, datę i błędy; opis poniżej nie gwarantuje przyszłej dostępności.
 
 | Źródło | Dostęp i zakres | Rola | Wynik pilotażu |
 |---|---|---|---|
@@ -229,4 +231,4 @@ nie otwiera bramki 216 godzin historii. Ich awaria jest raportowana.
 
 ## Aktualizacja 30.09.2026 — bezpośredni kanał ukraiński
 
-`ua_air_force_public` jest podłączony w `config/sources.json`: [publiczny podgląd oficjalnego kanału](https://t.me/s/kpszsu). Jedno żądanie na cykl, maksymalnie 20 ostatnich tekstowych wpisów; bez mediów, logowania, pełnej historii i surowej telemetrii. Zawsze status partial, także przy udanym pobraniu. Oryginalny tekst, tożsamość postu, data publikacji, przekazania i odnośniki do wcześniejszych komunikatów trafiają do przeglądu. Analityk łączy jeden epizod i tworzy polski opis; data publikacji nie zastępuje czasu zdarzenia. Dane nie pochodzą od agregatora Strażnik.
+`ua_air_force_public` jest podłączony w `config/sources.json`: [publiczny podgląd oficjalnego kanału](https://t.me/s/kpszsu). Do 3 żądań na cykl (2 strony ostatnich wpisów i 1 strona wyszukiwania ЗБИТО), maksymalnie 60 tekstowych wpisów; bez mediów, logowania, pełnej historii i surowej telemetrii. Zawsze status partial, także przy udanym pobraniu. Oryginalny tekst, tożsamość postu, data publikacji, przekazania i odnośniki do wcześniejszych komunikatów trafiają do przeglądu. Analityk łączy jeden epizod i tworzy polski opis; data publikacji nie zastępuje czasu zdarzenia. Dane nie pochodzą od agregatora Strażnik.

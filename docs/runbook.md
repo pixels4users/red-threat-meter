@@ -12,6 +12,13 @@ Ten dokument dotyczy procesu RTB. Działająca osobno warstwa GNSS/logistyki uż
 
 ## Zwykły przebieg
 
+Przed przygotowaniem raportu odśwież GPSJAM przez
+`.venv/bin/python scripts/early_warning.py collect`. Główny proces importuje
+oczekiwaną dobę do przeglądu liczbowego według [kontraktu GNSS](gnss-review-integration.md).
+Pomiar nie daje sam punktów. Regionalne źródła Wołynia, Lwowa i Równego pobiera
+prepare. Przed nowym wpisem porównaj go z istniejącymi zdarzeniami OSW i ZSU;
+alarmy, odwołania oraz aktualizacje jednego trafienia nie są osobnymi atakami.
+
 Przy pełnym cyklu Codexa najpierw wykonaj [odczyt kont X](x-sources.md):
 `.venv/bin/python scripts/collect_x.py collect`. Pobranie API ma limity kosztów
 i częstości; `status` sprawdza lokalny licznik bez sieci. Nie resetuj limitów

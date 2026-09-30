@@ -4,6 +4,11 @@ Stan 23.09.2026; implementacja `src/osint_dashboard/early_warning/comparison.py`
 
 ## Co mierzymy
 
+Od 30.09.2026 [import do głównego przeglądu](gnss-review-integration.md) pozwala
+pokazać zaakceptowany pomiar w raporcie RTB i uwzględnić go w pokryciu danych.
+Sam wynik porównania nadal nie nalicza punktów, nie potwierdza atrybucji i nie
+uruchamia korelacji taktycznej.
+
 Miara to **udział komórek, w których wartość według wzoru GPSJAM osiąga co najmniej 10%**. Mianownik stanowi wspólny zestaw komórek H3, a nie liczba samolotów, powierzchnia państwa ani wszystkie komórki widoczne danego dnia. Wzór źródła i sposób interpretacji dokładności nawigacji opisuje [instrukcja pilotażu](early-warning-runbook.md), na podstawie [FAQ GPSJAM](https://gpsjam.org/faq).
 
 Porównujemy ostatnią zakończoną dobę UTC z wcześniejszą dostępną historią w oknie konfiguracji (obecnie 30 dni). Oczekiwany dzień musi być dostępny, znany przed granicą czasu raportu i pozbawiony flagi `suspect`. Starszego pomiaru nie przedstawiamy jako bieżącego.

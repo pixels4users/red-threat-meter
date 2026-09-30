@@ -6,7 +6,7 @@ decision_id. accept jest dopuszczalne tylko, jeśli wszystkie kontrole są true.
 Przy brakach, niejasności lub sprzeczności zastosuj hold z polskim uzasadnieniem.
 
 Kontrole:
-- quotes_support_claims: cytaty rzeczywiście uzasadniają każde ustalenie;
+- quotes_support_claims: cytaty lub typowane dowody liczbowe rzeczywiście uzasadniają każde ustalenie;
   obecność fragmentu nie wystarcza. Sprawdź całą treść, nie tylko wybrane cytaty.
 - independent_origins: przedruki i wspólny komunikat nie dają niezależnego
   potwierdzenia; źródło pierwotne i jego rola są wskazane prawidłowo.

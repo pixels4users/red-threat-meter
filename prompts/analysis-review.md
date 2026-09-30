@@ -58,3 +58,10 @@ Zniknięcie rekordu nie jest odwołaniem. GNSS w rozdzielczości dobowej
 nie zasila triady; lista dopuszczonych detektorów jest obecnie pusta.
 
 W v0.4 decyzja defer nie blokuje RTB; nie wymuszaj kwalifikacji ani wykluczenia dla podniesienia pewności. Komunikaty kpszsu łącz według epizodu, zachowuj przekazania i daty publikacji osobno. Kategoria `cross_border_air_pressure` wymaga dowodów rosyjskiego ataku na obwód lwowski, wołyński lub rówieński; sama obecność drona bez ustalonego operatora nie spełnia atrybucji. Potwierdzony przedział czasu może dać konserwatywny wkład; kod zachowuje jego granice.
+
+Pomiar `text_kind=measurement` wymaga dowodów `measurement` zamiast `quote`.
+Odczytaj observation i comparison, sprawdź dobę UTC, próbę, siatkę i dostawców.
+Kategoria context, country=null, attribution.actor=unknown, criteria=[]; bez
+assessment i official_warning. Geometry=null; bbox nie wyznacza państwa ani
+punktu. Data obserwacji może pochodzić z pola day. Traktuj 15% komórek jako
+udzial komórek z określoną wartością GPSJAM, nie 15% lotów ani ryzyko wojny.

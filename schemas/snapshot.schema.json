@@ -527,6 +527,55 @@
                 "origin_reason": {
                   "type": "string",
                   "minLength": 10
+                },
+                "measurement": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "observation_id",
+                    "field",
+                    "value"
+                  ],
+                  "properties": {
+                    "observation_id": {
+                      "type": "string",
+                      "pattern": "^ewo_[a-f0-9]{24}$"
+                    },
+                    "field": {
+                      "enum": [
+                        "day",
+                        "reported_cells",
+                        "eligible_cells",
+                        "high_cells",
+                        "high_cell_share_pct",
+                        "bbox",
+                        "common_cells",
+                        "current_pct",
+                        "reference_median_pct",
+                        "difference_pp",
+                        "reference_days"
+                      ]
+                    },
+                    "value": {
+                      "oneOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          },
+                          "minItems": 4,
+                          "maxItems": 4
+                        }
+                      ]
+                    }
+                  }
                 }
               },
               "required": [
@@ -534,11 +583,42 @@
                 "material_id",
                 "claim",
                 "stance",
-                "quote",
                 "origin_id",
                 "origin_reason"
               ],
-              "additionalProperties": false
+              "additionalProperties": false,
+              "oneOf": [
+                {
+                  "required": [
+                    "quote"
+                  ],
+                  "not": {
+                    "required": [
+                      "measurement"
+                    ]
+                  }
+                },
+                {
+                  "required": [
+                    "measurement"
+                  ],
+                  "not": {
+                    "required": [
+                      "quote"
+                    ]
+                  },
+                  "properties": {
+                    "claim": {
+                      "enum": [
+                        "occurrence",
+                        "timing",
+                        "location",
+                        "context"
+                      ]
+                    }
+                  }
+                }
+              ]
             },
             "minItems": 1
           },

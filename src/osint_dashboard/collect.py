@@ -159,13 +159,16 @@ def parse_article(body: bytes) -> str:
 
 
 def collect_source(source: dict, data_dir: Path, window_start: datetime, fetcher=None, *, backlog=(), known_full_urls=()) -> dict:
+    if source['adapter'] == 'gnss_review_import':
+        from .gnss_bridge import collect_verified_input
+        return collect_verified_input(source, data_dir)
     if source['adapter'] in ('x_browser_import', 'x_api_import'):
         from .x_sources import collect_captures
         return collect_captures(source, data_dir)
     fetcher = fetcher or Fetcher(data_dir, source)
     if source['adapter'] == 'telegram_public':
         from .telegram_sources import collect_air_force
-        return collect_air_force(source, fetcher)
+        return collect_air_force(source, fetcher, window_start)
     if source['adapter'] == 'public_bulletins':
         from .bulletin_sources import collect_bulletins
         return collect_bulletins(source, window_start, fetcher)

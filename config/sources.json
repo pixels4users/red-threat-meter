@@ -1,5 +1,5 @@
 {
-  "version": "sources-pilot-7",
+  "version": "sources-pilot-8",
   "description": "Aktywne kolektory bieżących publikacji o bezpieczeństwie Polski i wschodniej flanki NATO. Kontekst doktrynalny jest w doctrine-sources.json, kandydaci do rozbudowy w source-candidates.json.",
   "policy": "Jedyną listą automatycznie pobieranych źródeł są poniższe wpisy enabled=true. Strony referencyjne i doktryna nie stają się incydentami. Pierwotne pochodzenie należy ustalić dla konkretnego twierdzenia, nie tylko wydawcy.",
   "sources": [
@@ -650,6 +650,93 @@
       "fetch_articles": true,
       "bulletin_parser": "sg_podlaski",
       "notes": "Publiczne komunikaty regionalnego oddziału SG: pełne teksty z maksymalnie 3 stron. Nie stanowią pełnej serii dobowej ani pełnego pokrycia granicy PL–BY. Doniesienia o migracji poza granicą z Białorusią nie dowodzą presji białoruskiej; baseline wymaga odrębnego przeglądu."
+    },
+    {
+      "id": "ua_volyn_ova",
+      "publisher": "Wołyń — administracja obwodowa",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "telegram_public",
+      "url": "https://t.me/s/volynskaODA",
+      "allowed_hosts": [
+        "t.me"
+      ],
+      "path_prefix": "/s/volynskaODA",
+      "additional_path_prefixes": [
+        "/volynskaODA/"
+      ],
+      "max_pages": 2,
+      "max_items": 40,
+      "max_requests": 2,
+      "fetch_articles": false,
+      "notes": "Do 2 stron najnowszych tekstowych wpisów i 1 strony wyszukiwarki wydawcy dla ЗБИТО (podsumowania przechwyceń); do 60 unikalnych wpisów i 3 żądań łącznie. Jedno pochodzenie, niepełna historia, media nie są odczytywane. Czas publikacji nie zastępuje czasu zdarzenia; datowane podsumowania dostarczają oddzielnego dowodu.",
+      "channel": "volynskaODA",
+      "identity_url": "https://decentralization.gov.ua/news/14609",
+      "summary_query": "Ягодин"
+    },
+    {
+      "id": "ua_lviv_ova",
+      "publisher": "Lwów — administracja obwodowa",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "telegram_public",
+      "url": "https://t.me/s/kozytskyy_maksym_official",
+      "allowed_hosts": [
+        "t.me"
+      ],
+      "path_prefix": "/s/kozytskyy_maksym_official",
+      "additional_path_prefixes": [
+        "/kozytskyy_maksym_official/"
+      ],
+      "max_pages": 1,
+      "max_items": 20,
+      "max_requests": 1,
+      "fetch_articles": false,
+      "notes": "Do 2 stron najnowszych tekstowych wpisów i 1 strony wyszukiwarki wydawcy dla ЗБИТО (podsumowania przechwyceń); do 60 unikalnych wpisów i 3 żądań łącznie. Jedno pochodzenie, niepełna historia, media nie są odczytywane. Czas publikacji nie zastępuje czasu zdarzenia; datowane podsumowania dostarczają oddzielnego dowodu.",
+      "channel": "kozytskyy_maksym_official",
+      "identity_url": "https://loda.gov.ua/news/152667"
+    },
+    {
+      "id": "ua_rivne_ova",
+      "publisher": "Równe — administracja obwodowa",
+      "kind": "primary",
+      "enabled": true,
+      "required": false,
+      "adapter": "telegram_public",
+      "url": "https://t.me/s/ODA_RV",
+      "allowed_hosts": [
+        "t.me"
+      ],
+      "path_prefix": "/s/ODA_RV",
+      "additional_path_prefixes": [
+        "/ODA_RV/"
+      ],
+      "max_pages": 1,
+      "max_items": 20,
+      "max_requests": 1,
+      "fetch_articles": false,
+      "notes": "Do 2 stron najnowszych tekstowych wpisów i 1 strony wyszukiwarki wydawcy dla ЗБИТО (podsumowania przechwyceń); do 60 unikalnych wpisów i 3 żądań łącznie. Jedno pochodzenie, niepełna historia, media nie są odczytywane. Czas publikacji nie zastępuje czasu zdarzenia; datowane podsumowania dostarczają oddzielnego dowodu.",
+      "channel": "ODA_RV",
+      "identity_url": "https://www.rv.gov.ua/"
+    },
+    {
+      "id": "gpsjam_reviewed",
+      "publisher": "GPSJAM — pomiary nawigacji",
+      "kind": "primary",
+      "adapter": "gnss_review_import",
+      "url": "https://gpsjam.org/",
+      "allowed_hosts": [
+        "gpsjam.org"
+      ],
+      "path_prefix": "/",
+      "enabled": true,
+      "required": false,
+      "fetch_articles": false,
+      "max_pages": 1,
+      "max_items": 1,
+      "max_requests": 1
     }
   ]
 }

@@ -4,6 +4,8 @@ Aktualizacja: 25.09.2026. Status: **dotychczasowy plan zaakceptowany; kontrakt o
 
 Kolejna dostawa z 23.09 dodaje polskie tytuły i streszczenia, [porównanie GNSS na wspólnej siatce](gnss-reference-methodology.md) oraz [ocenę dostępu lotniczego](aviation-access.md). Mediana historii nie jest ustalonym poziomem normalnej aktywności. Przegląd agentowy obejmuje już wszystkie 10 pobranych publikacji; niezależne potwierdzenie twierdzeń pozostaje odrębne.
 
+Aktualizacja 30.09.2026: główny cykl v0.4 pobiera regionalne komunikaty Wołynia, Lwowa i Równego oraz importuje pomiary GPSJAM do przeglądu liczbowego. GNSS pozostaje kontekstem bez punktów i bez bonusu minutowego; zaakceptowany pomiar poprawia wyłącznie pokrycie danych w confidence. [Kontrakt](gnss-review-integration.md).
+
 ## Decyzja projektowa
 
 Rozbudować system o osobną warstwę sygnałów wczesnych. Obecny RTB celowo wymaga mocnego potwierdzenia i przypisania RU/BY; dlatego sam nie wystarcza do wczesnego ostrzegania. Brak takiej atrybucji nie może ukrywać anomalii przed analitykiem. Warstwa wczesna powinna przyjąć sygnał o nieznanym sprawcy i kierować go do sprawdzenia, zachowując jego niepewność.
@@ -11,7 +13,7 @@ Rozbudować system o osobną warstwę sygnałów wczesnych. Obecny RTB celowo wy
 | Wynik dla użytkownika | Co opisuje | Warunek |
 |---|---|---|
 | Sygnały wczesne | Zaobserwowane odchylenia i doniesienia wymagające uwagi | Jawne źródło, czas dostępności, jakość i uzasadnienie; atrybucja może być nieznana |
-| RTB | Potwierdzone, kwalifikujące się działania i przygotowania | Domyślny silnik v0.3; wcześniejsze odczyty zachowują v0.2 |
+| RTB | Potwierdzone, kwalifikujące się działania i przygotowania | Domyślny silnik v0.4; wcześniejsze odczyty zachowują v0.2/v0.3 |
 | Jakość pokrycia | Co rzeczywiście obserwujemy i gdzie brakuje danych | Aktualność, liczebność próby, kompletność i zależności źródeł |
 
 Na początek sygnały wczesne otrzymują statusy: „nowe doniesienie”, „anomalia do sprawdzenia”, „pilny przegląd”, „wyjaśnione” albo „brak podstaw do oceny”. Nie dodajemy drugiej nieskalibrowanej liczby 0–100. „Pilny przegląd” jest priorytetem analitycznym, nie prognozą ataku. Sam raport o dużej możliwej wadze może trafić do pilnego przeglądu mimo pojedynczego źródła; etykieta nie zmienia się wtedy na „potwierdzone”.
