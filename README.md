@@ -1,6 +1,6 @@
 # OSINT Threat Dashboard
 
-Lokalny pilotaż OSINT / Indicators & Warnings dla Polski i wschodniej flanki NATO. Gotowy jest proces danych: pobranie → archiwum → kolejka przeglądu → SQLite → raport i JSON/GeoJSON. Frontend **B — Chronologia** czyta publikacje z Supabase przez lokalne API. Pełny cykl na rzeczywistych danych sprawdzono 27.09.2026; szczegóły opisuje [integracja Supabase](supabase/README.md). Zaakceptowana metodologia to **RTB v0.3**; silnik od 29.09.2026 wykonuje v0.3. Dodano bezpośrednie PAŻP/AUP i RSO/ogólne; [zakres i ograniczenia](docs/v0.3-implementation.md).
+Lokalny pilotaż OSINT / Indicators & Warnings dla Polski i wschodniej flanki NATO. Gotowy jest proces danych: pobranie → archiwum → kolejka przeglądu → SQLite → raport i JSON/GeoJSON. Frontend **B — Chronologia** czyta publikacje z Supabase przez lokalne API. Pełny cykl na rzeczywistych danych sprawdzono ponownie 01.10.2026; szczegóły opisują [stan realizacji](docs/STATUS.md) i [integracja Supabase](supabase/README.md). Silnik od 30.09 wykonuje **RTB v0.4**: wynik 0–100 i osobna pewność danych, zgodnie z decyzją użytkownika. Zachowuje wygaszanie i reguły v0.3; [kontrakt v0.4](docs/v0.4-implementation.md).
 
 Działa również **osobny pilotaż sygnałów wczesnych**: dzienne pomiary GPSJAM i publikacje logistyczne belzhd. Pierwsze pobranie obejmuje 30 dni GNSS i 10 publikacji. Warstwa zachowuje obserwacje bez ustalonego sprawcy, pokazuje jakość danych i umożliwia przegląd. Nie ma jeszcze skalibrowanego detektora anomalii.
 
@@ -16,18 +16,20 @@ Na tym Macu środowisko jest już przygotowane. Uruchom plik **`Zbierz dane.comm
 
 Dla pomiarów GNSS i logistyki uruchom **`Zbierz sygnały wczesne.command`**. Otwiera osobny raport obserwacyjny i nie zmienia odczytu RTB. Przy pierwszym uruchomieniu zbiera 30 dni GNSS, potem odświeża trzy ostatnie doby oraz RSS. [Instrukcja sygnałów wczesnych](docs/early-warning-runbook.md).
 
-Dla danych lotniczych uruchom **`Zbierz dane lotnicze.command`**. Pobiera jedną próbę (do czterech zapytań) i otwiera raport jakości po polsku. Procesy uruchamia się ręcznie; nie są usługami działającymi w tle. Kolektor lotniczy wymaga co najmniej minuty przerwy od zakończenia poprzedniej próby i respektuje blokadę po błędzie limitu API. Osobny audyt historii ma polecenia opisane poniżej.
+Dla danych lotniczych uruchom **`Zbierz dane lotnicze.command`**. Pobiera jedną próbę (do czterech zapytań) i otwiera raport jakości po polsku. Pilotaż lotniczy uruchamia się ręcznie; nie należy do harmonogramu RTB. Kolektor lotniczy wymaga co najmniej minuty przerwy od zakończenia poprzedniej próby i respektuje blokadę po błędzie limitu API. Osobny audyt historii ma polecenia opisane poniżej.
 
 Nowe lub zmienione publikacje otrzymują polski opis w przeglądzie agenta. Możesz zlecić: „Przygotuj brakujące polskie tytuły i streszczenia według translator.md, przejrzyj nowe sygnały i odśwież raport”. Sam kolektor nie wywołuje płatnego modelu: do czasu przeglądu pokazuje polski komunikat oczekiwania zamiast obcojęzycznego tytułu.
 
-Raport może pokazać **„Niewyliczony — dane lub przegląd niepełne”**. To prawidłowy stan, kiedy pojawiły się nieocenione wiadomości albo nie działa wymagane źródło. Samo pobranie tekstu nie potwierdza incydentu. RTB jest niewalidowanym indeksem; wynik ponad 60 oznacza potrzebę pilnego przeglądu, bez przypisywania mu prawdopodobieństwa wojny.
+Nowy raport v0.4 zawiera **wynik 0–100 i osobną pewność danych**. Nieocenione materiały, niepełna historia i niedostępność źródeł obniżają pewność, bez blokowania indeksu. Zero oznacza brak naliczonych wkładów, nie potwierdzenie bezpieczeństwa. Awaria procesu pozostawia poprzedni raport z jego datą; wcześniejsze wydania v0.2/v0.3 mogą zachować wynik niewyliczony. RTB jest niewalidowanym indeksem; wynik ponad 60 oznacza potrzebę pilnego przeglądu, bez przypisywania mu prawdopodobieństwa wojny.
 
 Nowe materiały przegląda Codex. Możesz zlecić: **„Wykonaj pełny dzienny cykl
 według agents/analysis-cycle.md, opublikuj wynik do Supabase i sprawdź odczyt”**.
 Gotowy proces obejmuje pobranie, ocenę, drugi przegląd dowodów, obliczenie RTB
 i komentarz oparty na ustaleniach. Oceny AI są oznaczone jako wykonane przez
-agenta. Nie potrzeba osobnego API modelu; harmonogram pozostaje niewłączony.
-[Obsługa silnika](docs/analysis-runbook.md).
+agenta. Nie potrzeba osobnego API modelu. Od 01.10 aktywny jest lokalny
+harmonogram Codexa: codziennie o **09:00 czasu Warszawy**. Pierwszy zaplanowany
+przebieg 02.10 pozostaje do sprawdzenia; Mac i Codex muszą być włączone.
+[Obsługa silnika](docs/analysis-runbook.md), [harmonogram](docs/automation-runbook.md).
 
 ## Polecenia
 
@@ -131,12 +133,13 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 
 ## Dokumentacja i dalszy zakres
 
-- [Dashboard — obsługa](docs/dashboard-runbook.md) — ręczny cykl, publikacja, historia, korekty, uruchomienie i testy.
+- [Dashboard — obsługa](docs/dashboard-runbook.md) — publikacja, historia, korekty, uruchomienie i testy.
 - [Silnik Codexa](docs/analysis-runbook.md) — pełny cykl analizy, dowody, komentarz i publikacja, bez osobnego API modelu.
+- [Codzienny harmonogram](docs/automation-runbook.md) — warunki pracy, limity, odzyskiwanie po awarii i kontrola pierwszego wykonania.
 - [Kontrakt dashboardu](docs/dashboard-data-contract.md) — dozwolone pola, daty, braki, wersje i granica eksportu.
 - [Design System](design.md) — zaakceptowany układ B, kolory, komponenty i zasady UI.
 - [GitHub i Supabase](supabase/README.md) — repozytorium, migracja, uprawnienia i rzeczywisty stan połączenia. Samo połączenie usług nie uruchamia kolektorów ani strony.
-- [Metodologia RTB v0.3](docs/methodology.md) — zaakceptowane reguły, dowody, ograniczenia i jawny stan wdrożenia; [reguły silnika v0.2](docs/archive/methodology-v0.2.md).
+- [Metodologia RTB](docs/methodology.md) — bieżące v0.4, zaakceptowane reguły, dowody, ograniczenia i jawny stan wdrożenia; [reguły silnika v0.2](docs/archive/methodology-v0.2.md).
 - [Biblioteka doktryny](docs/doctrine.md) — katalog materiałów, dwa dodane artykuły, lokalne wyszukiwanie i zasady interpretacji.
 - [Szablon briefu](docs/templates/analytical-brief.md) — scenariusze warunkowe na 14–42 dni, dowody i kontrargumenty.
 - [Źródła i pokrycie](docs/sources.md) — działające integracje i luki.
@@ -153,5 +156,7 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 Dwa kierunki UI zostały przedstawione; użytkownik zaakceptował B — Chronologia
 i wdrożenie przepływu danych. Zapis i odczyt rzeczywistego wydania przez Supabase
 oraz automatyczne odświeżenie ekranu zostały sprawdzone. Pozostało osobne
-wdrożenie hostingu aplikacji i późniejszy harmonogram. Silnik ma już ścieżkę
-przeglądu Codexa i zatwierdzania komentarza. Reguły v0.3 są wdrożone. Integracje osobnych pilotaży, uzupełnienie historii zdarzeń i kalibracja pozostają kolejnymi pracami.
+wdrożenie hostingu aplikacji i podłączenie domeny. Silnik ma ścieżkę przeglądu
+Codexa, zatwierdzania komentarza i aktywny harmonogram. Działa v0.4 oraz import
+zweryfikowanych pomiarów GNSS do kontekstu i pokrycia. Uzupełnienie historii
+zdarzeń i kalibracja pozostają dalszymi pracami.

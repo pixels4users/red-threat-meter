@@ -233,6 +233,60 @@ def test_cli_fixture_publication_and_idempotent_retry(prepared, tmp_path, capsys
     assert first["report_id"] == second["report_id"]
 
 
+@pytest.mark.parametrize("response_lost_after_commit", [False, True])
+def test_failed_publication_preserves_history_and_retries_frozen_report(
+    prepared, tmp_path, capsys, monkeypatch, response_lost_after_commit
+):
+    from datetime import timedelta
+    from osint_dashboard.common import instant
+    from osint_dashboard.dashboard.publication import PublicationError
+
+    data, cid = prepared
+    reviewed(prepared); cycle.calculate(data, cid)
+    receipt = cycle.finish(data, cid)
+    snapshot, config = load_snapshot(Path(receipt["snapshot_dir"]))
+    previous = copy.deepcopy(snapshot)
+    previous["as_of"] = (instant(snapshot["as_of"]) - timedelta(days=1)).isoformat()
+    previous["window"]["end"] = previous["as_of"]
+    previous["window"]["start"] = (
+        instant(snapshot["window"]["start"]) - timedelta(days=1)
+    ).isoformat()
+    old = build_report(previous, config)
+    path = tmp_path / "releases.sqlite"
+    repo = LocalPublications(path)
+    repo.publish(old)
+    args = ["publish", "--data-dir", str(data), "--cycle", cid, "--local-store", str(path)]
+    publish = LocalPublications.publish
+
+    def interrupted(self, report, **kwargs):
+        if response_lost_after_commit:
+            publish(self, report, **kwargs)
+        raise PublicationError("Simulated connection failure")
+
+    monkeypatch.setattr(LocalPublications, "publish", interrupted)
+    assert main(args) == 1
+    capsys.readouterr()
+    folder, _ = cycle.load_cycle(data, cid)
+    export = folder / "publication-daily.json"
+    frozen = export.read_bytes()
+    candidate = json.loads(frozen)
+    assert not (folder / "published-daily.json").exists()
+    assert repo.get(old["report_id"])["report"] == old
+    expected_latest = candidate if response_lost_after_commit else old
+    assert repo.latest()["report"] == expected_latest
+
+    monkeypatch.setattr(LocalPublications, "publish", publish)
+    assert main(args) == 0
+    recovered = json.loads(capsys.readouterr().out)
+    assert recovered["verified_readback"]
+    assert recovered["created"] is not response_lost_after_commit
+    assert recovered["report_id"] == candidate["report_id"]
+    assert export.read_bytes() == frozen
+    assert repo.latest()["report"] == candidate
+    with repo.connect() as db:
+        assert db.execute("SELECT COUNT(*) FROM reports").fetchone()[0] == 2
+
+
 def test_snapshot_preserves_v02_military_preparation_category(prepared):
     data, cid = prepared
     proposal = proposal_for(data, cid)

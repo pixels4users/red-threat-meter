@@ -1,6 +1,6 @@
 # Silnik analityczny — cykl Codexa
 
-Stan: 30.09.2026. Wykonawcą analizy jest **Codex w tym projekcie**. Nie potrzeba
+Stan: 01.10.2026. Wykonawcą analizy jest **Codex w tym projekcie**. Nie potrzeba
 osobnego klucza do API modelu. Python pobiera materiały, sprawdza kontrakty i
 dowody, liczy RTB, zamraża raport oraz publikuje go do Supabase. Codex podejmuje
 decyzje analityczne i pisze komentarz na podstawie zapisanych materiałów.
@@ -93,8 +93,11 @@ wersję potrzebną do odtworzenia wcześniejszych wydań.
 
 ## Harmonogram i strona WWW
 
-Harmonogram nie został jeszcze włączony. Lokalny wariant zadania potrzebuje
-włączonego Maca i działającej aplikacji Codex. Zadanie chmurowe ChatGPT nie
+Od 01.10 aktywny jest codzienny harmonogram o 09:00 czasu Warszawy:
+**RTB — codzienna analiza i raport**. [Obsługa i odzyskiwanie](automation-runbook.md).
+Pierwsze wykonanie zaplanowane na 02.10 pozostaje do sprawdzenia.
+Lokalny wariant zadania potrzebuje włączonego Maca i działającej aplikacji Codex.
+Zadanie chmurowe ChatGPT nie
 otrzymuje automatycznie dostępu do tego folderu, bazy SQLite ani lokalnych
 sekretów. Warunki opisuje [dokumentacja zadań](https://learn.chatgpt.com/docs/automations).
 

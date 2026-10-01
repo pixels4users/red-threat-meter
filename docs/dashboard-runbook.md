@@ -1,14 +1,17 @@
 # Dashboard — publikowanie i obsługa
 
-Stan: 30.09.2026. Interfejs **B — Chronologia**, kontrakt `dashboard-v1`.
+Stan: 01.10.2026. Interfejs **B — Chronologia**, kontrakt `dashboard-v1`.
 Stan chmurowej migracji i połączenia: `supabase/README.md`.
 
 ## Co uruchamia raport
 
-Analiza jest uruchamiana ręcznie. Przycisk „Odśwież” na stronie tylko pobiera
+Analizę można zlecić ręcznie; aktywny jest też lokalny harmonogram Codexa
+codziennie o 09:00 czasu Warszawy. [Warunki i kontrola](automation-runbook.md).
+Przycisk „Odśwież” na stronie tylko pobiera
 ostatnią publikację. Otwarta strona sprawdza nowy raport co 30 sekund; nie
 uruchamia kolektorów ani modelu. Publikacja danych nie wymaga przebudowy strony.
-Harmonogram zadań nie został dodany.
+Harmonogram nie wymaga otwartej strony. Pierwszy przebieg zaplanowany na
+02.10 wymaga potwierdzenia wykonania i publikacji.
 
 Pełną analizę zleca się Codexowi według `agents/analysis-cycle.md`.
 [Instrukcja silnika](analysis-runbook.md) opisuje oceny i przegląd komentarza.

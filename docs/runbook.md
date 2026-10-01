@@ -1,6 +1,10 @@
-# Ciągły RTB v0.4 — aktualizacja 30.09.2026
+# Ciągły RTB v0.4 — aktualizacja 01.10.2026
 
 Bieżące polecenia wykonują v0.4. Dane niepełne i decyzje defer obniżają pewność; nie wstrzymują liczby. Wynik 0 oznacza brak naliczonych sygnałów. Przed publikacją sprawdź osobno zakres danych, status oficjalnych ostrzeżeń i świeżość. Awaria procesu pozostawia ostatni poprawny raport. [Metodologia](methodology.md) i [wdrożenie](v0.4-implementation.md). Wzmianki o v0.3 poniżej opisują wprowadzenie wygaszania; jej tryb można wybrać jawnie do odtworzenia.
+
+Codzienny cykl Codexa ma aktywny harmonogram o 09:00 czasu Warszawy.
+[Instrukcja harmonogramu](automation-runbook.md) opisuje warunki lokalnego
+wykonania, limity X i odzyskiwanie po awarii. Hosting i domena nie są włączone.
 
 # Obsługa lokalnego procesu
 
@@ -92,7 +96,7 @@ Replay sprawdza również kod i instrukcje agentów. Dla wydań v0.1 użyj osobn
 
 Metodologia v0.3 i dobór nowych źródeł zostały zaakceptowane 25.09.2026. Dokładne reguły v0.2 zachowano w `docs/archive/methodology-v0.2.md` oraz `config/archive/scoring-v0.2.json`; działające `config/scoring-v0.json` nadal wskazuje v0.2. Silnik v0.3 implementuje wygaszanie, graf PRG, grupowanie, bramki korelacji i kontrakty; przypadki matematyczne sprawdzają testy. Akceptacja źródła w rejestrze kandydatów nie podłącza adaptera.
 
-Nie zmieniaj etykiet metodologii w zapisanych odczytach ani nie dopisuj wyników v0.3 do serii v0.2. Instrukcje w `agents/` używają kontraktu v0.3. Dane do dashboardu przechodzą przez wersjonowany eksport i Supabase; harmonogram i hosting są osobnymi etapami.
+Nie zmieniaj etykiet metodologii w zapisanych odczytach ani nie dopisuj wyników v0.3 do serii v0.2. Instrukcje w `agents/` używają obecnie kontraktu v0.4. Dane do dashboardu przechodzą przez wersjonowany eksport i Supabase; harmonogram nie uruchamia hostingu strony.
 
 ## Błędy i odzyskiwanie pracy
 
@@ -133,4 +137,4 @@ Opcja `--fixture PLIK.json` domyślnie zapisuje do `data/demo`. Plik musi deklar
 
 ## Co wymaga dalszej realizacji
 
-Pełne teksty dodatkowych źródeł, geokoder z oceną niepewności, kontrola nadrabiania długich przerw, automatyczny przegląd modelem i limit kosztów, harmonogram, alarmy, porównywalne odczyty historyczne oraz dashboard. Płatny odczyt X jest ograniczony zaakceptowanym pilotażem; instalacja nie zamawia nowych usług ani nie wysyła powiadomień.
+Pełne teksty dodatkowych źródeł, geokoder z oceną niepewności, kontrola nadrabiania długich przerw, alarmy, porównywalne odczyty historyczne oraz hosting dashboardu. Pierwszy cykl uruchomiony przez harmonogram pozostaje do sprawdzenia. Płatny odczyt X jest ograniczony zaakceptowanym pilotażem; instalacja nie zamawia nowych usług.

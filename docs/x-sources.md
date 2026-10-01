@@ -1,6 +1,6 @@
 # Konta X — API, odczyt Codexa i import do raportu
 
-Stan: 30.09.2026. Wskazane przez użytkownika konta
+Stan: 01.10.2026. Wskazane przez użytkownika konta
 [OSINT Defender](https://x.com/sentdefender) i
 [OSINT Technical](https://x.com/osinttechnical) są opcjonalnymi źródłami
 wtórnymi w `config/sources.json`. Parametry śledzące linków nie są zachowywane.
@@ -20,8 +20,9 @@ korzysta z płatnego API modelu AI. Analizę nadal wykonuje Codex.
 ```
 
 `collect` to jawne uruchomienie płatnego pobrania. `prepare` tylko importuje
-zapisane paczki X i nie zamawia kolejnych odczytów. Harmonogram nie został
-włączony. Konfiguracja: `config/x-api.json`; kontrakty: JSON Schema 2020-12.
+zapisane paczki X i nie zamawia kolejnych odczytów. Od 01.10 polecenie collect
+wchodzi do [codziennego harmonogramu Codexa](automation-runbook.md), z tymi
+samymi limitami. Konfiguracja: `config/x-api.json`; kontrakty: JSON Schema 2020-12.
 Domyślne ograniczenia pilotażu:
 
 - Tylko dwa wskazane konta; po jednej stronie, maksymalnie 10 wpisów na konto
@@ -82,7 +83,7 @@ przeglądarki jako alternatywnego sposobu odczytu, zachowuje faktyczne treści,
 a Python importuje paczkę według `schemas/x-capture.schema.json`. API ma osobny
 kontrakt `schemas/x-api-capture.schema.json`. `analysis_cycle.py prepare` nie
 otwiera przeglądarki. Pełne zadanie Codexa wykonuje pobranie API przed `prepare`,
-zgodnie z `agents/analysis-cycle.md`; harmonogram nie został włączony.
+zgodnie z `agents/analysis-cycle.md`; harmonogram jest aktywny od 01.10.
 
 Pierwsza próba: czytnik WWW zwrócił 403; przeglądarka pokazała tożsamość kont,
 po pięć wpisów i ograniczenie dostępu do dalszej historii. Trzy regionalne

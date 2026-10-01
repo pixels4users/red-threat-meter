@@ -1,4 +1,62 @@
-# Stan realizacji — 30.09.2026
+# Stan realizacji — 01.10.2026
+
+## Zmiana doby i odbiór harmonogramu — 01.10.2026, 12:12
+
+Cykl `2026-10-01T100253Z-e71de236` obejmuje 17 źródeł i **91 materiałów do
+przeglądu**. Rozstrzygnięto 80, 11 pozostawiono do wyjaśnienia. Codex wykonał
+ocenę, drugi krytyczny przegląd 29 decyzji oraz osobny przegląd komentarza.
+Wszystkie oceny mają `reviewer.type=agent`. **RTB 3/100, pewność 22%** wobec
+wczorajszych 25%; częściowy odczyt RCB obniżył pokrycie. Nie zablokował indeksu.
+
+Nowy biuletyn ZSU opisuje noc 30.09/01.10: 107 dronów, w tym 63 odrzutowe.
+Nie ustala lokalizacji wszystkich trafień; pozostaje kontekstem bez nowych
+punktów. Nakładający się bilans dzienny odroczono, bez sumowania obu liczników.
+Serie alarmów Wołynia i Równego zaktualizowano w istniejących zdarzeniach.
+Nowy alarm nie dowodzi trafienia. Aktualizacje X dotyczące Nowej Dęby
+połączono; uwzględniono późniejsze wykluczenie zagrożenia chemicznego,
+biologicznego i radiologicznego, bez automatycznej kwalifikacji sabotażu.
+
+Sprawdzono 34 rekordy bieżącej listy RSO oraz plan PAŻP na 01–02.10
+z 411 wierszami. Ćwiczenia RCB/RSO i planowane strefy nie otrzymują punktów.
+Brak pełnego artykułu RCB z 30.09 pozostaje odroczeniem; skrót o wcześniejszym
+zagrożeniu nie staje się bieżącym ostrzeżeniem. Komentarz zawiera datowany
+nalot i zapowiedziane przez MON wsparcie szwedzkich Gripenów w misji NATO.
+
+GPSJAM: jedna nowa doba, **30/30 od 01 do 30.09**. Dla 30.09 kwalifikuje się
+572 z 642 komórek, 125 ma podwyższony udział niskiej dokładności. Na wspólnej
+siatce **492 komórek: 15,65%**, wobec mediany **16,26%** z wcześniejszych
+29 dób. To porównanie opisowe; skład siatki różni się od wczorajszego.
+Zaakceptowany pomiar daje 50% pokrycia domeny GNSS i zero punktów RTB.
+
+Wkład trzech punktów nadal pochodzi z tego samego epizodu 29/30.09.
+Rewizja i przedział wystąpienia nie zmieniły się. Najstarszy możliwy wiek
+wynosi 43,21 godziny, więc zgodnie z metodologią nie rozpoczęło się jeszcze
+wygaszanie po 48 godzinach. Osobna kontrola granic potwierdziła pełną wagę
+po 48 h, 6/7 po 72 h i zero po 216 h, bez publikowania scenariuszy testowych.
+
+Raport `rpt_c78f0e37f01bf51f50f00d9e32095896f9f0717e525a077b51618f0da582bd4c`
+zapisano w Supabase z `verified_readback=true`. Lokalny odczyt i pobierany JSON
+są identyczne z eksportem. Strona pokazuje datę **01.10.2026, 12:12**, RTB 3,
+pewność 22% i polski komentarz. 74 wpisy obejmują zdarzenia i kontekst,
+nie 74 zagrożenia. Pełne siatki GNSS pozostają prywatne. Replay ze 142
+zamrożonych plików dał identyczny wynik bez sieci; baza i klucze obce są poprawne.
+Dowód: `data/analysis/cycles/2026-10-01T100253Z-e71de236/verification.json`.
+
+**51 testów cyklu, v0.4, GNSS i publikacji przeszło**, w tym dwa nowe przypadki:
+awaria przed zapisem i utrata odpowiedzi po zapisie. Ponowienie zachowuje
+eksport i nie tworzy duplikatu. W izolowanej przeglądarce sprawdzono także
+HTTP 503: wynik i data pozostają widoczne, a powrót połączenia przywraca
+odświeżanie. Nie wprowadzono danych testowych do Supabase.
+
+X: dwa żądania, 18 wpisów, pięć wybranych do przeglądu; szacowany koszt
+**0,090 USD**, łącznie **0,165 USD** w lokalnym rejestrze. Oba konta nadal
+mają zaległe strony. Limity bez zmian; koszt wymaga uzgodnienia z rozliczeniem X.
+
+Aktywowano **RTB — codzienna analiza i raport**, codziennie o **09:00 czasu
+Warszawy**, w istniejącym wątku Codexa. Pierwszy zaplanowany przebieg 02.10
+pozostaje do sprawdzenia. Wymaga włączonego Maca i działającego Codexa;
+[warunki i odzyskiwanie](automation-runbook.md). Nie zmieniono wag, kodu
+silnika ani UI. Hosting produkcyjnego dashboardu i domena pozostają niewłączone.
 
 ## Zachodnia Ukraina i zweryfikowane pomiary GNSS — 30.09.2026, 15:11
 
