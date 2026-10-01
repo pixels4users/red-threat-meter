@@ -82,9 +82,13 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
 - Zakres obserwacji (01.10.2026): rozwijana sekcja „Pewność danych…” znajduje
   się po treści widoku, przed stopką. W Przeglądzie poprzedzają ją oś czasu
   i mapa, również na telefonie. Mały wskaźnik pewności pozostaje przy RTB.
-- Wsparcie (01.10.2026): neutralny przycisk „Postaw kawę” z ikoną filiżanki
-  w nawigacji desktop/mobile i stopce; prowadzi do buycoffee.to/red-threat-meter
-  w nowej karcie. Używa tokenów istniejących akcji, bez zewnętrznego obrazka.
+- Wsparcie (01.10.2026): na prośbę użytkownika zielony, oficjalny przycisk
+  BuyCoffee w nawigacji desktop/mobile i stopce; prowadzi do
+  buycoffee.to/red-threat-meter w nowej karcie. Lokalna kopia dostarczonego
+  PNG primary, szerokość do 176 px i cel dotykowy co najmniej 44 px.
+  To wyjątek od neutralnych akcji; zieleń marki nie oznacza poziomu indeksu.
+- Nagłówek bez przycisku „Odśwież”: zachowuje datę raportu. Odczyt co 30 s
+  i po powrocie do karty działa automatycznie; nie uruchamia nowej analizy.
 - Powłoka: sidebar desktop, pasek z hamburgerem mobile, duży dialog menu.
 - RTB: wartość, delta ze strzałką, okres porównania, pewność danych i dwa
   wkłady: działania oraz przygotowania. To odrębne informacje.

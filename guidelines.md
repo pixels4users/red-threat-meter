@@ -24,6 +24,8 @@ zaakceptowany układ: **B — Chronologia**.
   czerwonego priorytetu. Zero/brak danych są neutralne; przy ostrzeżeniu
   oficjalnym nie używamy zieleni. Akcje nadal pozostają neutralne.
 - Przyciski, aktywne menu, linki, hover, focus i przełączniki są neutralne.
+  Wyjątek zaakceptowany 01.10.2026: zielony przycisk marki BuyCoffee,
+  odróżniający wsparcie od aktywnej pozycji menu.
 - Czerwień stosuj tylko do znaczenia zagrożenia oraz do ikony marki.
 - Czerwona delta dodatnia oznacza wzrost indeksu, nie potwierdzenie ataku.
   Spadek jest neutralny; nie daje automatycznego komunikatu „bezpiecznie”.

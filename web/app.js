@@ -264,7 +264,7 @@ $('[data-report-type]').addEventListener('change', e => { state.historyType = e.
 $('[data-more-reports]').addEventListener('click', () => loadHistory(true));
 
 async function refresh() {
-  if (busy) return; busy = true; $('[data-refresh]').disabled = true;
+  if (busy) return; busy = true;
   try {
     const next = checkEnvelope(await api('/api/latest'));
     const changed = !loaded || next?.report.report_id !== envelope?.report.report_id;
@@ -272,9 +272,8 @@ async function refresh() {
     if (changed) { render(); await loadHistory(); if (state.historyType !== 'daily') { const h = await api('/api/reports?type=daily'); dailyHistory = h.items; drawTrend(); } }
     else freshness();
   } catch { failed = true; loaded = true; if (!envelope) renderMetric(); else freshness(); }
-  finally { busy = false; $('[data-refresh]').disabled = false; }
+  finally { busy = false; }
 }
-$('[data-refresh]').addEventListener('click', () => { refresh(); if (state.page === 'reports') loadHistory(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
 new ResizeObserver(drawTrend).observe($('.r-analysis'));
 render(); renderReports();
