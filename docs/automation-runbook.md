@@ -92,6 +92,6 @@ Po pierwszym wykonaniu z harmonogramu sprawdź rzeczywisty czas uruchomienia,
 koszt X i potwierdzenie publikacji. Harmonogram można wstrzymać lub zmienić
 w Codexie, wskazując jego nazwę. Właściwy dashboard wdrożono online 01.10
 w osobnym projekcie Sites. Nowy raport w Supabase zasila go bez ponownego
-wdrożenia strony. Domena `redthreatalert.pl` oczekuje na zmianę DNS;
+wdrożenia strony. Domena `redthreatalert.pl` jest aktywna z HTTPS od 01.10;
 [hosting i domena](hosting-runbook.md). Hosting nie przenosi lokalnego
 harmonogramu analizy do chmury.

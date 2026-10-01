@@ -79,11 +79,16 @@ odczyt, archiwum 12 raportów i pobieranie identycznego JSON. Przeszło 12 test�
 adaptera oraz 7 testów frontendu/bazy. Paczka nie zawiera kluczy.
 Dowód: `data/sites/deployment-verification-2026-10-01.json`.
 
-## Domena redthreatalert.pl — przygotowana, jeszcze niepodłączona
+## Domena redthreatalert.pl — aktywna od 01.10.2026
 
 Delegacja DNS wskazuje `dns.home.pl`, `dns2.home.pl` i `dns3.home.pl`.
-Przypisanie Sites `appgdom_6abe3d9d5ca88191a10d7a890f470322` ma status `pending`;
-rekordów home.pl nie zmieniono. Wartości otrzymane z Sites:
+Przypisanie Sites `appgdom_6abe3d9d5ca88191a10d7a890f470322` ma status `active`,
+podobnie certyfikat HTTPS. Adres: [redthreatalert.pl](https://redthreatalert.pl).
+W zalogowanym panelu home.pl dodano dwa rekordy A i dwa TXT. Lista była pusta;
+kontrola DNS nie wykazała wcześniejszych rekordów A, AAAA, MX ani TXT domeny
+głównej. Delegacja DNS i prywatny dostęp Sites pozostają bez zmian.
+Potwierdzenie: `data/sites/domain-verification-2026-10-01.json`.
+Zastosowane wartości otrzymane z Sites:
 
 | Typ | Pełna nazwa | Wartość |
 |---|---|---|
@@ -98,8 +103,8 @@ domeny głównej zależy od formularza. Nie twórz sprzecznych zestawów A/AAAA.
 Zachowaj MX i TXT poczty; sprawdź, czy poczta nie korzysta z adresu domeny
 głównej, zanim zmienisz A. [Instrukcja home.pl](https://pomoc.home.pl/baza-wiedzy/rekord-dla-domeny-jak-dodac-usunac-lub-zmienic-rekord-dla-subdomeny).
 
-Użytkownik może zalogować się do home.pl w przeglądarce, a Codex wprowadzi
-uzgodnione rekordy, albo użytkownik przepisze tabelę samodzielnie.
+Przy przyszłej zmianie użytkownik może zalogować się do home.pl w przeglądarce,
+a Codex wprowadzi uzgodnione rekordy, albo użytkownik przepisze je samodzielnie.
 Nie potrzeba hasła w rozmowie, kodu AuthInfo ani transferu domeny.
 Po zmianie sprawdź DNS oraz stan domeny i certyfikatu w Sites. Sam zapis
 rekordów nie potwierdza aktywnego HTTPS. Wariant `www` wymaga własnego

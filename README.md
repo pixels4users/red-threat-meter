@@ -161,7 +161,8 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 Dwa kierunki UI zostały przedstawione; użytkownik zaakceptował B — Chronologia
 i wdrożenie przepływu danych. Zapis i odczyt rzeczywistego wydania przez Supabase
 oraz automatyczne odświeżenie ekranu zostały sprawdzone. Hosting aplikacji
-działa w Sites; podłączenie domeny jest kolejnym krokiem. Silnik ma ścieżkę przeglądu
+działa w Sites pod adresem [redthreatalert.pl](https://redthreatalert.pl),
+obecnie z prywatnym dostępem. Silnik ma ścieżkę przeglądu
 Codexa, zatwierdzania komentarza i aktywny harmonogram. Działa v0.4 oraz import
 zweryfikowanych pomiarów GNSS do kontekstu i pokrycia. Uzupełnienie historii
 zdarzeń i kalibracja pozostają dalszymi pracami.

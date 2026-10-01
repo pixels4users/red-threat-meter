@@ -1,5 +1,14 @@
 # Stan realizacji — 01.10.2026
 
+## Podłączenie domeny — 01.10.2026, 14:59
+
+[redthreatalert.pl](https://redthreatalert.pl) jest przypisana do właściwego
+dashboardu. Zapisano w home.pl dwa rekordy A i dwa TXT. Sites potwierdza
+`status=active`, `provider_status=active` i `ssl_status=active`.
+Dostęp pozostaje prywatny; nie zmieniono odbiorców, kodu ani danych.
+Wariant `www` nie został skonfigurowany. Potwierdzenie:
+`data/sites/domain-verification-2026-10-01.json`.
+
 ## Właściwy dashboard online — 01.10.2026
 
 Frontend B — Chronologia działa pod adresem
