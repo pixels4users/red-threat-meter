@@ -19,7 +19,7 @@ $('.r-overview').prepend($('.r-context'));
 root.style.setProperty('--r-kpi-size', '104px');
 const notice = el('p', 'r-data-notice'); notice.setAttribute('role', 'status'); $('.r-hero').after(notice);
 const official = el('section', 'r-official-warnings'); official.setAttribute('aria-label', 'Oficjalne ostrzeżenia'); $('.r-hero').before(official);
-const coverage = el('details', 'r-coverage'); $('.r-hero').after(coverage);
+const coverage = el('details', 'r-coverage'); $('.r-bottom-line').before(coverage);
 for (const panel of $$('[data-detail]')) panel.append($('template[data-template=detail]').content.cloneNode(true));
 for (const [key, value] of Object.entries(categories)) { const option = el('option', '', value.label); option.value = key; $('[data-category]').append(option); }
 

@@ -13,6 +13,8 @@ zaakceptowany układ: **B — Chronologia**.
 5. Każdy odstęp ma rolę z `theme.css`. Stosuj `gap` w szeregach i grupach.
 6. Przy 320 px treść się zawija, bez poziomego przewijania i uciętych kontrolek.
 7. RTB pozostaje przy przewijaniu. W B oś czasu poprzedza mapę, również na telefonie.
+8. Rozwijany zakres obserwacji umieszczamy po treści widoku, przed stopką;
+   w Przeglądzie po osi czasu i mapie. Skrót pewności pozostaje przy RTB.
 
 ## Kolor
 

@@ -67,6 +67,9 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
 
 ## Komponenty v0.2
 
+- Zakres obserwacji (01.10.2026): rozwijana sekcja „Pewność danych…” znajduje
+  się po treści widoku, przed stopką. W Przeglądzie poprzedzają ją oś czasu
+  i mapa, również na telefonie. Mały wskaźnik pewności pozostaje przy RTB.
 - Wsparcie (01.10.2026): neutralny przycisk „Postaw kawę” z ikoną filiżanki
   w nawigacji desktop/mobile i stopce; prowadzi do buycoffee.to/red-threat-meter
   w nowej karcie. Używa tokenów istniejących akcji, bez zewnętrznego obrazka.
