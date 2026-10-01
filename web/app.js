@@ -1,6 +1,6 @@
 import { createIcons, Radar, Menu, X, LayoutDashboard, Map, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee } from 'lucide';
 import { select, scaleLinear, line, extent } from 'd3';
-import { categories, statuses, sourceStatuses, scoreLabel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, comparable, checkEnvelope, safeLink, reportText } from './data.js';
+import { categories, statuses, sourceStatuses, scoreLabel, threatLevel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, comparable, checkEnvelope, safeLink, reportText } from './data.js';
 import { initializeMaps, mapPoints } from './map.js';
 
 const root = document.querySelector('#rtb-dashboard');
@@ -41,11 +41,13 @@ function freshness() {
 function renderMetric() {
   const r = report(), score = r?.rtb.score ?? null;
   $('.r-kpi').textContent = scoreLabel(score);
-  root.dataset.redPriority = String(r?.rtb.red_priority?.eligible === true);
+  const level = threatLevel(r?.rtb);
+  root.dataset.threatLevel = level.tone;
+  $('[data-threat-level]').textContent = level.label;
   $('.r-kpi').setAttribute('aria-label', score === null ? 'Indeks niewyliczony' : `${score} na 100`);
   for (const e of $$('[data-dialog-score]')) e.textContent = scoreLabel(score);
   $('[data-as-of]').textContent = r ? `Stan na ${fullTime(r.as_of)}` : failed ? 'Odczyt chwilowo niedostępny' : loaded ? 'Brak opublikowanego raportu' : 'Ładowanie raportu…';
-  $('.r-metric .r-eyebrow').textContent = 'Indeks RTB · raport dobowy';
+  $('.r-metric .r-eyebrow').textContent = 'Indeks RTA · raport dobowy';
   $('[data-confidence]').textContent = r?.rtb.confidence.percent == null ? 'Nieokreślona' : `${r.rtb.confidence.percent}%`;
   $('.r-confidence').title = 'Pewność opisuje zakres obserwacji, ukończony przegląd i dostępność historii. Nie jest prawdopodobieństwem eskalacji.';
   let status = $('[data-score-status]');
@@ -89,7 +91,7 @@ function drawTrend() {
   const compatible = all.map(row => ({ ...row, valid: r && comparable(row, r.provenance) && (r.provenance.methodology_version !== 'rtb-v0.4' || row.confidence_key === r.rtb.confidence.comparison_key) && row.score !== null }));
   const values = compatible.filter(p => p.valid);
   target.hidden = values.length < 2;
-  $('[data-history-note]').textContent = values.length < 2 ? 'Brak porównywalnego trendu' : 'Historia RTB · przerwy oznaczają brak porównywalnego wyniku';
+  $('[data-history-note]').textContent = values.length < 2 ? 'Brak porównywalnego trendu' : 'Historia RTA · przerwy oznaczają brak porównywalnego wyniku';
   if (values.length < 2 || target.clientWidth < 10) return;
   const w = target.clientWidth, h = 40, bounds = extent(values, d => d.score);
   const x = scaleLinear().domain([0, Math.max(1, compatible.length - 1)]).range([4, w - 4]);
@@ -192,7 +194,7 @@ function renderReports() {
   const host = $('[data-reports]'); host.replaceChildren();
   for (const r of history) {
     const row = el('article', 'r-report-row'), mark = el('span', 'r-report-icon'); const icon = el('i'); icon.dataset.lucide = 'files'; mark.append(icon);
-    const info = el('div'); info.append(el('h3', '', `${r.report_type === 'daily' ? 'Raport dobowy' : 'Raport tygodniowy'} · ${fullTime(r.as_of)}`), el('p', 'r-small', `RTB ${r.score === null ? 'niewyliczony' : r.score + '/100'} · ${r.methodology_version}${r.supersedes ? ' · korekta' : ''}`));
+    const info = el('div'); info.append(el('h3', '', `${r.report_type === 'daily' ? 'Raport dobowy' : 'Raport tygodniowy'} · ${fullTime(r.as_of)}`), el('p', 'r-small', `RTA ${r.score === null ? 'niewyliczony' : r.score + '/100'} · ${r.methodology_version}${r.supersedes ? ' · korekta' : ''}`));
     const actions = el('div', 'r-report-actions'); actions.append(button('Czytaj', () => readReport(r.report_id, 'read')), button('Pobierz', () => readReport(r.report_id, 'text')),
       button('JSON', () => readReport(r.report_id, 'json'), 'r-link'), button('GeoJSON', () => readReport(r.report_id, 'geojson'), 'r-link'));
     row.append(mark, info, actions); host.append(row);

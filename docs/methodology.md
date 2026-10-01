@@ -1,5 +1,16 @@
 # Metodologia RTB v0.4
 
+Nazwa publiczna indeksu od 01.10.2026: **RTA — Red Threat Alert**.
+Zmiana nazwy w interfejsie nie zmienia silnika `rtb-v0.4`, kontraktu `rtb`,
+hashy ani zapisanych raportów. Dashboard stosuje roboczą, nieskalibrowaną
+skalę opisową: (0,20] „zagrożenie: niskie”; >20 „podwyższone”; >60 „wysokie”
+wyłącznie przy spełnionej bramce czerwonego priorytetu. Przy braku tej bramki
+wynik >60 pozostaje podwyższony i wymaga przeglądu. Granica 20 jest konwencją
+prezentacji, nie empirycznie ustalonym progiem bezpieczeństwa. Zero pokazuje
+„Brak naliczonych sygnałów”, a brak wyniku „Zagrożenie: nieocenione”.
+Poziom opisuje naliczone sygnały; pewność danych i ostrzeżenia służb pozostają
+osobne. Przy aktywnym lub nieustalonym ostrzeżeniu niski wynik nie jest zielony.
+
 **Wersja `rtb-v0.4`, 30.09.2026.** Ciągły indeks i niezależna pewność danych wynikają z decyzji użytkownika: luki nie blokują całego wyniku. Parametry pozostają eksperymentalne, bez kalibracji prognostycznej.
 
 | Element | Wersja / stan |

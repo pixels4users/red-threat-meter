@@ -18,6 +18,11 @@ zaakceptowany układ: **B — Chronologia**.
 
 ## Kolor
 
+- Od 01.10.2026 użytkownik zatwierdził zielony niski wynik indeksu RTA.
+  Zieleń opisuje niski poziom naliczonych sygnałów, nie gwarancję bezpieczeństwa.
+  Robocza skala UI: (0,20] niski, >20 podwyższony; >60 wysoki dopiero z bramką
+  czerwonego priorytetu. Zero/brak danych są neutralne; przy ostrzeżeniu
+  oficjalnym nie używamy zieleni. Akcje nadal pozostają neutralne.
 - Przyciski, aktywne menu, linki, hover, focus i przełączniki są neutralne.
 - Czerwień stosuj tylko do znaczenia zagrożenia oraz do ikony marki.
 - Czerwona delta dodatnia oznacza wzrost indeksu, nie potwierdzenie ataku.

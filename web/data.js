@@ -14,6 +14,15 @@ export const statuses = { unverified: 'Pojedyncze doniesienie', confirmed_primar
 export const sourceStatuses = { current: 'Aktualne', stale: 'Wymaga odświeżenia', partial: 'Niepełne', unavailable: 'Niedostępne' };
 export const scoreLabel = n => n == null ? '—' : new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 1 }).format(n);
 export const visibleWarnings = rtb => (rtb?.official_warnings ?? []).filter(w => ['active', 'unknown'].includes(w.status));
+// Presentation bands only: no changes to scoring, confidence or official alerts.
+export function threatLevel(rtb) {
+  const score = rtb?.score;
+  if (!Number.isFinite(score) || score < 0 || score > 100) return { tone: 'unknown', label: 'Zagrożenie: nieocenione' };
+  if (score === 0) return { tone: 'unknown', label: 'Brak naliczonych sygnałów' };
+  if (score > 60 && rtb.red_priority?.eligible === true) return { tone: 'high', label: 'Zagrożenie: wysokie' };
+  if (score > 20) return { tone: 'elevated', label: 'Zagrożenie: podwyższone' };
+  return { tone: visibleWarnings(rtb).length ? 'unknown' : 'low', label: 'Zagrożenie: niskie' };
+}
 export const timeZone = 'Europe/Warsaw';
 const formatter = new Intl.DateTimeFormat('sv-SE', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 export const parts = value => Object.fromEntries(formatter.formatToParts(new Date(value)).map(p => [p.type, p.value]));
@@ -69,7 +78,7 @@ export function safeLink(url) {
 
 export function reportText(report) {
   const score = report.rtb.score === null ? 'Za mało danych do wyliczenia indeksu' : `${report.rtb.score}/100`;
-  return [`Red Threat Meter · ${fullTime(report.as_of)}`, `RTB: ${score}`, `Pewność danych: ${report.rtb.confidence.percent == null ? 'nieokreślona' : report.rtb.confidence.percent + '%'}`, 'Zero RTB nie potwierdza bezpieczeństwa.', `Metodologia: ${report.provenance.methodology_version}`, '',
+  return [`Red Threat Alert · ${fullTime(report.as_of)}`, `RTA: ${score}`, `Pewność danych: ${report.rtb.confidence.percent == null ? 'nieokreślona' : report.rtb.confidence.percent + '%'}`, 'Zero RTA nie potwierdza bezpieczeństwa.', `Metodologia: ${report.provenance.methodology_version}`, '',
     ...report.limitations, '', ...report.gaps.map(g => g.message), '',
     ...report.incidents.flatMap(i => [i.title, i.summary, `Opublikowano: ${fullTime(i.published_at)}`, `Data zdarzenia: ${i.occurred_on ?? 'nieustalona'}`, statuses[i.status], ...i.sources.map(s => `${s.publisher}: ${s.url}`), ''])].join('\n');
 }

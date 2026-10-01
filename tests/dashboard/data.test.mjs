@@ -1,6 +1,17 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { timelineGroups, safeLink, comparable, checkEnvelope, scoreLabel, visibleWarnings } from '../../web/data.js';
+import { timelineGroups, safeLink, comparable, checkEnvelope, scoreLabel, threatLevel, visibleWarnings } from '../../web/data.js';
+
+test('presentation bands preserve unknown, zero, red evidence gate and official warnings', () => {
+  for (const score of [undefined, null, NaN, -1, 101]) assert.equal(threatLevel({ score }).tone, 'unknown');
+  assert.deepEqual(threatLevel({ score: 0 }), { tone: 'unknown', label: 'Brak naliczonych sygnałów' });
+  for (const score of [0.1, 3, 20]) assert.equal(threatLevel({ score }).tone, 'low');
+  for (const score of [20.1, 60, 60.1, 100]) assert.equal(threatLevel({ score }).tone, 'elevated');
+  assert.equal(threatLevel({ score: 60, red_priority: { eligible: true } }).tone, 'elevated');
+  assert.equal(threatLevel({ score: 60.1, red_priority: { eligible: true } }).tone, 'high');
+  assert.equal(threatLevel({ score: 100, red_priority: { eligible: false } }).tone, 'elevated');
+  for (const status of ['active', 'unknown']) assert.equal(threatLevel({ score: 3, official_warnings: [{ status }] }).tone, 'unknown');
+});
 
 test('semantic zoom uses Polish calendar boundaries, including DST and month edges', () => {
   const records = [{published_at:'2026-09-30T21:59:00Z'}, {published_at:'2026-09-30T22:01:00Z'}, {published_at:'2026-10-01T08:00:00Z'}];

@@ -67,6 +67,13 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
 
 ## Komponenty v0.2
 
+- Indeks RTA (01.10.2026): nowa nazwa publiczna; kontrakt `rtb`, identyfikatory
+  metodologii i archiwalne dane zachowują nazwy. Liczba i opis poziomu mają
+  kolor: (0,20] zielony, (20,60] bursztynowy, >60 czerwony tylko przy
+  `red_priority.eligible=true`; bez tej bramki pozostaje podwyższony/bursztynowy.
+  To robocza skala prezentacji, bez kalibracji i wpływu na punktację.
+  Zero i brak wyniku są neutralne; aktywne/nieustalone ostrzeżenie oficjalne
+  wyłącza zieleń niskiego wyniku. Pewność pozostaje osobną informacją.
 - Stopka (01.10.2026): podpis „RedThreatAlert by Pixels4Users” oraz informacja
   o indeksie po lewej; ikona X z linkiem do x.com/redthreatalert i „Postaw kawę”
   po prawej. Na wąskim ekranie grupa przechodzi poniżej tekstu i pozostaje

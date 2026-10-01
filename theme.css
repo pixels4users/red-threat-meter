@@ -17,6 +17,8 @@
   --color-signal-neutral: light-dark(#525252, #b8b8b8);
   --color-on-signal: light-dark(#ffffff, #141414);
   --color-threat: light-dark(#bd302b, #ff7973);
+  --color-index-low: light-dark(#237044, #79d69b);
+  --color-index-elevated: light-dark(#8a5800, #edbf65);
   --color-threat-surface: light-dark(#fff1f0, #321918);
   --color-brand-mark: var(--color-threat);
   --color-map-land: light-dark(#fafafa, #1a1a1a);
@@ -101,6 +103,9 @@
 .rtb-app[data-appearance="dark"] { color-scheme: dark; }
 .rtb-app[data-trend="up"] { --r-trend: var(--color-threat); }
 .rtb-app[data-trend="down"] { --r-trend: var(--color-text-secondary); }
+.rtb-app[data-threat-level="low"] { --r-index-color: var(--color-index-low); }
+.rtb-app[data-threat-level="elevated"] { --r-index-color: var(--color-index-elevated); }
+.rtb-app[data-threat-level="high"] { --r-index-color: var(--color-threat); }
 
 /* Stan zagrożenia przekazuje ocena; kolor nie ustala progu punktacji. */
 .rtb-app [data-threat="high"] {
