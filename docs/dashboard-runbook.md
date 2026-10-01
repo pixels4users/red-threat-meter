@@ -2,6 +2,8 @@
 
 Stan: 01.10.2026. Interfejs **B — Chronologia**, kontrakt `dashboard-v1`.
 Stan chmurowej migracji i połączenia: `supabase/README.md`.
+Właściwy dashboard jest [online](https://red-threat-alert.michalomski.chatgpt.site)
+z prywatnym dostępem Sites. [Hosting i domena](hosting-runbook.md).
 
 ## Co uruchamia raport
 
@@ -43,7 +45,7 @@ Służą również odtworzeniu konfiguracji na innym, uprawnionym komputerze.
    wykonano już w SQL Editor i oznaczono w historii CLI; nie wykonuj jej drugi
    raz. `supabase migration list --linked` potwierdza zgodność obu stron.
 
-Klucz jest używany wyłącznie przez proces Python, nie przez Vite. Nie dodawaj
+Klucz jest używany wyłącznie przez serwer Python lub Worker Sites, nie przez Vite. Nie dodawaj
 prefiksu `VITE_`, nie wysyłaj `.env.dashboard` do hostingu statycznego i nie
 serwuj całego repozytorium przez HTTP. Adres docelowej bazy jest przypięty w
 `config/dashboard.json`; pomyłka projektu zatrzymuje wydawcę.
@@ -127,7 +129,7 @@ bazy testowej. Ekran oznacza dane syntetyczne.
 wersjonowane elementy. `dashboard_readers` jest listą dopuszczonych tożsamości
 Supabase Auth, początkowo pustą. Nie dodajemy użytkowników automatycznie.
 
-Anonim nie odczyta raportów. Samo założenie konta również nie wystarcza.
+Anonim nie odczyta raportów bezpośrednio z Supabase. Samo założenie konta również nie wystarcza.
 Dopuszczony użytkownik może tylko czytać; RPC publikacji jest dostępne dla
 serwera. RLS i wycofanie uprawnień zapisu chronią tabele, a triggery blokują
 zmianę/usunięcie opublikowanej historii. Nie używamy `upsert` do korekt.
@@ -150,20 +152,19 @@ role, RLS, atomowość, idempotencję i blokowanie danych testowych; nie zapisuj
 nic do chmury. Test HTTP korzysta z portu loopback i może wymagać uprawnienia
 środowiska do otwierania lokalnych gniazd.
 
-Lokalny serwer Python nie jest gotowym wdrożeniem Sites. Opublikowana wcześniej
-wizualizacja pozostaje statycznym projektem. Przed podmianą potrzebny jest
-serwerowy adapter hostingu, jego sekrety i test ochrony całego `/api/` tym samym
-mechanizmem dostępu co strony. Nie wolno publikować klucza ani samych plików
-frontendu z niedziałającym API i nazywać tego pełnym wdrożeniem.
+01.10 wdrożono serwerowy adapter Sites w osobnym projekcie dashboardu.
+Strona i API korzystają z prywatnego dostępu Sites. Sekret Supabase jest
+w runtime serwera; frontend go nie otrzymuje. Design System pozostaje
+osobną wizualizacją. [Obsługa wdrożenia](hosting-runbook.md).
 
 Pełny odbiór danych wykonano 27.09.2026: prawdziwy raport z procesu live →
 Supabase → lokalny odczyt → automatyczne odświeżenie ekranu. Potwierdzenie
-znajduje się w `data/dashboard/cloud-verification.json`. Harmonogram nie jest
-jeszcze uruchomiony; hosting aplikacji pozostaje odrębnym wdrożeniem.
+znajduje się w `data/dashboard/cloud-verification.json`. Harmonogram
+aktywowano 01.10; pierwsze zaplanowane wykonanie pozostaje do sprawdzenia.
 Komentarz przygotowuje Codex w pełnym cyklu analizy; wydawca sprawdza prywatny
 rekord jego przeglądu powiązany z dokładnym wydaniem i tekstem. Komentarz bez
-takiego rekordu nie przejdzie publikacji. Adaptery osobnych pilotaży
-i implementacja metodologii v0.3 pozostają odrębnymi pracami.
+takiego rekordu nie przejdzie publikacji. Aktualny silnik to v0.4;
+zakres osobnych pilotaży opisują ich instrukcje.
 
 29.09.2026 sprawdzono dodatkowo rzeczywisty cykl z przeglądem Codexa: 46
 rozstrzygniętych materiałów, 4 wstrzymane pozycje OSW, 9 nowych obserwacji.

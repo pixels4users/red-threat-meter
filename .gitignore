@@ -23,3 +23,6 @@ node_modules/
 .playwright-cli/
 output/
 research/
+hosting/.generated/
+.sites-runtime/
+data/sites/

@@ -1,5 +1,25 @@
 # Stan realizacji — 01.10.2026
 
+## Właściwy dashboard online — 01.10.2026
+
+Frontend B — Chronologia działa pod adresem
+[Red Threat Alert](https://red-threat-alert.michalomski.chatgpt.site), obecnie
+z prywatnym dostępem Sites. Osobny Worker czyta oczyszczone publikacje z Supabase;
+nowy raport pojawia się po odświeżeniu bez ponownego wdrażania strony.
+Design System pozostaje osobnym projektem. Klucze są w runtime serwera,
+poza przeglądarką, źródłami Git i paczką wdrożenia.
+
+Lokalnie sprawdzono rzeczywisty raport z 12:12: RTB 3/100, pewność 22%,
+archiwum 12 wydań i zgodność pobieranego JSON z publikacją. Przeszło 12 nowych
+testów adaptera oraz 7 testów frontendu/bazy. Natywna publikacja Sites zwróciła
+`succeeded`; potwierdzenie i granice sprawdzeń zapisano w
+`data/sites/deployment-verification-2026-10-01.json`.
+
+Nie zmieniono metodologii, danych ani harmonogramu analizy. Przygotowano
+przypisanie domeny `redthreatalert.pl` i rekordy A/TXT, ale DNS home.pl
+pozostaje niezmieniony. Domena ma status `pending`.
+[Instrukcja wdrożenia i kolejnego kroku](hosting-runbook.md).
+
 ## Zmiana doby i odbiór harmonogramu — 01.10.2026, 12:12
 
 Cykl `2026-10-01T100253Z-e71de236` obejmuje 17 źródeł i **91 materiałów do

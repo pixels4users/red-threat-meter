@@ -1,0 +1,106 @@
+# Dashboard online — hosting i domena
+
+Stan: 01.10.2026. Właściwy frontend **B — Chronologia** działa pod adresem
+[Red Threat Alert](https://red-threat-alert.michalomski.chatgpt.site).
+Projekt Sites: `appgprj_6abe3ae4ab688191ade3a1f128a64451`.
+Dostęp jest prywatny, dla właściciela. Design System pozostaje osobnym projektem.
+
+## Przepływ danych
+
+Codex wykonuje analizę lokalnie → wydawca zapisuje oczyszczony raport w
+Supabase → serwer strony odczytuje publikację → przeglądarka pokazuje wynik,
+oś czasu, mapę, dziennik i archiwum. Otwarta strona sprawdza nowy raport
+co 30 sekund. Publikacja raportu nie wymaga nowego wdrożenia kodu strony.
+
+Hosting działa niezależnie od Maca. **Tworzenie kolejnych analiz nadal wymaga
+włączonego Maca i Codexa**: [harmonogram](automation-runbook.md) działa o 09:00
+czasu Warszawy. Awaria analizy nie zmienia daty poprzedniej publikacji.
+Próg nieaktualności to 30 godzin.
+
+## Granica dostępu
+
+`hosting/worker.mjs` obsługuje odczyt ustalonych ścieżek `/api/` z tabeli
+`dashboard_reports` w przypiętym projekcie Supabase. Nie ma dowolnego proxy,
+SQL, RPC ani zapisu z przeglądarki. Odbiorca otrzymuje tylko `dashboard-v1`,
+bez surowego archiwum, prywatnych ocen i pełnych siatek GNSS.
+
+Runtime Sites ma `SUPABASE_URL` i sekretny `SUPABASE_SECRET_KEY`. Klucz pozostaje
+na serwerze; nie jest kluczem o uprawnieniach wyłącznie do odczytu. Ograniczenie
+operacji egzekwuje adapter. RLS bazy nie zmieniono. Polityka Sites obejmuje
+stronę i jej API. Publiczne udostępnienie jest osobną zmianą, nie skutkiem DNS.
+
+Wydawca Python sprawdza hash zawartości, dowody i przegląd komentarza.
+Adapter hostingu sprawdza zamknięty JSON Schema 2020-12, tryb live, tożsamość
+rekordu, daty, adresy źródeł i spójność mapy oraz komentarza. Nie przelicza
+sumy kontrolnej serializacji Python w JavaScript. Walidator AJV jest kompilowany podczas
+budowania; serwer nie kompiluje kodu dynamicznie. Błąd odczytu zwraca HTTP 503,
+bez zastępczego raportu i bez treści wyjątku.
+
+## Budowanie i kolejne wdrożenia
+
+Główne repozytorium pozostaje w GitHub. `.openai/hosting.json` zachowuje
+tożsamość dashboardu. Minimalny checkout Sites w ignorowanym
+`data/sites/dashboard-source/` zawiera frontend, adapter, schemat i konfigurację
+odczytu. Nie zawiera bazy, materiałów źródłowych, skilli ani kluczy.
+
+Kontrola lokalna z katalogu głównego:
+
+```sh
+npm ci
+npm test
+npm run test:site
+npm run build:site
+node scripts/serve_hosted_dashboard.mjs
+```
+
+Ostatnie polecenie uruchamia zbudowany Worker na `127.0.0.1:8770`, z prywatną
+konfiguracją `.env.dashboard`. Zwykły build i serwer Python pozostają dostępne.
+
+Przy następnej publikacji Codex używa skilli Sites:
+
+1. Odczytaj manifest i ten sam projekt; nie twórz kolejnego Site.
+2. Przed edycją otwórz istniejący checkout przez `site-workflow.mjs`,
+   zachowując wynik jako `source`.
+3. W katalogu głównym wykonaj `node scripts/stage_site_source.mjs`.
+   Zainstaluj zmienione zależności checkoutu przez helper Sites.
+4. W checkoutcie uruchom workflow z `source`, pozostałymi testami/budowaniem
+   i ścieżką archiwum. Helper buduje `dist/client` i `dist/server/index.js`,
+   zapisuje commit, wysyła źródło i pakuje dokładnie tę wersję.
+5. Przekaż zwrócone `project_id`, `commit_sha` i `archive` do natywnej
+   publikacji Sites. Zachowaj obecną grupę odbiorców. Wymagaj końcowego
+   `status=succeeded`; przy błędzie kontynuuj ten sam projekt i wersję.
+   Sekrety konfiguruj wyłącznie jako runtime secrets, poza kodem i logami.
+
+Pierwsze wdrożenie: źródło Sites
+`93b4f59881ab7d8f3ac7bff1a50b8436644ca9f0`,
+deployment `appgdep_6abe3d6018a48191973b748622ea21ef`, runtime revision 1.
+Natywna publikacja zakończyła się powodzeniem. Lokalnie sprawdzono rzeczywisty
+odczyt, archiwum 12 raportów i pobieranie identycznego JSON. Przeszło 12 testów
+adaptera oraz 7 testów frontendu/bazy. Paczka nie zawiera kluczy.
+Dowód: `data/sites/deployment-verification-2026-10-01.json`.
+
+## Domena redthreatalert.pl — przygotowana, jeszcze niepodłączona
+
+Delegacja DNS wskazuje `dns.home.pl`, `dns2.home.pl` i `dns3.home.pl`.
+Przypisanie Sites `appgdom_6abe3d9d5ca88191a10d7a890f470322` ma status `pending`;
+rekordów home.pl nie zmieniono. Wartości otrzymane z Sites:
+
+| Typ | Pełna nazwa | Wartość |
+|---|---|---|
+| A | `redthreatalert.pl` | `162.159.143.30` |
+| A | `redthreatalert.pl` | `172.66.3.26` |
+| TXT | `_openai-site-verification.redthreatalert.pl` | `openai-site-verification=HeQmYnqBe8es6HFS0vt3-t4laYx_LH3LU_bFX_kmLeM` |
+| TXT | `_cf-custom-hostname.redthreatalert.pl` | `f510689d-a2a9-40e2-9824-2426c56f1c2c` |
+
+Przed zastosowaniem odczytaj aktualny stan przypisania i istniejące rekordy
+domeny. W home.pl przejdź do domeny i zarządzania rekordami DNS; oznaczenie
+domeny głównej zależy od formularza. Nie twórz sprzecznych zestawów A/AAAA.
+Zachowaj MX i TXT poczty; sprawdź, czy poczta nie korzysta z adresu domeny
+głównej, zanim zmienisz A. [Instrukcja home.pl](https://pomoc.home.pl/baza-wiedzy/rekord-dla-domeny-jak-dodac-usunac-lub-zmienic-rekord-dla-subdomeny).
+
+Użytkownik może zalogować się do home.pl w przeglądarce, a Codex wprowadzi
+uzgodnione rekordy, albo użytkownik przepisze tabelę samodzielnie.
+Nie potrzeba hasła w rozmowie, kodu AuthInfo ani transferu domeny.
+Po zmianie sprawdź DNS oraz stan domeny i certyfikatu w Sites. Sam zapis
+rekordów nie potwierdza aktywnego HTTPS. Wariant `www` wymaga własnego
+przypisania i rekordów otrzymanych z Sites; nie został jeszcze dodany.

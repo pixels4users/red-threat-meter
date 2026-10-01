@@ -12,6 +12,10 @@ Sprawdzono również **trzy półgodzinne wycinki historii lotniczej** z 22–24
 
 ## Jak korzystać
 
+Właściwy dashboard jest [online](https://red-threat-alert.michalomski.chatgpt.site)
+z prywatnym dostępem Sites. Czyta publikacje z Supabase przez serwerowe API;
+nie wymaga uruchomionego lokalnego serwera WWW. [Hosting i domena](docs/hosting-runbook.md).
+
 Na tym Macu środowisko jest już przygotowane. Uruchom plik **`Zbierz dane.command`** z katalogu projektu. Pobierze dostępne publikacje i otworzy raport. Przy pierwszym uruchomieniu na innym komputerze potrzebny jest Python 3.11+ oraz dostęp do internetu do instalacji zależności.
 
 Dla pomiarów GNSS i logistyki uruchom **`Zbierz sygnały wczesne.command`**. Otwiera osobny raport obserwacyjny i nie zmienia odczytu RTB. Przy pierwszym uruchomieniu zbiera 30 dni GNSS, potem odświeża trzy ostatnie doby oraz RSS. [Instrukcja sygnałów wczesnych](docs/early-warning-runbook.md).
@@ -134,6 +138,7 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 ## Dokumentacja i dalszy zakres
 
 - [Dashboard — obsługa](docs/dashboard-runbook.md) — publikacja, historia, korekty, uruchomienie i testy.
+- [Dashboard online i domena](docs/hosting-runbook.md) — wdrożenie Sites i przygotowane rekordy home.pl.
 - [Silnik Codexa](docs/analysis-runbook.md) — pełny cykl analizy, dowody, komentarz i publikacja, bez osobnego API modelu.
 - [Codzienny harmonogram](docs/automation-runbook.md) — warunki pracy, limity, odzyskiwanie po awarii i kontrola pierwszego wykonania.
 - [Kontrakt dashboardu](docs/dashboard-data-contract.md) — dozwolone pola, daty, braki, wersje i granica eksportu.
@@ -155,8 +160,8 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 
 Dwa kierunki UI zostały przedstawione; użytkownik zaakceptował B — Chronologia
 i wdrożenie przepływu danych. Zapis i odczyt rzeczywistego wydania przez Supabase
-oraz automatyczne odświeżenie ekranu zostały sprawdzone. Pozostało osobne
-wdrożenie hostingu aplikacji i podłączenie domeny. Silnik ma ścieżkę przeglądu
+oraz automatyczne odświeżenie ekranu zostały sprawdzone. Hosting aplikacji
+działa w Sites; podłączenie domeny jest kolejnym krokiem. Silnik ma ścieżkę przeglądu
 Codexa, zatwierdzania komentarza i aktywny harmonogram. Działa v0.4 oraz import
 zweryfikowanych pomiarów GNSS do kontekstu i pokrycia. Uzupełnienie historii
 zdarzeń i kalibracja pozostają dalszymi pracami.

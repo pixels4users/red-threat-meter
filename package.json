@@ -7,7 +7,9 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "test": "node --test tests/dashboard/*.test.mjs",
-    "test:database": "node --test tests/dashboard/database.test.mjs"
+    "test:database": "node --test tests/dashboard/database.test.mjs",
+    "build:site": "node scripts/build_hosted_dashboard.mjs",
+    "test:site": "node scripts/compile_hosted_validator.mjs && node --test tests/hosting/*.test.mjs"
   },
   "dependencies": {
     "d3": "7.9.0",
@@ -16,6 +18,8 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.3.14",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
     "vite": "^7.1.7"
   }
 }
