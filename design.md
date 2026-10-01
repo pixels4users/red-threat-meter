@@ -67,6 +67,9 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
 
 ## Komponenty v0.2
 
+- Stopka (01.10.2026): podpis „RedThreatAlert by Pixels4Users” oraz informacja
+  o indeksie po lewej; „Postaw kawę” po prawej. Na wąskim ekranie przycisk
+  przechodzi poniżej tekstu i pozostaje wyrównany do prawej.
 - Zakres obserwacji (01.10.2026): rozwijana sekcja „Pewność danych…” znajduje
   się po treści widoku, przed stopką. W Przeglądzie poprzedzają ją oś czasu
   i mapa, również na telefonie. Mały wskaźnik pewności pozostaje przy RTB.
