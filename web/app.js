@@ -228,33 +228,30 @@ function render() {
   maps.draw(); icons();
 }
 function navigate(page) {
+  $('.r-hero').hidden = page !== 'overview';
   state.page = page; state.selected = null; state.related = [];
   for (const b of $$('[data-page]')) { if (b.dataset.page === page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   for (const view of $$('[data-view]')) view.hidden = view.dataset.view !== page;
   $('[data-page-title]').textContent = pages[page]; renderDetails(); maps.draw(); icons();
   if (page === 'reports') loadHistory();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  $('[data-page-title]').setAttribute('tabindex', '-1');
+  $('[data-page-title]').focus({ preventScroll: true });
 }
 
-const menu = $('[data-mobile-menu]'), menuToggle = $('[data-open-menu]'), mapDialog = $('[data-map-dialog]'); let mapOpener;
-menu.id = 'rtb-mobile-menu';
-const closeMenu = () => { menu.close(); menuToggle.setAttribute('aria-expanded', 'false'); menuToggle.focus({ preventScroll: true }); };
+const mapDialog = $('[data-map-dialog]'); let mapOpener;
 const maps = initializeMaps(root, report, () => state.selected, selectSignals, icons, b => { mapOpener = b; mapDialog.showModal(); maps.draw(); if (document.fullscreenEnabled) root.requestFullscreen?.().catch(() => {}); });
-menuToggle.addEventListener('click', () => { menu.showModal(); menuToggle.setAttribute('aria-expanded', 'true'); });
-$('[data-close-menu]').addEventListener('click', closeMenu);
-menu.addEventListener('cancel', e => { e.preventDefault(); closeMenu(); });
-menu.addEventListener('close', () => menuToggle.setAttribute('aria-expanded', 'false'));
 $('[data-close-map]').addEventListener('click', () => mapDialog.close());
 mapDialog.addEventListener('close', () => { if (document.fullscreenElement === root) document.exitFullscreen().catch(() => {}); maps.draw(); mapOpener?.focus({ preventScroll: true }); });
 let wasFullscreen = false;
 document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement === root) { wasFullscreen = true; maps.draw(); } else if (wasFullscreen) { wasFullscreen = false; if (mapDialog.open) mapDialog.close(); } });
-for (const dialog of [menu, mapDialog]) dialog.addEventListener('keydown', event => {
+for (const dialog of [mapDialog]) dialog.addEventListener('keydown', event => {
   if (event.key !== 'Tab') return;
   const controls = [...dialog.querySelectorAll('button:not(:disabled),a[href],select')].filter(e => e.getClientRects().length), first = controls[0], last = controls.at(-1);
   if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
   else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
 });
-matchMedia('(max-width:620px)').addEventListener('change', e => { if (!e.matches && menu.open) closeMenu(); });
-for (const b of $$('[data-page]')) b.addEventListener('click', () => { navigate(b.dataset.page); if (menu.open) closeMenu(); });
+for (const b of $$('[data-page]')) b.addEventListener('click', () => navigate(b.dataset.page));
 for (const b of $$('[data-go]')) b.addEventListener('click', () => navigate(b.dataset.go));
 for (const b of $$('[data-close-detail]')) b.addEventListener('click', () => { state.selected = null; state.related = []; renderDetails(); maps.draw(); });
 $('[data-category]').addEventListener('change', e => { state.category = e.target.value; renderJournal(); });

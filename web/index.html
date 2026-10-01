@@ -3,7 +3,7 @@
 <body><a class="skip-link" href="#main">Przejdź do treści</a><div id="rtb-dashboard" class="rtb-app" data-layout="signals" data-appearance="auto">
 <div class="r-shell">
 <aside class="r-sidebar">
-<div class="r-side-header"><div class="r-brand"><span class="r-brand-mark"><i aria-hidden="true" data-lucide="radar"></i></span><span>Red Threat<br/> Alert</span></div><button aria-controls="rtb-mobile-menu" aria-expanded="false" aria-haspopup="dialog" aria-label="Otwórz menu" class="r-menu-toggle cursor-interaction" data-open-menu="" type="button"><i aria-hidden="true" data-lucide="menu"></i></button></div>
+<div class="r-side-header"><div class="r-brand"><span class="r-brand-mark"><i aria-hidden="true" data-lucide="radar"></i></span><span>Red Threat<br/> Alert</span></div></div>
 <nav aria-label="Nawigacja główna" class="r-nav r-desktop-nav">
 <button aria-current="page" class="cursor-interaction" data-page="overview" type="button"><i aria-hidden="true" data-lucide="layout-dashboard"></i><span>Przegląd</span></button>
 <button class="cursor-interaction" data-page="map" type="button"><i aria-hidden="true" data-lucide="map"></i><span>Mapa Operacyjna</span></button>
@@ -43,19 +43,14 @@
 <footer class="r-bottom-line"><div class="r-footer-info"><strong>RedThreatAlert by Pixels4Users</strong><span>Indeks eksperymentalny · Polska i wschodnia flanka NATO</span><span>Indeks opisuje nasilenie sygnałów, nie prawdopodobieństwo eskalacji.</span></div><div class="r-footer-actions"><a class="r-support-link r-social-link" href="https://x.com/redthreatalert" target="_blank" rel="noopener noreferrer" aria-label="RedThreatAlert na X — otwiera nową kartę" title="RedThreatAlert na X"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26L22.827 21.75H16.17l-5.214-6.817-5.967 6.817H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"/></svg></a><a class="r-support-link r-coffee-link" href="https://buycoffee.to/red-threat-meter" target="_blank" rel="noopener noreferrer" aria-label="Postaw kawę dla Red Threat Alert na buycoffee.to — otwiera nową kartę"><img src="/assets/buycoffee-primary-pl.png" width="312" height="81" alt="Postaw kawę"></a></div></footer>
 </main>
 </div>
-<dialog aria-label="Menu główne" class="r-dialog r-menu-dialog" data-mobile-menu="">
-<header class="r-dialog-header"><div class="r-brand"><span class="r-brand-mark"><i aria-hidden="true" data-lucide="radar"></i></span><span>Red Threat Alert</span></div><button aria-label="Zamknij menu" class="r-dialog-close cursor-interaction" data-close-menu="" type="button"><i aria-hidden="true" data-lucide="x"></i></button></header>
-<nav aria-label="Nawigacja mobilna" class="r-nav r-mobile-nav">
-<button class="cursor-interaction" data-page="overview" type="button"><i aria-hidden="true" data-lucide="layout-dashboard"></i><span>Przegląd</span></button>
-<button class="cursor-interaction" data-page="map" type="button"><i aria-hidden="true" data-lucide="map"></i><span>Mapa Operacyjna</span></button>
-<button class="cursor-interaction" data-page="journal" type="button"><i aria-hidden="true" data-lucide="list-filter"></i><span>Dziennik Sygnałów</span></button>
-<button class="cursor-interaction" data-page="reports" type="button"><i aria-hidden="true" data-lucide="files"></i><span>Raporty</span></button>
-<a class="r-support-link r-coffee-link" href="https://buycoffee.to/red-threat-meter" target="_blank" rel="noopener noreferrer" aria-label="Postaw kawę dla Red Threat Alert na buycoffee.to — otwiera nową kartę"><img src="/assets/buycoffee-primary-pl.png" width="312" height="81" alt="Postaw kawę"></a>
+<nav aria-label="Nawigacja mobilna" class="r-bottom-nav">
+<button type="button" data-page="overview" aria-current="page"><i aria-hidden="true" data-lucide="layout-dashboard"></i><span>Przegląd</span></button>
+<button type="button" data-page="map"><i aria-hidden="true" data-lucide="map"></i><span>Mapa</span></button>
+<button type="button" data-page="journal"><i aria-hidden="true" data-lucide="list-filter"></i><span>Dziennik</span></button>
+<button type="button" data-page="reports"><i aria-hidden="true" data-lucide="files"></i><span>Raporty</span></button>
 </nav>
-<footer class="r-menu-footer"><div><div class="r-eyebrow">Indeks RTA</div><div class="r-dialog-index"><b data-dialog-score="">—</b><span>/100</span></div></div><span class="r-small"></span></footer>
-</dialog>
 <dialog aria-label="Powiększona mapa operacyjna" class="r-dialog r-map-dialog" data-map-dialog="">
-<header class="r-dialog-header"><div><div class="r-eyebrow">Mapa operacyjna</div><div class="r-dialog-index"><b data-dialog-score="">—</b><span>/100</span></div></div><button aria-label="Zamknij powiększoną mapę" class="r-dialog-close cursor-interaction" data-close-map="" type="button"><i aria-hidden="true" data-lucide="x"></i><span>Zamknij</span></button></header>
+<header class="r-dialog-header"><div><div class="r-eyebrow">Mapa operacyjna</div></div><button aria-label="Zamknij powiększoną mapę" class="r-dialog-close cursor-interaction" data-close-map="" type="button"><i aria-hidden="true" data-lucide="x"></i><span>Zamknij</span></button></header>
 <div class="r-expanded-grid" data-expanded-grid="" data-selected="false"><div class="r-map-region" data-map-slot="expanded"></div><aside data-detail="expanded" hidden=""></aside></div>
 </dialog>
 <template data-template="map"><div class="r-map-stage"><svg aria-label="Mapa sygnałów. Flaga w stolicy oznacza informację dotyczącą całego kraju." class="r-map" role="img"></svg><div class="r-map-markers"></div><div aria-label="Sterowanie mapą" class="r-map-tools" role="group"><button aria-label="Przybliż mapę" class="r-map-tool cursor-interaction" data-map-action="in" data-tooltip="Przybliż" type="button"><i aria-hidden="true" data-lucide="plus"></i></button><button aria-label="Oddal mapę" class="r-map-tool cursor-interaction" data-map-action="out" data-tooltip="Oddal" type="button"><i aria-hidden="true" data-lucide="minus"></i></button><button aria-label="Pokaż cały obszar" class="r-map-tool cursor-interaction" data-map-action="reset" data-tooltip="Pokaż cały obszar" type="button"><i aria-hidden="true" data-lucide="scan"></i></button><button aria-label="Powiększ mapę" class="r-map-tool cursor-interaction" data-map-action="expand" data-tooltip="Powiększ mapę" type="button"><i aria-hidden="true" data-lucide="maximize"></i></button></div><span aria-hidden="true" class="r-map-zoom" data-map-zoom="">1×</span></div><div class="r-map-legend"><span><i aria-hidden="true" data-lucide="circle-dot"></i>Punkt lokalny</span><span><i aria-hidden="true" data-lucide="flag"></i>Informacja dla całego kraju</span></div><div class="r-map-credit"><span>Lokalizacje orientacyjne</span><span>Podkład mapy: naturalearthdata.com</span></div></template>

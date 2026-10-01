@@ -6,13 +6,13 @@ zaakceptowany układ: **B — Chronologia**.
 
 ## Hierarchia i układ
 
-1. RTB pozostaje największą liczbą, razem z trendem i mniejszą pewnością danych.
+1. Tylko w Przeglądzie indeks RTA pozostaje największą liczbą, razem z trendem i mniejszą pewnością danych.
 2. Trzy zdania komentarza są obok wyniku; na telefonie bezpośrednio pod nim.
 3. Mapa oraz oś czasu tworzą asymetryczny układ; nie kolekcję identycznych kart.
-4. Cztery pozycje menu zachowują nazwy i kolejność. Mobile używa hamburgera.
+4. Cztery pozycje menu zachowują nazwy i kolejność. Mobile używa dolnego paska: Przegląd, Mapa, Dziennik, Raporty.
 5. Każdy odstęp ma rolę z `theme.css`. Stosuj `gap` w szeregach i grupach.
 6. Przy 320 px treść się zawija, bez poziomego przewijania i uciętych kontrolek.
-7. RTB pozostaje przy przewijaniu. W B oś czasu poprzedza mapę, również na telefonie.
+7. Indeks pozostaje przy przewijaniu tylko w Przeglądzie. W B oś czasu poprzedza mapę, również na telefonie.
 8. Rozwijany zakres obserwacji umieszczamy po treści widoku, przed stopką;
    w Przeglądzie po osi czasu i mapie. Skrót pewności pozostaje przy RTB.
 
@@ -54,7 +54,7 @@ zaakceptowany układ: **B — Chronologia**.
 
 ## Interakcje i dostępność
 
-- „Postaw kawę” jest osobnym linkiem wsparcia w menu i stopce, poza czterema
+- „Postaw kawę” jest osobnym linkiem wsparcia w menu desktop i stopce, poza czterema
   widokami danych. Otwiera nową kartę, z etykietą dostępną i `noopener noreferrer`.
 - Przycisk ma czasownik lub jednoznaczną nazwę; ikona ma dostępną etykietę.
 - Zachowuj widoczny fokus. Dialogi zamykają się przez Esc i przycisk, po
