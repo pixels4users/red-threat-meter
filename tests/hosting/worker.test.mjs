@@ -25,7 +25,7 @@ test('latest returns the existing envelope and sends the key only to the pinned 
     assert.equal(u.pathname, '/rest/v1/dashboard_reports');
     assert.equal(u.searchParams.get('report_type'), 'eq.daily');
     assert.equal(u.searchParams.get('limit'), '1');
-    assert.equal(init.method, 'GET'); assert.equal(init.redirect, 'error');
+    assert.equal(init.method, 'GET'); assert.equal(init.redirect, 'manual');
     assert.equal(init.headers.apikey, env.SUPABASE_SECRET_KEY);
     return reply([current]);
   });
@@ -38,6 +38,36 @@ test('latest returns the existing envelope and sends the key only to the pinned 
 test('configuration has no secrets or project identifiers', async () => {
   const result = await handle(request('/api/config'), env, blockedFetch);
   assert.deepEqual(await result.json(), { refresh_seconds: 30, stale_after_hours: 30 });
+});
+
+test('Worker-compatible transport rejects redirects without sending credentials onward', async () => {
+  let calls = 0;
+  const result = await handle(request('/api/latest'), env, async (url, init) => {
+    calls++;
+    if (init.redirect === 'error') throw new TypeError('Unsupported redirect mode');
+    assert.equal(init.redirect, 'manual');
+    assert.equal(new URL(url).origin, env.SUPABASE_URL);
+    return new Response(null, { status: 302, headers: { Location: 'https://other.example/' } });
+  });
+  assert.equal(calls, 1);
+  assert.equal(result.status, 503);
+  assert.deepEqual(await result.json(), { error: 'temporarily_unavailable' });
+});
+
+test('default transport preserves the native Worker fetch receiver', async () => {
+  const original = globalThis.fetch;
+  let calls = 0;
+  globalThis.fetch = async function () {
+    assert.equal(this, globalThis, 'Cloudflare native fetch requires its receiver');
+    calls++;
+    return reply([row()]);
+  };
+  try {
+    const result = await handle(request('/api/latest'), env);
+    assert.equal(result.status, 200);
+    assert.equal(calls, 1);
+    assert.equal((await result.json()).report.report_id, row().report_id);
+  } finally { globalThis.fetch = original; }
 });
 
 test('no write proxy, arbitrary query, duplicate parameter or cross-origin read', async () => {

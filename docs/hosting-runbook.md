@@ -3,7 +3,9 @@
 Stan: 01.10.2026. Właściwy frontend **B — Chronologia** działa pod adresem
 [Red Threat Alert](https://red-threat-alert.michalomski.chatgpt.site).
 Projekt Sites: `appgprj_6abe3ae4ab688191ade3a1f128a64451`.
-Dostęp jest prywatny, dla właściciela. Design System pozostaje osobnym projektem.
+Dostęp jest publiczny od 01.10.2026 na wyraźne polecenie użytkownika.
+Adres docelowy: [redthreatalert.pl](https://redthreatalert.pl).
+Design System pozostaje osobnym projektem.
 
 ## Przepływ danych
 
@@ -79,6 +81,24 @@ odczyt, archiwum 12 raportów i pobieranie identycznego JSON. Przeszło 12 test�
 adaptera oraz 7 testów frontendu/bazy. Paczka nie zawiera kluczy.
 Dowód: `data/sites/deployment-verification-2026-10-01.json`.
 
+Naprawa produkcyjna 01.10.2026: runtime odrzucał `redirect: 'error'` błędem
+TypeError przed wysłaniem zapytania. Używamy `manual` i odrzucamy wszystkie
+odpowiedzi 3xx: klucz nie jest przekazywany do adresu przekierowania.
+Lokalny test Node nie wykrył pierwotnej niezgodności środowisk; dodano test
+transportu i zakazu podążania za przekierowaniem. Przechodzi 14 testów adaptera.
+Anonimowy odczyt produkcyjny potwierdził HTTP 200, raport z 01.10 o 12:12
+(Warszawa), RTB 3, pewność 22%, 74 wpisy, archiwum 12 raportów i zgodność
+pobranego JSON. Zweryfikowano widok raportu oraz menu mobilne w przeglądarce.
+Źródło Sites: `89fe895e1702cf5d0252bd491ef81eb5fcec589f`,
+deployment: `appgdep_6abe5fbdc2c48191a643aacb947b4ccb`, wersja 5,
+runtime revision 1, public access revision 2.
+Dowód: `data/sites/public-report-verification-2026-10-01.json`.
+
+Przyciski „Postaw kawę” w nawigacji, menu mobilnym i stopce prowadzą do
+`https://buycoffee.to/red-threat-meter`. Korzystają z neutralnych stylów
+Design Systemu, bez zewnętrznego skryptu ani obrazka. Otwierają nową kartę
+z `rel="noopener noreferrer"`.
+
 ## Domena redthreatalert.pl — aktywna od 01.10.2026
 
 Delegacja DNS wskazuje `dns.home.pl`, `dns2.home.pl` i `dns3.home.pl`.
@@ -86,7 +106,8 @@ Przypisanie Sites `appgdom_6abe3d9d5ca88191a10d7a890f470322` ma status `active`,
 podobnie certyfikat HTTPS. Adres: [redthreatalert.pl](https://redthreatalert.pl).
 W zalogowanym panelu home.pl dodano dwa rekordy A i dwa TXT. Lista była pusta;
 kontrola DNS nie wykazała wcześniejszych rekordów A, AAAA, MX ani TXT domeny
-głównej. Delegacja DNS i prywatny dostęp Sites pozostają bez zmian.
+głównej. Delegacja DNS pozostała bez zmian. W chwili podłączania domeny dostęp
+Sites był prywatny; później zmieniono go na publiczny zgodnie z opisem powyżej.
 Potwierdzenie: `data/sites/domain-verification-2026-10-01.json`.
 Zastosowane wartości otrzymane z Sites:
 

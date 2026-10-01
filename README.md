@@ -12,8 +12,8 @@ Sprawdzono również **trzy półgodzinne wycinki historii lotniczej** z 22–24
 
 ## Jak korzystać
 
-Właściwy dashboard jest [online](https://red-threat-alert.michalomski.chatgpt.site)
-z prywatnym dostępem Sites. Czyta publikacje z Supabase przez serwerowe API;
+Właściwy dashboard jest [publicznie dostępny online](https://redthreatalert.pl).
+Czyta publikacje z Supabase przez serwerowe API;
 nie wymaga uruchomionego lokalnego serwera WWW. [Hosting i domena](docs/hosting-runbook.md).
 
 Na tym Macu środowisko jest już przygotowane. Uruchom plik **`Zbierz dane.command`** z katalogu projektu. Pobierze dostępne publikacje i otworzy raport. Przy pierwszym uruchomieniu na innym komputerze potrzebny jest Python 3.11+ oraz dostęp do internetu do instalacji zależności.
@@ -162,7 +162,7 @@ Dwa kierunki UI zostały przedstawione; użytkownik zaakceptował B — Chronolo
 i wdrożenie przepływu danych. Zapis i odczyt rzeczywistego wydania przez Supabase
 oraz automatyczne odświeżenie ekranu zostały sprawdzone. Hosting aplikacji
 działa w Sites pod adresem [redthreatalert.pl](https://redthreatalert.pl),
-obecnie z prywatnym dostępem. Silnik ma ścieżkę przeglądu
+z publicznym dostępem. Silnik ma ścieżkę przeglądu
 Codexa, zatwierdzania komentarza i aktywny harmonogram. Działa v0.4 oraz import
 zweryfikowanych pomiarów GNSS do kontekstu i pokrycia. Uzupełnienie historii
 zdarzeń i kalibracja pozostają dalszymi pracami.

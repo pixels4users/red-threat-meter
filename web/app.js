@@ -1,11 +1,11 @@
-import { createIcons, Radar, Menu, X, LayoutDashboard, Map, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp } from 'lucide';
+import { createIcons, Radar, Menu, X, LayoutDashboard, Map, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee } from 'lucide';
 import { select, scaleLinear, line, extent } from 'd3';
 import { categories, statuses, sourceStatuses, scoreLabel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, comparable, checkEnvelope, safeLink, reportText } from './data.js';
 import { initializeMaps, mapPoints } from './map.js';
 
 const root = document.querySelector('#rtb-dashboard');
 const $ = s => root.querySelector(s), $$ = s => [...root.querySelectorAll(s)];
-const icons = () => createIcons({ icons: { Radar, Menu, X, LayoutDashboard, Map, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp }, attrs: { width: 16, height: 16, 'aria-hidden': 'true' } });
+const icons = () => createIcons({ icons: { Radar, Menu, X, LayoutDashboard, Map, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee }, attrs: { width: 16, height: 16, 'aria-hidden': 'true' } });
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const button = (text, action, cls = 'r-button') => { const b = el('button', cls, text); b.type = 'button'; b.addEventListener('click', action); return b; };
 const pages = { overview: 'Przegląd', map: 'Mapa Operacyjna', journal: 'Dziennik Sygnałów', reports: 'Raporty' };

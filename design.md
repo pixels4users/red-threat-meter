@@ -67,6 +67,9 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
 
 ## Komponenty v0.2
 
+- Wsparcie (01.10.2026): neutralny przycisk „Postaw kawę” z ikoną filiżanki
+  w nawigacji desktop/mobile i stopce; prowadzi do buycoffee.to/red-threat-meter
+  w nowej karcie. Używa tokenów istniejących akcji, bez zewnętrznego obrazka.
 - Powłoka: sidebar desktop, pasek z hamburgerem mobile, duży dialog menu.
 - RTB: wartość, delta ze strzałką, okres porównania, pewność danych i dwa
   wkłady: działania oraz przygotowania. To odrębne informacje.

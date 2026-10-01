@@ -45,6 +45,8 @@ zaakceptowany układ: **B — Chronologia**.
 
 ## Interakcje i dostępność
 
+- „Postaw kawę” jest osobnym linkiem wsparcia w menu i stopce, poza czterema
+  widokami danych. Otwiera nową kartę, z etykietą dostępną i `noopener noreferrer`.
 - Przycisk ma czasownik lub jednoznaczną nazwę; ikona ma dostępną etykietę.
 - Zachowuj widoczny fokus. Dialogi zamykają się przez Esc i przycisk, po
   zamknięciu zwracają fokus; Tab nie wychodzi za otwarte okno.

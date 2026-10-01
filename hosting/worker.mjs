@@ -81,7 +81,9 @@ async function readRows(env, params, fetcher) {
   if (key.startsWith('eyJ')) headers.Authorization = `Bearer ${key}`;
   // No request URL, user headers, table name or SQL is forwarded to Supabase.
   const response = await fetcher(`${ORIGIN}/rest/v1/dashboard_reports?${new URLSearchParams(params)}`,
-    { method: 'GET', headers, redirect: 'error', signal: AbortSignal.timeout(10_000) });
+    // This hosting runtime rejects redirect:'error'. Manual mode never forwards
+    // credentials to a redirect destination; all 3xx responses fail below.
+    { method: 'GET', headers, redirect: 'manual', signal: AbortSignal.timeout(10_000) });
   if (!response.ok || Number(response.headers.get('content-length')) > MAX_BYTES) throw new Error('upstream');
   const reader = response.body?.getReader();
   if (!reader) throw new Error('upstream');
@@ -102,7 +104,8 @@ async function readRows(env, params, fetcher) {
   return rows;
 }
 
-export async function handle(request, env, fetcher = fetch) {
+// Preserve the receiver for runtimes whose native fetch requires it.
+export async function handle(request, env, fetcher = (...args) => globalThis.fetch(...args)) {
   const url = new URL(request.url);
   if (!['GET', 'HEAD'].includes(request.method)) return json({ error: 'method_not_allowed' }, 405);
   if (!url.pathname.startsWith('/api/')) {
@@ -156,7 +159,23 @@ export async function handle(request, env, fetcher = fetch) {
   } catch (error) {
     if (error instanceof InvalidRequest) return json({ error: 'invalid_request' }, 400);
     // Deliberately exclude exception bodies, source text and credentials.
-    console.error('dashboard_read_failed');
+    const reasons = ['configuration', 'upstream', 'size_limit', 'invalid_report', 'invalid_source',
+      'invalid_map', 'invalid_commentary', 'invalid_history', 'invalid_anchor', 'invalid_identity', 'invalid_type'];
+    console.error('dashboard_read_failed', JSON.stringify({
+      reason: reasons.includes(error.message) ? error.message : 'runtime',
+      error_type: error instanceof TypeError ? 'TypeError' : 'Error',
+      runtime_detail: /redirect/i.test(error.message) ? 'redirect_mode' :
+        /header/i.test(error.message) ? 'header_format' :
+        /invocation|this reference/i.test(error.message) ? 'native_receiver' :
+        /decod|encoding|fatal/i.test(error.message) ? 'decoder' :
+        /fetch|network/i.test(error.message) ? 'network' : 'other',
+      key_has_whitespace: /\s/.test(env?.SUPABASE_SECRET_KEY ?? ''),
+      url_configured: typeof env?.SUPABASE_URL === 'string',
+      url_matches: env?.SUPABASE_URL === ORIGIN,
+      key_configured: typeof env?.SUPABASE_SECRET_KEY === 'string',
+      key_supported: /^(sb_secret_|eyJ)/.test(env?.SUPABASE_SECRET_KEY ?? ''),
+      timeout_supported: typeof AbortSignal.timeout === 'function'
+    }));
     return json({ error: 'temporarily_unavailable' }, 503);
   }
 }

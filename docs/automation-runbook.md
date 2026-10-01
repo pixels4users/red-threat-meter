@@ -51,6 +51,11 @@ bez nadzoru.
    zgodności odczytanego raportu. Zapisz dowód w prywatnym `verification.json`
    tego cyklu. Lokalna strona nie musi działać podczas publikacji; po
    otwarciu pobierze najnowszy pakiet z Supabase.
+8. Po publikacji sprawdź publiczny `https://redthreatalert.pl/api/latest`:
+   wymagaj HTTP 200 i zgodności `report.report_id` z opublikowanym wydaniem.
+   Ten odczyt nie wymaga klucza ani lokalnego serwera. Zapisz wynik w dowodzie
+   cyklu. Awarię hostingu zgłoś oddzielnie od udanej publikacji w Supabase;
+   nie twórz ponownie analizy ani nie zmieniaj ustawień hostingu w harmonogramie.
 
 Analiza nie zmienia kodu, wag, limitów ani źródeł. Opis oceny i dokładne
 argumenty poleceń pozostają w instrukcji agenta, bez drugiej konkurencyjnej
