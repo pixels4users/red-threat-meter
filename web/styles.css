@@ -341,7 +341,7 @@ body { margin:0; }
 .rtb-app[data-red-priority="true"] .r-kpi { color:var(--color-threat); }
 .rtb-app .r-official-warnings article { padding:var(--space-md);margin-block:var(--space-sm);background:var(--r-surface);border-inline-start:4px solid currentColor; }
 .rtb-app .r-official-warnings [data-shelter="true"] { border-color:var(--color-threat);background:var(--color-threat-surface); }
-.rtb-app .r-coverage { padding:var(--space-sm) 0;border-bottom:1px solid var(--r-line);font-size:var(--text-body-small); }
+.rtb-app .r-coverage { padding:var(--space-sm) 0;font-size:var(--text-body-small); }
 .rtb-app .r-coverage summary { cursor:pointer;min-height:44px;align-content:center; }
 .rtb-app .r-coverage-content { display:grid;gap:var(--space-sm);padding:var(--space-md) 0; }
 .rtb-app .r-source-state { display:flex;flex-wrap:wrap;gap:var(--space-xs) var(--space-md); }
