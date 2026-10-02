@@ -1,0 +1,209 @@
+<style>
+#rta-ux-directions .rta-concept{--ux-bg:light-dark(#fff,#0a0a0a);--ux-side:light-dark(#f6f6f6,#141414);--ux-soft:light-dark(#f4f4f4,#202020);--ux-text:light-dark(#171717,#f5f5f5);--ux-muted:light-dark(#626262,#aaa);--ux-line:light-dark(#dedede,#383838);--ux-green:light-dark(#237044,#79d69b);--ux-red:light-dark(#bd302b,#ff7973);--ux-selected:light-dark(#171717,#eee);--ux-on-selected:light-dark(#fff,#171717);font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-size:14px;line-height:1.55;color:var(--ux-text);background:var(--ux-bg);min-height:1120px;display:grid;grid-template-columns:176px minmax(0,1fr);box-sizing:border-box}
+#rta-ux-directions .rta-concept *{box-sizing:border-box}
+#rta-ux-directions .rta-concept [hidden]{display:none!important}
+#rta-ux-directions .rta-concept h1,#rta-ux-directions .rta-concept h2,#rta-ux-directions .rta-concept h3,#rta-ux-directions .rta-concept p{margin:0}
+#rta-ux-directions .rta-concept h1{font-size:28px;line-height:1.25;font-weight:500;letter-spacing:-.8px}
+#rta-ux-directions .rta-concept h2{font-size:18px;line-height:1.35;font-weight:500;letter-spacing:-.3px}
+#rta-ux-directions .rta-concept h3{font-size:15px;line-height:1.4;font-weight:500}
+#rta-ux-directions .rta-concept strong{font-weight:600}
+#rta-ux-directions .rta-concept a{color:inherit;text-underline-offset:4px}
+#rta-ux-directions .rta-concept button,#rta-ux-directions .rta-concept select{font:inherit;color:inherit;min-height:44px;background:var(--ux-bg);border:1px solid var(--ux-line);border-radius:8px;padding:8px 12px}
+#rta-ux-directions .rta-concept select{font-size:16px;max-width:100%;width:100%}
+#rta-ux-directions .rta-side{background:var(--ux-side);padding:28px 16px;display:flex;flex-direction:column;gap:32px}
+#rta-ux-directions .rta-brand{display:flex;align-items:center;gap:8px;font-size:16px;line-height:1.3;font-weight:600;letter-spacing:-.3px}
+#rta-ux-directions .rta-brand i,#rta-ux-directions .rta-brand svg{color:var(--ux-red);width:28px;height:28px;flex:none}
+#rta-ux-directions .rta-nav{display:grid;gap:8px}
+#rta-ux-directions .rta-nav span{display:flex;align-items:center;gap:8px;padding:12px 8px;font-size:13px;line-height:1.35;color:var(--ux-muted)}
+#rta-ux-directions .rta-nav .rta-active{color:var(--ux-text);background:var(--ux-bg);border-radius:8px;font-weight:500}
+#rta-ux-directions .rta-nav svg{width:18px;height:18px;flex:none}
+#rta-ux-directions .rta-side-note{margin-top:auto!important;color:var(--ux-muted);font-size:12px}
+#rta-ux-directions .rta-main{padding:24px 32px 20px;min-width:0;display:flex;flex-direction:column}
+#rta-ux-directions .rta-demo{font-size:12px;color:var(--ux-muted);border-bottom:1px solid var(--ux-line);padding-bottom:12px;margin-bottom:24px!important}
+#rta-ux-directions .rta-header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:32px}
+#rta-ux-directions .rta-muted{color:var(--ux-muted)}
+#rta-ux-directions .rta-small{font-size:12px;line-height:1.5;color:var(--ux-muted)}
+#rta-ux-directions .rta-eyebrow{font-size:11px;letter-spacing:1px;font-weight:500;text-transform:uppercase;color:var(--ux-muted)}
+#rta-ux-directions .rta-hero{display:grid;grid-template-columns:184px minmax(0,1fr);gap:32px;padding-bottom:32px;border-bottom:1px solid var(--ux-line)}
+#rta-ux-directions .rta-number{font-size:96px;line-height:1.08;font-weight:500;letter-spacing:-6px;color:var(--ux-green);font-variant-numeric:tabular-nums}
+#rta-ux-directions .rta-denom{font-size:20px;letter-spacing:-.5px;color:var(--ux-muted);margin-left:8px}
+#rta-ux-directions .rta-level{font-size:14px;font-weight:500;margin-top:4px!important}
+#rta-ux-directions .rta-certainty{margin-top:8px!important;font-size:12px;color:var(--ux-muted)}
+#rta-ux-directions .rta-summary{padding-top:4px;display:flex;flex-direction:column;gap:12px}
+#rta-ux-directions .rta-summary h2{font-size:22px;line-height:1.3;letter-spacing:-.6px}
+#rta-ux-directions .rta-summary p{font-size:15px;line-height:1.6}
+#rta-ux-directions .rta-workspace{display:grid;grid-template-areas:'region' 'topics';gap:32px;margin-top:32px}
+#rta-ux-directions .rta-region{grid-area:region;min-width:0}
+#rta-ux-directions .rta-section-heading{display:flex;gap:16px;justify-content:space-between;align-items:center;margin-bottom:20px}
+#rta-ux-directions .rta-region-picker{max-width:220px;min-width:180px}
+#rta-ux-directions .rta-region-picker span{display:block;font-size:12px;color:var(--ux-muted);margin-bottom:4px}
+#rta-ux-directions .rta-regional-grid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:24px}
+#rta-ux-directions .rta-story{border-bottom:1px solid var(--ux-line);padding:0 0 16px;margin-bottom:16px}
+#rta-ux-directions .rta-story:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+#rta-ux-directions .rta-story summary{list-style:none;min-height:44px;display:flex;flex-direction:column;gap:4px}
+#rta-ux-directions .rta-story summary::-webkit-details-marker{display:none}
+#rta-ux-directions .rta-story summary h3{display:flex;justify-content:space-between;gap:12px}
+#rta-ux-directions .rta-story summary h3::after{content:'+';font-weight:400;font-size:20px;flex:none}
+#rta-ux-directions .rta-story[open] summary h3::after{content:'−'}
+#rta-ux-directions .rta-story .rta-expanded{margin-top:12px;display:grid;gap:12px;color:var(--ux-muted)}
+#rta-ux-directions .rta-guidance{padding:20px;background:var(--ux-soft);border-radius:8px;align-self:start;display:grid;gap:12px}
+#rta-ux-directions .rta-guidance a{display:inline-flex;align-items:center;gap:8px;font-size:13px;min-height:44px;font-weight:500}
+#rta-ux-directions .rta-guidance .rta-eyebrow{color:var(--ux-text)}
+#rta-ux-directions .rta-guidance-text{font-size:14px}
+#rta-ux-directions .rta-topics{grid-area:topics;min-width:0}
+#rta-ux-directions .rta-topics-intro{margin:8px 0 16px!important}
+#rta-ux-directions .rta-topic{border-top:1px solid var(--ux-line);padding:16px 0}
+#rta-ux-directions .rta-topic summary{list-style:none;display:grid;grid-template-columns:1fr 1fr 20px;gap:16px;align-items:center;min-height:44px}
+#rta-ux-directions .rta-topic summary::-webkit-details-marker{display:none}
+#rta-ux-directions .rta-topic-title{font-weight:500}
+#rta-ux-directions .rta-topic-meta{display:flex;flex-direction:column;gap:2px}
+#rta-ux-directions .rta-topic-plus{font-size:20px}
+#rta-ux-directions .rta-topic[open] .rta-topic-plus{transform:rotate(45deg)}
+#rta-ux-directions .rta-topic-content{margin-top:12px;display:grid;gap:8px}
+#rta-ux-directions .rta-topic-content a{min-height:44px;display:inline-flex;align-items:center}
+#rta-ux-directions .rta-coverage{margin-top:24px;padding:16px 0;border-top:1px solid var(--ux-line)}
+#rta-ux-directions .rta-coverage summary{min-height:44px;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ux-muted)}
+#rta-ux-directions .rta-coverage p{padding-bottom:12px;color:var(--ux-muted);font-size:12px}
+#rta-ux-directions .rta-footer{margin-top:auto;padding-top:20px;border-top:1px solid var(--ux-line);display:flex;justify-content:space-between;gap:16px;font-size:11px;color:var(--ux-muted)}
+#rta-ux-directions .rta-mobile-nav{display:none}
+#rta-ux-directions .rta-changes .rta-workspace{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-areas:'topics region';gap:32px}
+#rta-ux-directions .rta-changes .rta-regional-grid{grid-template-columns:1fr;gap:20px}
+#rta-ux-directions .rta-changes .rta-section-heading{display:block}
+#rta-ux-directions .rta-changes .rta-region-picker{display:block;max-width:none;margin-top:16px}
+#rta-ux-directions .rta-changes .rta-topic summary{grid-template-columns:minmax(0,1fr) 20px;gap:8px}
+#rta-ux-directions .rta-changes .rta-topic-title{font-size:18px}
+#rta-ux-directions .rta-changes .rta-topic-meta{grid-column:1;grid-row:2}
+#rta-ux-directions .rta-changes .rta-topic-plus{grid-column:2;grid-row:1/3}
+#rta-ux-directions .rta-changes .rta-topic{padding:20px 0}
+#rta-ux-directions .rta-concept.rta-quiet-guidance .rta-guidance{background:transparent;border-radius:0;border-left:2px solid var(--ux-line);padding:0 0 0 20px}
+@media(max-width:780px){#rta-ux-directions .rta-concept{grid-template-columns:152px minmax(0,1fr)}#rta-ux-directions .rta-main{padding:24px}#rta-ux-directions .rta-hero{grid-template-columns:148px minmax(0,1fr);gap:20px}#rta-ux-directions .rta-number{font-size:84px}#rta-ux-directions .rta-regional-grid{grid-template-columns:1fr}#rta-ux-directions .rta-changes .rta-workspace{grid-template-columns:1fr;grid-template-areas:'topics' 'region'}}
+@media(max-width:620px){#rta-ux-directions .rta-concept{grid-template-columns:1fr;min-height:1640px}#rta-ux-directions .rta-side{padding:16px;gap:0}#rta-ux-directions .rta-brand{font-size:16px}#rta-ux-directions .rta-brand br{display:none}#rta-ux-directions .rta-side .rta-nav,#rta-ux-directions .rta-side-note{display:none}#rta-ux-directions .rta-main{padding:16px}#rta-ux-directions .rta-demo{font-size:11px;margin-bottom:20px!important}#rta-ux-directions .rta-header{margin-bottom:24px}#rta-ux-directions .rta-hero{grid-template-columns:1fr;gap:24px;padding-bottom:24px}#rta-ux-directions .rta-number{font-size:88px}#rta-ux-directions .rta-summary h2{font-size:22px}#rta-ux-directions .rta-workspace{margin-top:24px;gap:32px}#rta-ux-directions .rta-section-heading{display:block}#rta-ux-directions .rta-region-picker{display:block;max-width:none;margin-top:12px}#rta-ux-directions .rta-topic summary{grid-template-columns:1fr 20px;gap:4px}#rta-ux-directions .rta-topic-title{grid-column:1}#rta-ux-directions .rta-topic-meta{grid-column:1;grid-row:2}#rta-ux-directions .rta-topic-plus{grid-column:2;grid-row:1/3}#rta-ux-directions .rta-changes .rta-workspace{grid-template-areas:'region' 'topics'}#rta-ux-directions .rta-footer{flex-direction:column;gap:4px}#rta-ux-directions .rta-mobile-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--ux-bg);border-top:1px solid var(--ux-line);gap:4px;padding:8px;margin-top:24px}#rta-ux-directions .rta-mobile-nav span{min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;color:var(--ux-muted)}#rta-ux-directions .rta-mobile-nav .rta-active{color:var(--ux-text);background:var(--ux-soft);border-radius:8px}#rta-ux-directions .rta-mobile-nav svg{width:20px;height:20px}}
+</style>
+<div id="rta-ux-directions" class="viz-carousel" aria-label="Kierunki rozwoju Przeglądu Red Threat Alert" data-previous-label="Poprzedni kierunek" data-next-label="Następny kierunek">
+  <section data-variant="Dla Ciebie" aria-label="Dla Ciebie">
+    <div class="rta-concept" data-layout="personal" aria-label="Układ Dla Ciebie">
+      <aside class="rta-side">
+        <div class="rta-brand"><i data-lucide="radar" aria-hidden="true"></i><span>Red Threat<br> Alert</span></div>
+        <nav class="rta-nav" aria-label="Podgląd nawigacji">
+          <span class="rta-active" aria-current="page"><i data-lucide="layout-dashboard" aria-hidden="true"></i>Przegląd</span>
+          <span><i data-lucide="map" aria-hidden="true"></i>Mapa Operacyjna</span>
+          <span><i data-lucide="list-filter" aria-hidden="true"></i>Dziennik Sygnałów</span>
+          <span><i data-lucide="files" aria-hidden="true"></i>Raporty</span>
+        </nav>
+        <p class="rta-side-note">Polska i wschodnia<br>flanka NATO</p>
+      </aside>
+      <main class="rta-main">
+        <p class="rta-demo">Prototyp układu · treści z raportu 2.10.2026 · przykładowe dopasowanie regionu</p>
+        <header class="rta-header"><h1>Przegląd</h1><p class="rta-small">Stan na 2 października 2026<br>09:25 · raport dobowy</p></header>
+        <section class="rta-hero" aria-label="Indeks Polski i najważniejsze wydarzenia">
+          <div><p class="rta-eyebrow">Indeks RTA · Polska</p><div><span class="rta-number">2,7</span><span class="rta-denom">/100</span></div><p class="rta-level">Zagrożenie: niskie</p><p class="rta-certainty">Pewność danych: 25%</p></div>
+          <div class="rta-summary"><p class="rta-eyebrow">Co się dzieje</p><h2>Ataki dronów w Ukrainie.<br>Polskę wzmocnią Gripeny.</h2><p>Ukraińskie Siły Powietrzne podały, że w nocy z 30 września na 1 października kraj zaatakowało 107 dronów. Na październik zapowiedziano dyżury szwedzkich myśliwców nad Polską.</p><p class="rta-small">Niski indeks nie zastępuje lokalnych komunikatów służb.</p></div>
+        </section>
+        <div class="rta-workspace">
+          <section class="rta-region" aria-label="Wydarzenia i zalecenia dla wybranego regionu">
+            <div class="rta-section-heading"><div><p class="rta-eyebrow">Czy dotyczy mnie</p><h2 data-region-heading aria-live="polite">Dla mieszkańców Polski</h2></div><label class="rta-region-picker"><span>Twój region</span><select class="cursor-interaction" data-region-select><option value="PL">Cała Polska</option><option value="PL-14">Mazowieckie</option><option value="PL-32">Zachodniopomorskie</option></select></label></div>
+            <div class="rta-regional-grid">
+              <div>
+                <details class="rta-story" data-coast><summary class="cursor-interaction"><span class="rta-small">Świnoujście i okolice · zapowiedź</span><h3>Ograniczenia na wybrzeżu 5–8 października</h3></summary><div class="rta-expanded"><p>Zapowiedziano usuwanie niewybuchów z II wojny światowej. W godzinach 08:00–15:00 plan obejmuje zakaz wchodzenia do wody od granicy polsko-niemieckiej do Międzyzdrojów oraz ograniczenia ruchu na wodzie.</p><p>To zaplanowane działania, nie informacja o nowym ataku. Ograniczenia nie dotyczą całego województwa.</p><a href="https://komunikaty.tvp.pl/komunikaty/wszystkie/ogolne/0?_format=xml" target="_blank" rel="noopener noreferrer">Źródło: Regionalny System Ostrzegania ↗</a></div></details>
+                <details class="rta-story" data-exercise><summary class="cursor-interaction"><span class="rta-small">Powiat pyrzycki · ćwiczenia</span><h3>Ćwiczenia służb 2–3 października</h3></summary><div class="rta-expanded"><p>RCB zapowiedziało ćwiczenia służb w powiecie pyrzyckim. Komunikat przekazano również w RSO. Dotyczy ćwiczeń, nie ataku.</p><a href="https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-sluzb-01102026" target="_blank" rel="noopener noreferrer">Przeczytaj komunikat RCB ↗</a></div></details>
+                <p class="rta-small" data-region-empty hidden>W tym podglądzie nie ma osobnego wydarzenia dla Mazowsza. Komunikaty ogólnopolskie nadal dotyczą tego regionu.</p>
+                <details class="rta-story"><summary class="cursor-interaction"><span class="rta-small">Cała Polska · cyberbezpieczeństwo</span><h3>Fałszywe wiadomości podatkowe</h3></summary><div class="rta-expanded"><p>CERT Polska ostrzega przed wiadomościami podszywającymi się pod Krajową Administrację Skarbową. Załącznik udający raport podatkowy instaluje oprogramowanie umożliwiające zdalny dostęp do urządzenia i przejęcie danych.</p><a href="https://moje.cert.pl/komunikaty/2026/183/przestepcy-znow-podszywaja-sie-pod-krajowa-administracje-skarbowa/" target="_blank" rel="noopener noreferrer">Przeczytaj ostrzeżenie CERT Polska ↗</a></div></details>
+              </div>
+              <aside class="rta-guidance" aria-label="Zalecenia i terminy"><p class="rta-eyebrow">Co powinienem zrobić</p><h3 data-guidance-title>Sprawdź, czy komunikat dotyczy Twoich planów</h3><p class="rta-guidance-text" data-guidance-text>Na wybrzeżu zapowiedziano ograniczenia na 5–8 października. Przed wyjazdem sprawdź ich dokładny zakres i aktualność.</p><p class="rta-small" data-guidance-scope>Świnoujście i okolice · termin przyszły</p><a data-guidance-link href="https://komunikaty.tvp.pl/komunikaty/wszystkie/ogolne/0?_format=xml" target="_blank" rel="noopener noreferrer"><span data-guidance-link-label>Komunikat RSO</span><i data-lucide="arrow-up-right" aria-hidden="true"></i></a></aside>
+            </div>
+          </section>
+          <section class="rta-topics" aria-label="Nowe komunikaty i porównania tematyczne"><p class="rta-eyebrow">Co się zmieniło</p><h2 data-topics-heading>Nowe komunikaty w tematach</h2><p class="rta-small rta-topics-intro">Publikacje z 1–2 października. Nowa publikacja nie musi oznaczać nowego incydentu.</p>
+            <details class="rta-topic"><summary class="cursor-interaction"><span class="rta-topic-title">Cyberbezpieczeństwo</span><span class="rta-topic-meta"><span>Ostrzeżenie przed oszustwem</span><span class="rta-small">Zmiana aktywności: nieoceniona</span></span><span class="rta-topic-plus" aria-hidden="true">+</span></summary><div class="rta-topic-content"><p>CERT opisał fałszywe wiadomości podatkowe. To aktualizacja wiedzy o konkretnej kampanii; raport nie ustala wzrostu liczby ataków.</p><p class="rta-small">Porównanie z poprzednią dobą: brak podstaw do oceny zmiany aktywności.</p></div></details>
+            <details class="rta-topic"><summary class="cursor-interaction"><span class="rta-topic-title">Przestrzeń powietrzna</span><span class="rta-topic-meta"><span>Nowy bilans ataku w Ukrainie</span><span class="rta-small">Zmiana aktywności: nieoceniona</span></span><span class="rta-topic-plus" aria-hidden="true">+</span></summary><div class="rta-topic-content"><p>Raport zawiera komunikaty o atakach dronowych w Ukrainie. Ostrzeżenie o przelocie i późniejszy bilans nie są dwoma osobnymi atakami.</p><p class="rta-small">Porównanie z poprzednią dobą: bez zweryfikowanego zestawienia nie oznaczamy trendu.</p></div></details>
+            <details class="rta-topic"><summary class="cursor-interaction"><span class="rta-topic-title">Nawigacja satelitarna</span><span class="rta-topic-meta"><span>Brak oceny zmiany</span><span class="rta-small">To nie oznacza braku zakłóceń</span></span><span class="rta-topic-plus" aria-hidden="true">+</span></summary><div class="rta-topic-content"><p>Ten widok nie zawiera porównania pomiarów dla wspólnego obszaru i okresu. Nie określamy sytuacji jako „normalnej”.</p></div></details>
+          </section>
+        </div>
+        <details class="rta-coverage"><summary class="cursor-interaction">+ Pewność danych: 25% · zakres obserwacji</summary><p>Ocena opiera się na częściowych obserwacjach. Pewność opisuje pokrycie źródeł, ukończony przegląd i dostępną historię. Nie jest prawdopodobieństwem wojny.</p><p>Indeks dotyczy Polski. Wybór regionu zmienia treści poniżej, nie wynik krajowy.</p></details>
+        <footer class="rta-footer"><span>RedThreatAlert by Pixels4Users</span><span>Indeks eksperymentalny · nie jest prawdopodobieństwem eskalacji</span></footer>
+      </main>
+      <nav class="rta-mobile-nav" aria-label="Podgląd nawigacji mobilnej"><span class="rta-active" aria-current="page"><i data-lucide="layout-dashboard" aria-hidden="true"></i>Przegląd</span><span><i data-lucide="map" aria-hidden="true"></i>Mapa</span><span><i data-lucide="list-filter" aria-hidden="true"></i>Dziennik</span><span><i data-lucide="files" aria-hidden="true"></i>Raporty</span></nav>
+    </div>
+  </section>
+  <section data-variant="Raport zmian" aria-label="Raport zmian" hidden></section>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('rta-ux-directions');
+  const first = root.querySelector('.rta-concept');
+  const second = first.cloneNode(true);
+  second.classList.add('rta-changes');
+  second.dataset.layout = 'changes';
+  second.setAttribute('aria-label','Układ Raport zmian');
+  second.querySelector('[data-topics-heading]').textContent = 'Zmiany według tematu';
+  root.querySelector('[data-variant="Raport zmian"]').append(second);
+  const knownRegions = ['PL','PL-14','PL-32'];
+  let region = 'PL';
+  const restore = state => {
+    const saved = state?.modelContent?.region;
+    if (knownRegions.includes(saved)) region = saved;
+  };
+  restore(window.openai?.widgetState);
+  const apps = [first,second];
+  let stageFrame = 0;
+  function fitStages() {
+    cancelAnimationFrame(stageFrame);
+    stageFrame = requestAnimationFrame(() => {
+      const width = root.clientWidth;
+      if (!width) return;
+      const heights = apps.map(app => {
+        const sample = app.cloneNode(true);
+        sample.setAttribute('aria-hidden','true');
+        Object.assign(sample.style,{position:'absolute',visibility:'hidden',pointerEvents:'none',width:width+'px',minHeight:'0',left:'0',top:'0'});
+        root.append(sample);
+        const height = Math.ceil(sample.getBoundingClientRect().height);
+        sample.remove();
+        return height;
+      });
+      for (const app of apps) app.style.minHeight = Math.max(...heights)+'px';
+    });
+  }
+  function renderRegion() {
+    const mazovia = region === 'PL-14';
+    const name = region === 'PL-32' ? 'Zachodniopomorskie' : mazovia ? 'Mazowieckie' : 'Dla mieszkańców Polski';
+    for (const app of apps) {
+      app.querySelector('[data-region-select]').value = region;
+      app.querySelector('[data-region-heading]').textContent = name;
+      app.querySelector('[data-coast]').hidden = mazovia;
+      app.querySelector('[data-exercise]').hidden = mazovia;
+      app.querySelector('[data-region-empty]').hidden = !mazovia;
+      app.querySelector('[data-region-empty]').style.marginBottom = '20px';
+      app.querySelector('[data-guidance-title]').textContent = mazovia ? 'Uważaj na wiadomości o zaległych podatkach' : 'Sprawdź, czy komunikat dotyczy Twoich planów';
+      app.querySelector('[data-guidance-text]').textContent = mazovia ? 'Przeczytaj ostrzeżenie CERT Polska i sprawdź, jak wyglądają wiadomości używane w tej kampanii.' : 'Na wybrzeżu zapowiedziano ograniczenia na 5–8 października. Przed wyjazdem sprawdź ich dokładny zakres i aktualność.';
+      app.querySelector('[data-guidance-scope]').textContent = mazovia ? 'Komunikat ogólnopolski · CERT Polska' : 'Świnoujście i okolice · termin przyszły';
+      app.querySelector('[data-guidance-link]').href = mazovia ? 'https://moje.cert.pl/komunikaty/2026/183/przestepcy-znow-podszywaja-sie-pod-krajowa-administracje-skarbowa/' : 'https://komunikaty.tvp.pl/komunikaty/wszystkie/ogolne/0?_format=xml';
+      app.querySelector('[data-guidance-link-label]').textContent = mazovia ? 'Ostrzeżenie CERT Polska' : 'Komunikat RSO';
+    }
+    fitStages();
+  }
+  for (const app of apps) {
+    for (const detail of app.querySelectorAll('details')) detail.addEventListener('toggle',fitStages);
+    app.querySelector('[data-region-select]').addEventListener('change', event => {
+      region = event.target.value;
+      renderRegion();
+      window.openai?.setWidgetState?.({modelContent:{region,scope:'ux-prototype'},privateContent:null}).catch(() => {});
+    });
+    if (globalThis.Tweak) {
+      const choices = {emphasizeGuidance:true};
+      const tweak = new Tweak({container:app,onChange:() => app.classList.toggle('rta-quiet-guidance',!choices.emphasizeGuidance)});
+      tweak.addToggle(choices,'emphasizeGuidance',{label:'Wyróżnij zalecenia tłem'});
+    }
+  }
+  window.addEventListener('openai:set_globals',event => {
+    const state = event.detail?.globals?.widgetState;
+    if (state) { restore(state); renderRegion(); }
+  });
+  renderRegion();
+  let stageWidth = 0;
+  new ResizeObserver(entries => {
+    const width = entries[0].contentRect.width;
+    if (width !== stageWidth) { stageWidth = width; fitStages(); }
+  }).observe(root);
+  document.fonts?.ready.then(fitStages);
+  if (globalThis.lucide) lucide.createIcons({attrs:{width:18,height:18}});
+})();
+</script>
