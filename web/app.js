@@ -182,13 +182,24 @@ function renderJournal() {
 function download(name, text, type) {
   const url = URL.createObjectURL(new Blob([text], { type })), a = el('a'); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+let reportOpener;
+function showReportPreview(title, body, opener) {
+  const preview = $('[data-report-preview]'), heading = $('[data-report-title]');
+  reportOpener = opener;
+  heading.textContent = title; $('[data-report-body]').textContent = body; preview.hidden = false;
+  if (state.page === 'reports') {
+    heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true });
+    preview.scrollIntoView({ block: 'start', behavior: 'instant' });
+  }
+}
 async function readReport(id, action) {
+  const opener = document.activeElement;
   try {
     const item = checkEnvelope(await api(`/api/reports/${id}`)); if (!item) throw new Error('missing');
-    if (action === 'read') { $('[data-report-preview]').hidden = false; $('[data-report-title]').textContent = `Raport · ${fullTime(item.report.as_of)}`; $('[data-report-body]').textContent = reportText(item.report); }
+    if (action === 'read') showReportPreview(`Raport · ${fullTime(item.report.as_of)}`, reportText(item.report), opener);
     else if (action === 'text') download(`rtb-${item.report.as_of.slice(0, 10)}.txt`, reportText(item.report), 'text/plain;charset=utf-8');
     else download(`${id}.${action}`, JSON.stringify(action === 'geojson' ? item.report.geojson : item.report, null, 2), 'application/json');
-  } catch { $('[data-report-preview]').hidden = false; $('[data-report-title]').textContent = 'Raport chwilowo niedostępny'; $('[data-report-body]').textContent = 'Spróbuj otworzyć go ponownie.'; }
+  } catch { showReportPreview('Raport chwilowo niedostępny', 'Spróbuj otworzyć go ponownie.', opener); }
 }
 function renderReports() {
   const host = $('[data-reports]'); host.replaceChildren();
@@ -256,7 +267,10 @@ for (const b of $$('[data-go]')) b.addEventListener('click', () => navigate(b.da
 for (const b of $$('[data-close-detail]')) b.addEventListener('click', () => { state.selected = null; state.related = []; renderDetails(); maps.draw(); });
 $('[data-category]').addEventListener('change', e => { state.category = e.target.value; renderJournal(); });
 $('[data-source]').addEventListener('change', e => { state.source = e.target.value; renderJournal(); });
-$('[data-close-report]').addEventListener('click', () => { $('[data-report-preview]').hidden = true; });
+$('[data-close-report]').addEventListener('click', () => {
+  $('[data-report-preview]').hidden = true;
+  (reportOpener?.isConnected ? reportOpener : $('[data-report-type]')).focus();
+});
 $('[data-report-type]').addEventListener('change', e => { state.historyType = e.target.value; history = []; nextOffset = null; $('[data-report-preview]').hidden = true; loadHistory(); });
 $('[data-more-reports]').addEventListener('click', () => loadHistory(true));
 

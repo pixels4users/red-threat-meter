@@ -105,6 +105,9 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
 - Oś czasu: grupy godzinowe/dobowe/tygodniowe, rozwijanie wpisów i powrót.
 - Dziennik: tematy, źródła, wiersz sygnału i szczegóły.
 - Raporty: stronicowana historia, odczyt, pobieranie tekstu, JSON i GeoJSON.
+  Od 02.10.2026 „Czytaj” przewija do początku podglądu i ustawia fokus na
+  tytule raportu; tak samo widoczny jest komunikat nieudanego odczytu.
+  Zamknięcie podglądu zwraca fokus do przycisku otwierającego.
 - Kontrolki: przycisk neutralny, link, pole wyboru, przełącznik okresu,
   stany hover/pressed/disabled/focus. Cel dotykowy co najmniej 44 × 44 px.
 
