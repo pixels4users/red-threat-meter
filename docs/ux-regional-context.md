@@ -1,89 +1,136 @@
-# UX: znaczenie wydarzeń dla użytkownika
+# UX: spójny Przegląd i Mapa Operacyjna
 
-Status: propozycja do iteracji, 02.10.2026. Żaden kierunek nie został jeszcze zaakceptowany ani wdrożony na stronie publicznej.
+Status: ocena wykonalności i propozycja do akceptacji, 02.10.2026. Ten plan zastępuje wcześniejszą propozycję osobnych sekcji regionalnych ponad osią czasu i mapą. Makiety `ui/experiments/rta-ux-directions.html` są zapisem wcześniejszego eksperymentu, nie docelową specyfikacją.
 
-## Cel i hipoteza
+## Zakres
 
-Pierwszy ekran powinien odpowiadać na trzy pytania: co się dzieje, czy dotyczy mnie i czy powinienem coś zrobić. RTA pozostaje największą liczbą i występuje wyłącznie w Przeglądzie. Wydarzenia, ich zasięg i oficjalne instrukcje pozwalają zinterpretować tę liczbę.
+Cel: odpowiedzieć na pytania „co się dzieje”, „czy dotyczy mnie” i „co powinienem zrobić”, zachowując minimalizm obecnej strony.
 
-Pierwszy eksperyment dotyczy kolejności informacji w Przeglądzie. Zachowujemy paletę, czteropunktową skalę odstępów, nawigację i dostęp do mapy, dziennika oraz raportów. Nie uruchamiamy powiadomień ani nowych analiz.
+Zachowujemy siatkę Przeglądu: oś czasu po lewej, mapa po prawej; na telefonie oś przed mapą. Nie dokładamy pomiędzy podsumowaniem a siatką kolejnej kolekcji kart. Przebudowa dotyczy zawartości obecnego obszaru indeksu i komentarza, etykiet osi oraz osobnej Mapy Operacyjnej. RTA pozostaje największą liczbą i występuje tylko w Przeglądzie. Szczegółowy zakres źródeł nadal jest poniżej osi i mapy, skrót pewności przy wyniku. Zachowujemy neutralne kontrolki i skalę odstępów 4 px. Powiadomienia są poza zakresem.
 
-## Dwa kierunki
+## Sprawdzone ustalenia
 
-### Dla Ciebie — rekomendowany punkt wyjścia
+Sprawdzono lokalny dashboard, kod frontendu i publikacji oraz eksport `data/analysis/commentary-revisions/2026-10-02-verified-events-v2/publication-daily.json` (02.10.2026, 09:25 czasu Warszawy, raport `rpt_eac9ac1f8145fa0820288abc21e8782c545d0dd185733af4431b9a4dad94fb2f`).
 
-1. Indeks dla Polski i krótki komentarz: najważniejsze sprawdzone wydarzenia.
-2. Wybór województwa przy sekcji regionalnej. Polska jako domyślna opcja; zapamiętanie świadomego wyboru tylko w tej przeglądarce, bez konta i geolokalizacji.
-3. Wydarzenia dotyczące wybranego obszaru oraz osobno komunikaty ogólnopolskie. Wyróżnione oficjalne zalecenia z miejscem, terminem, źródłem i datą sprawdzenia.
-4. Zmiany w tematach, następnie dotychczasowe oś czasu i mapa. Szczegółowy zakres obserwacji pozostaje niżej.
+- „Polska / flanka wschodnia” w menu to opis, nie działający wybór regionu. Przełącznik będzie nową funkcją.
+- Raport ma 83 wpisy, w tym 80 z kategorią punktacji `context`. Filtr tematu Dziennika korzysta z tej kategorii, dlatego wiele informacji lotniczych, cyber i GNSS trafia do „Sytuacji w regionie”.
+- Wpis CERT „Fałszywe wiadomości podatkowe instalują Remcos” (`evt_7393684f1cbcc37946935635`) jest widoczny przy „Wszystkich tematach”. Filtr „Cyberbezpieczeństwo” daje 0 z 83 wpisów. Nie pochodzi on z osobnego zbioru; wcześniejsza makieta dodatkowo użyła innej nazwy tego samego wpisu.
+- Eksport zawiera **0 punktów GeoJSON**. Flagi krajowe tworzy frontend; nie są lokalizacjami incydentów. Część lokalnych wpisów, np. Świnoujście i powiat pyrzycki, ma nadal obszar „Polska”.
+- Silnik ma 16 wyników wojewódzkich; w tym raporcie wszystkie wynoszą 0. To nie liczba lokalnych wpisów: zapowiedź formowania brygady w Łowiczu ma 0 punktów, choć jest użyteczną informacją regionalną. Przy nieustalonym przypisaniu istotnych zdarzeń obecny kod może również zwrócić regionalne `null`.
+- Eksport nie ma osobnej pewności wojewódzkiej ani wskaźników odchylenia w dziedzinach. `confidence.domains[].percent` opisuje pokrycie źródeł, nie nasilenie zagrożenia.
+- GNSS ma opisowe porównanie historyczne w pilotażu, ale nie zweryfikowaną normę. Nie ma ogólnego automatycznego detektora anomalii dla lotnictwa i cyber.
+- Mapa i Dziennik korzystają z wpisów najnowszego raportu. Archiwum udostępnia raporty, nie gotowy, scalony zbiór sygnałów za kwartał lub rok.
+- Komentarz jest jednym zatwierdzonym tekstem. Generator dopuszcza 1–3 zdania, ale nie eksportuje trzech nazwanych pól.
 
-Dobry dla osoby odwiedzającej stronę po raz pierwszy. Region wpływa na dobór treści; indeks pozostaje jawnie opisany jako wynik dla Polski. Nie wprowadzamy na tym etapie regionalnego „poziomu bezpieczeństwa”.
+## Ocena propozycji
 
-### Raport zmian
+| Zmiana | Ocena | Warunek |
+| --- | --- | --- |
+| Trzy krótkie wiersze komentarza | Zalecana; niewielka zmiana widoku, średnia procesu publikacji | Nazwane pola, dowody dla treści, regionalna wersja i proste stany braku danych |
+| Makro / województwo obok indeksu | Wykonalne; większa zmiana danych niż wyglądu | Przypisania, wynik i pewność regionalna oraz wspólny wybór sygnałów |
+| Małe wskaźniki odchyleń | Zalecany układ; liczby zależą od danych porównawczych | Miara, okres odniesienia i porównywalność; norma wymaga osobnego ustalenia |
+| Etykiety regionów na osi | Mała zmiana widoku po uzupełnieniu danych | Zweryfikowane obszary i jedna reguła dla wszystkich widoków |
+| Filtry → mapa → lista | Średnia zmiana widoku; większa dla długiej historii | Jeden zbiór wyników dla mapy, listy i liczników; usuwanie powtórzeń |
+| Spójne pojęcie sygnału | Pierwszy etap i warunek reszty | Rozdzielenie tematu, rodzaju, zasięgu i wkładu do indeksu |
 
-Po wyniku i komentarzu główny obszar zajmuje przegląd tematów: co nowego i jak zmieniła się aktywność względem poprzedniego porównywalnego okresu. Wybrany region i zalecenia są w bocznej kolumnie; na telefonie trafiają przed tematy. Kliknięcie tematu pokazuje wydarzenia i podstawę porównania.
+## Jeden zbiór sygnałów
 
-Dobry dla regularnego czytelnika. Wymaga bardziej kompletnej historii oraz większej dyscypliny rozróżnienia nowej publikacji od nowego zdarzenia. Aktualne dane pozwalają przedstawić nowe komunikaty, ale nie zapewniają jeszcze porównywalnego trendu w każdej dziedzinie.
+**Sygnał** to opublikowany po przeglądzie zapis zdarzenia, pomiaru, ostrzeżenia lub istotnej zapowiedzi. Materiał źródłowy jest dowodem; artykuł lub przedruk nie tworzy automatycznie kolejnego sygnału. Stopień potwierdzenia pozostaje osobny.
 
-## Ustalenia z obecnych danych
+Każdy sygnał ma stały identyfikator, wspólny tytuł i opis, źródła, daty oraz:
 
-Sprawdzono lokalny dashboard oraz zamrożony eksport `data/analysis/commentary-revisions/2026-10-02-verified-events-v2/publication-daily.json` (stan na 02.10.2026, 09:25 czasu Warszawy):
+- **Temat:** np. lotnictwo, cyberbezpieczeństwo, nawigacja, infrastruktura, granica; niezależny od kategorii punktacji, możliwe kilka tematów.
+- **Rodzaj:** zdarzenie, ostrzeżenie, zapowiedź/ćwiczenia, pomiar. Ćwiczenia nie są atakiem, a ostrzeżenie cyber nie jest automatycznie wykonanym incydentem.
+- **Obszar, którego dotyczy:** kraj, województwa lub obszar zagraniczny, ewentualnie nieustalony. Miejsce zdarzenia i zasięg skutków/instrukcji są różnymi danymi.
+- **Wkład do RTA:** osobna ocena. Użyteczny dla mieszkańca wpis może mieć 0 punktów. Etykieta „Cyberbezpieczeństwo” nie nadaje punktów ani rosyjskiej atrybucji.
 
-- RTA 2,7/100, pewność 25%, `trend.direction=unavailable`, `official_warnings=[]`.
-- Eksport zawiera 83 rekordy: 27 z dokładnością krajową, 28 regionalną, 9 miejską i 19 bez ustalonej lokalizacji. Liczby te nie opisują liczby nowych incydentów w dobie.
-- Zapowiedzi ćwiczeń w powiecie pyrzyckim i neutralizacji niewybuchów w Świnoujściu mają w eksporcie lokalizację „Polska”. Przed filtrowaniem regionalnym należy dopisać zweryfikowane obszary obowiązywania; nie wyciągać ich automatycznie z tekstu tytułu.
-- Ostrzeżenie CERT o fałszywych wiadomościach podatkowych ma kategorię punktacji `context`. Potrzebuje niezależnego tagu tematycznego „Cyberbezpieczeństwo”, bez zmiany oceny lub punktów.
-- `rtb.regions` zawiera 16 zerowych wyników. To nie jest dowód równomiernego pokrycia ani bezpieczeństwa każdego województwa.
-- `confidence.domains[].percent` to pokrycie źródeł. Nie wolno używać tych procentów jako nasilenia zagrożenia lub jego wzrostu.
-- Bieżący trend wymaga zgodnych identyfikatorów metodologii, konfiguracji, źródeł, kodu oraz porównania pewności. Nie usuwamy tych kontroli na potrzeby UI.
+Dziennik zawiera cały opublikowany zbiór, oś grupuje jego wybrany podzbiór, mapa przedstawia rekordy z możliwą do pokazania lokalizacją. Przegląd podsumowuje te same rekordy. Wyróżnione wydarzenie lub zalecenie prowadzi do odpowiednich szczegółów; nie powstaje osobna lista „innych informacji”. Krótszy tytuł, jeśli potrzebny, jest wspólnym polem używanym wszędzie, a nie doraźną przeróbką na jednym ekranie.
 
-Makiety korzystają z treści powyższego raportu. Przypisanie lokalnych przykładów do zachodniopomorskiego jest ręczną demonstracją projektową, a nie zapisem nowej oceny w bazie. Zmiana regionu nie przelicza indeksu. Brak podstaw porównania pozostaje widoczny; makiety nie wymyślają trendu ani zapewnienia o bezpieczeństwie.
+Bez współrzędnych wpis pozostaje w Dzienniku i liście pod mapą. Nie wstawiamy fikcyjnego punktu w środku województwa. Flaga stolicy oznacza zasięg krajowy, nie lokalne zdarzenie. Liczba markerów/klastrów nie zastępuje liczby sygnałów. Tematy i regiony wymagają przeglądu; korekty tworzą nową wersję bez zmieniania starego raportu. Zasięg wydawcy „Polska” sam nie dowodzi ogólnopolskiego zasięgu konkretnego komunikatu.
 
-## Warunki dla treści
+## Przegląd: obecna siatka, nowa treść górnej sekcji
 
-### Czy dotyczy mnie
+### Trzy wiersze komentarza
 
-Rozdzielamy miejsce zdarzenia od obszaru wpływu lub obowiązywania instrukcji. Proponowane przyszłe pola prezentacyjne: `topics`, `affected_areas` (stabilny identyfikator, zakres lokalny/krajowy/nieustalony), `relevance_summary`, odwołania do sprawdzonych ustaleń i przeglądu. Pola wymagają projektu kontraktu i nowej wersji eksportu, nie domysłów przeglądarki.
+Proponowane etykiety: **Sytuacja:**, **Twój region:**, **Co zrobić:**. Trzy krótkie wiersze, bez osobnych kart, najwyżej jedno zdanie w każdym. W trybie makro drugi wiersz dotyczy Polski i regionu analizy. Nazwane pola i odwołania do sygnałów są przygotowywane i sprawdzane razem z raportem. Przegląd redakcyjny obejmuje treść, region, terminy i źródła. Frontend nie rozcina obecnego tekstu ani nie interpretuje Markdown wygenerowanego przez model.
 
-Komunikat ogólnopolski jest widoczny po wyborze województwa, lecz oznaczony jako ogólnopolski. Nieustalonego zasięgu nie przypisujemy do każdego regionu. Flaga w stolicy nie tworzy lokalnego zdarzenia w Warszawie. Bałtyk jest obszarem zainteresowania, cyberbezpieczeństwo tematem; nie mieszamy ich na jednej skali.
+Nie wymuszamy trzech twierdzeń, kiedy znamy tylko jedno. Miejsca w układzie są stałe, a brakujące dane mają prosty opis, np. „Brak lokalnych danych dla łódzkiego”. Brak aktualnych instrukcji i sprawdzone niewydanie nowych instrukcji to różne stany; tylko w drugim można napisać „Brak nowych zaleceń w tym raporcie”. Brak danych nie prowadzi do komunikatu „Nie musisz nic robić”.
 
-### Czy powinienem coś zrobić
+Zalecenia ochronne wynikają z komunikatu właściwej instytucji i zachowują jego obszar oraz czas. LLM nie tworzy nakazu ewakuacji, zapewnienia o bezpieczeństwie ani decyzji finansowej z samego indeksu. Istotna aktywna instrukcja służb zachowuje pierwszeństwo także przy niskim RTA. Plan ma przyszły termin; odwołanie zastępuje instrukcję w bieżącym widoku bez kasowania historii.
 
-Oddzielna sekcja instrukcji służb: wydawca, bezpośredni URL, zakres, treść, czas obowiązywania, status i data sprawdzenia. Instrukcję pokazujemy wiernie i tylko dla właściwego obszaru; jej ważność wymaga weryfikacji. Zapowiedź na przyszły tydzień nie jest aktywnym zakazem dzisiaj.
+### Region obok indeksu
 
-Istotne obowiązujące ostrzeżenie trafia ponad zwykły układ podsumowania, także przy niskim RTA. Brak opublikowanej instrukcji, niepełny odczyt i odwołanie ostrzeżenia to różne stany. LLM nie tworzy samodzielnie zaleceń ewakuacji, decyzji finansowych ani zapewnień o bezpieczeństwie. W pierwszym kroku link do sprawdzonego komunikatu jest lepszy niż wygenerowana porada.
+Przełącznik `[Skala makro] [Region: łódzkie ▾]` jest wykonalny. Dla cywilów można zamiast „Skala makro” użyć „Cały obszar”, z opisem Polski i dotychczasowego regionu analizy. Nie przemianowujemy dotychczasowego wyniku na węższy indeks samej Polski.
 
-### Co się zmieniło
+Wybór województwa aktualizuje razem podpis i wynik RTA, pewność, komentarz, wskaźniki dziedzin, oś oraz mapę. Trend porównuje ten sam obszar. Indeks pochodzi z silnika, nie z sumowania punktów widocznych na mapie: obejmuje także wygaszanie, limity i przenoszenie wpływu między regionami.
 
-Rozdzielamy trzy komunikaty:
+Obliczenia regionalne istnieją, ale przed ich prezentacją trzeba uzupełnić przypisania i informację o kompletności. Krajowych 25% nie kopiujemy jako pewności każdego województwa. Przed udostępnieniem przełącznika trzeba ustalić zachowanie obecnego regionalnego `null` i ewentualne rozszerzenie zasady 0–100 z osobną pewnością na regiony. Krajowy v0.4 pozostaje liczbowy i nie jest blokowany przez tę pracę. Zero nie jest potwierdzeniem bezpieczeństwa.
 
-- **Nowy materiał / aktualizacja:** zmiana w raporcie albo publikacja w podanym okresie, z datą; nie oznacza automatycznie wzrostu aktywności.
-- **Więcej / mniej zdarzeń:** tylko odrębne ocenione zdarzenia, porównywalne okna, stabilne źródła i znany zasięg obserwacji. Przedruki i aktualizacje nie zwiększają licznika.
-- **Zmiana zagrożenia:** odrębna ocena analityczna, nie automatyczna etykieta z liczby publikacji.
+Region może być zapamiętany lokalnie, bez konta i geolokalizacji. Komunikaty ogólnopolskie pozostają widoczne z taką etykietą. Nieustalonego zasięgu nie przypisujemy do wszystkich województw. Sygnał z sąsiedniego obszaru nie dostaje etykiety wybranego województwa tylko dlatego, że punktacja uwzględnia wpływ pośredni.
 
-Bez danych wyświetlamy „Brak podstaw do porównania”, a przy częściowym odczycie wyjaśniamy brak zakresu. Nie zastępujemy tego etykietą „normalnie”. Brak różnicy w porównywalnych pomiarach nie jest skalibrowaną normą. GNSS nadal jest kontekstem, bez punktacji i automatycznej atrybucji.
+### Wskaźniki dziedzin
 
-## Etapy po wyborze kierunku
+„Działania / Przygotowania” przenosimy do rozwijanych szczegółów indeksu. W ich miejscu: Lotnictwo, Cyber, Nawigacja — ikona i krótka wartość, bez kart. Układ zawija się na telefonie; odstępy 8/12/16 px. Rozbicie punktów nadal istnieje w metodyce i danych.
 
-1. **Iteracja ekranu:** dopracować wybrany układ na odseparowanych danych. Potwierdzić zachowanie przy wyborze regionu, ostrzeżeniu, jego odwołaniu i braku danych. Zapisać zaakceptowane zasady w `design.md`, `guidelines.md` i ewentualnie `theme.css`.
-2. **Kontrakt znaczenia i zasięgu:** osobne tagi tematyczne, zweryfikowane obszary, podstawa porównania, źródła i ważność instrukcji. Rozszerzyć schemat i eksport wraz z testami. Bez zmiany punktacji RTA.
-3. **Integracja lokalna:** wdrożyć zaakceptowane sekcje w `web/app.js`, `web/data.js`, `web/styles.css` i szablonie ekranu, zgodnie z faktycznymi nazwami plików sprawdzonymi przed implementacją. Pozostałe widoki otrzymają spójny filtr regionu dopiero po decyzji o jego zakresie; archiwalny raport zachowuje swój wynik i datę.
-4. **Odbiór i publikacja:** sprawdzenie desktop/mobile, dostępności, prawdziwego eksportu, pustych stanów i regresji istniejącej nawigacji; akceptacja użytkownika; dopiero potem wdrożenie.
-5. **Raporty regionalne, później powiadomienia:** najpierw lokalny widok raportu dobowego dla wybranego regionu. Wysyłka wymaga osobnej decyzji o kanale, subskrypcji i zasadach deduplikacji. Pilne alerty wymagają częstszego monitorowania oraz potwierdzonej aktualności źródeł; analiza raz dziennie nie zapewnia ostrzegania w czasie rzeczywistym.
+Przykłady języka, nie dzisiejsze ustalenia: „Cyber: więcej zdarzeń niż tydzień temu”, „Nawigacja: mniej zakłóceń niż w poprzedniej dobie”, „Lotnictwo: brak danych do porównania”. Każde porównanie wymaga zaakceptowanej miary dla właściwego obszaru i okresów. Więcej publikacji nie daje etykiety „Anomalia”. Procent ma wskazaną podstawę; przy zerze w poprzednim okresie pokazujemy liczbę nowych zdarzeń, nie procent. GNSS może wymagać różnicy w punktach procentowych, nie procentu liczby ataków. Strzałka oznacza zmianę mierzonego zjawiska, nie automatycznie zmianę bezpieczeństwa. Szczegóły są rozwijane.
 
-## Kryteria pierwszej iteracji
+„Rutynowe” wymaga ustalonego charakteru działań. „Poniżej normy” wymaga zweryfikowanej normy. Obecne dane nie uzasadniają tych etykiet automatycznie. Opisowe porównanie GNSS można wykorzystać po włączeniu do sprawdzonego eksportu, nadal bez punktacji i atrybucji. Brak danych daje dokładnie: „Brak danych do porównania”.
 
-- Czytelnik potrafi wskazać najważniejsze wydarzenie, jego znaczenie dla wybranego regionu i ewentualne obowiązujące zalecenie bez otwierania metodologii.
-- Potrafi odróżnić ogólnopolskie ostrzeżenie cyber od lokalnego ograniczenia, planowane działanie od trwającego zdarzenia i brak danych od braku zagrożenia.
-- Zmiana regionu nie zmienia po cichu znaczenia indeksu; data raportu pozostaje widoczna.
-- Każde „więcej / mniej” ma wskazany okres, porównywalną podstawę i zdarzenia, z których wynika.
-- Na szerokości 320 px da się wybrać region, otworzyć szczegóły i odczytać zalecenie; nawigacja pozostaje na dole. Klawiatura i fokus działają.
-- Komunikaty ogólnopolskie nie znikają po wybraniu województwa. Ostrzeżenie nie znika wskutek niskiego indeksu.
+### Etykiety osi czasu
 
-## Stan prac
+Neutralne etykiety: „Zachodniopomorskie”, „Cała Polska”, „Obwód lwowski”, „Obszar nieustalony”. Dla wielu obszarów najwyżej dwa i „+2 regiony” ze szczegółami. Zagregowana godzina lub dzień może dotyczyć wielu miejsc; nie nadajemy całej grupie obszaru pierwszego wpisu. Nazwy są wspólne z mapą i Dziennikiem.
 
-Gałąź eksperymentalna: `codex/ux-regional-context`, utworzona z `dfe9129`. Dokument i makiety są propozycją. Nie zmieniono kodu produkcyjnego, bazy, harmonogramu, konfiguracji źródeł ani hostingu. Szablony Design Systemu pozostają na wersji zaakceptowanej; aktualizacja nastąpi po wyborze kierunku. Prototyp nie jest częścią buildu produkcyjnego.
+Etykieta wskazuje obszar, nie kierunek zbliżania się zagrożenia. Nie narusza siatki ani czytelności tytułu. Oś nadal grupuje publikacje; data zdarzenia jest osobną informacją.
 
-Makiety: `ui/experiments/rta-ux-directions.html`. Fragment zawiera dwa warianty i przykładowy wybór Polski, Mazowsza oraz zachodniopomorskiego. To skrócony podgląd nowych sekcji Przeglądu; istniejące mapa i oś czasu pozostają w planie poniżej nich i nie zostały przebudowane w makiecie. Widoczna nawigacja jest ilustracją; działają wybór regionu, szczegóły wpisów, porównanie wariantów i linki źródłowe. RSO ma w obecnym eksporcie adres strumienia XML — docelowo należy uzupełnić zweryfikowany adres czytelnego komunikatu, bez zgadywania URL.
+## Mapa Operacyjna: filtry → mapa → lista
 
-Sprawdzenie lokalne: oba warianty, trzy opcje regionu, zachowanie komunikatu ogólnopolskiego po filtrowaniu, stały wynik krajowy, rozwijanie szczegółów klawiaturą, brak poziomego przepełnienia przy szerokości okna 320 i 1024 px, kontrolka wyboru wysokości 44 px i brak błędów JavaScript. Nie uruchamiano pełnej regresji aplikacji, bo kod produkcyjny pozostał niezmieniony.
+Nagłówek, zwarty wiersz filtrów zawijany na telefonie, mapa, liczba wyników i lista tych samych sygnałów. Bez indeksu na tym ekranie.
+
+**Obszar:** Flanka wschodnia, Cała Polska i wszystkie 16 województw. Flanka oznacza jawnie zdefiniowany zakres projektu z istotnym sąsiedztwem, nie zgadywany promień od użytkownika. Identyfikatory województw już są w `config/regions-v0.3.json`.
+
+Liczba przy województwie dotyczy lokalnych sygnałów w wybranym okresie i temacie, np. `Łódzkie (0)`. Komunikaty ogólnopolskie pokazujemy dodatkowo, z osobną liczbą, aby „0 lokalnych” nie kolidowało z widocznym ostrzeżeniem dla całej Polski. Liczniki obejmują wpisy bez punktu na mapie; nie liczą powielonych raportów ani klastrów. Wszystkie województwa pozostają dostępne przy zerze. Nieudany odczyt nie tworzy zera.
+
+**Okres:** Dzisiaj, Ten tydzień, Ten miesiąc, Ten kwartał, Ten rok. Tydzień od poniedziałku; miesiąc, kwartał i rok kalendarzowe; Europe/Warsaw. Rozpoczęty okres kończy się na dostępnych danych, pokazujemy przedział i datę raportu. Zachowujemy podstawę „Według daty publikacji”; dat nie dopowiadamy. Bezdatowe wpisy pozostają dostępne osobno jako „Bez daty”.
+
+Mapa i lista używają identycznego zbioru po filtrowaniu. Podsumowanie może brzmieć „10 sygnałów · 7 z lokalizacją”. Kliknięcie wiersza wskazuje odpowiadający punkt, a punkt ten sam wpis. Brak współrzędnych nie usuwa wiersza z listy. Nie wracamy do kolorowania całych państw jako mapy zagrożenia.
+
+Przejście z Przeglądu ustawia obszar Mapy zgodnie z wybranym regionem. Dalej filtry Mapy są jawne; powrót zachowuje wybór Przeglądu i nie zmienia po cichu indeksu krajowego. Przejście do Dziennika przenosi filtry. Okres Mapy filtruje sygnały, nie tworzy „rocznego RTA”. Archiwalny raport zachowuje swój wynik i datę.
+
+Kwartał i rok wymagają odczytu historii, wyboru właściwych rewizji i usunięcia powtórzeń sygnału obecnego w wielu raportach. `/api/reports` jest katalogiem raportów, nie takim zbiorem. Krótsza historia otrzymuje informację np. „Dane dostępne od 10 września”; wcześniejsze miesiące nie są przedstawiane jako okresy bez zdarzeń. Uwzględniamy korekty, odwołania ostrzeżeń i połączenia epizodów. Aktywna instrukcja ochronna potrzebuje osobnego oznaczonego miejsca, jeśli filtr czasu ukrywa jej pierwotną publikację.
+
+## Język
+
+| Unikamy | Pokazujemy |
+| --- | --- |
+| „Brak oceny zmiany” | „Brak danych do porównania” |
+| „Ten widok nie zawiera porównania pomiarów dla wspólnego obszaru i okresu…” | „Brak danych do porównania” |
+| „To aktualizacja wiedzy o konkretnej kampanii; raport nie ustala wzrostu liczby ataków” | „CERT ostrzega przed fałszywymi wiadomościami podatkowymi” |
+| „Normalnie” wywnioskowane z pustego zbioru | „Brak nowych sygnałów w wybranym okresie” — tylko po poprawnym odczycie |
+| „Zagrożenie 0%” | „RTA 0/100” z informacją o pewności |
+
+Nie dokładamy do każdej informacji zdania o procesie analizy. Opis mówi o wydarzeniu; metodyka jest dostępna w szczegółach, logi poza publicznym UI.
+
+## Kolejność po akceptacji
+
+1. **Wspólne dane i słownik.** Temat, rodzaj, obszar i daty. Przejrzeć reprezentatywne wpisy: CERT, Świnoujście, Łowicz, plan PAŻP, pomiar GNSS i ostrzeżenie z odwołaniem. Uzupełnić nowe oceny, nie zmieniając punktów dla naprawy filtra.
+2. **Kontrakt publikacji.** Wersjonowane pola tematów, obszarów, komentarza, regionalnej kompletności i porównań. Zmiany obejmują `schemas/dashboard/report.schema.json`, `src/osint_dashboard/dashboard/contract.py`, generator komentarza i przegląd redakcyjny. Zachować odczyt starych raportów; nie dopisywać luźnych pól do ścisłego schematu.
+3. **Jedna makieta na obecnej siatce.** Trzy wiersze komentarza, przełącznik, pasek dziedzin i etykiety; te same rekordy w każdym miejscu, bez nowych sekcji nad osią i mapą. Po wyborze zaktualizować `design.md`, `guidelines.md` i ewentualnie `theme.css`.
+4. **Frontend i mapa.** `web/index.html`, `web/app.js`, `web/data.js`, `web/map.js`, `web/styles.css`: wspólne filtrowanie i prezentacja wpisu. Historia w warstwie publikacji i `hosting/worker.mjs` wymaga stronicowania i deduplikacji. Liczbowy widok regionalny udostępnić razem z ukończeniem danych regionalnych, nie wcześniej.
+5. **Porównania.** Włączać tylko gotowe, sprawdzone miary dziedzin. Ustalenie norm i etykiet „Anomalia” jest osobnym zadaniem analitycznym; nie blokuje pozostałych ulepszeń UI ani indeksu krajowego.
+6. **Odbiór → akceptacja → publikacja.** Sprawdzić eksport i odczyt, stare raporty, puste stany, okresy, regiony i mobile. Dopiero potem publikacja, bez powiadomień.
+
+## Kryteria odbioru
+
+- CERT jest widoczny pod Cyberbezpieczeństwem i otwiera ten sam wpis z każdego widoku; może nadal mieć 0 punktów.
+- Łowicz otrzymuje obszar łódzkiego; źródło MON nie czyni go wydarzeniem w Warszawie.
+- Wynik, pewność, komentarz i trend dotyczą tego samego obszaru i raportu. Pewności krajowej nie kopiujemy do województw.
+- Brak zdarzeń, brak odczytu, brak porównania i odwołanie ostrzeżenia mają różne, krótkie komunikaty. Plan nie staje się wykonanym atakiem.
+- Liczniki, mapa i lista używają jednego zbioru. Komunikaty krajowe, bezdatowe wpisy i brak współrzędnych nie giną bez informacji. Jeden sygnał w dziesięciu raportach nie staje się dziesięcioma zdarzeniami.
+- „0” przy regionie oznacza zero pasujących wpisów, nie poziom bezpieczeństwa. Kwartał i rok pokazują rzeczywisty zakres historii.
+- Procent ma konkretną miarę i podstawę; poprzednie zero nie daje nieskończonego procentu. GNSS zachowuje ograniczenia metodyki.
+- Oś i mapa zachowują siatkę i proporcje. Przy 320 px kontrolki zawijają się, etykiety nie zasłaniają tytułów, działa klawiatura i dolna nawigacja.
+- Nowy kontrakt nie psuje archiwum, zatwierdzania komentarza ani publikacji w Supabase.
+
+## Stan wykonania oceny
+
+Zmieniono tylko ten dokument na gałęzi `codex/ux-regional-context`. Nie zmieniono makiet, kodu, danych, metodologii, harmonogramu ani hostingu. Nowa wersja UI nie jest wdrożona. Sprawdzenie obejmowało kod, kontrakty, eksport i odtworzenie problemu filtra w przeglądarce. Przywrócono Przegląd i wszystkie tematy. Nie pobierano nowych źródeł ani nie uruchamiano pełnej regresji, bo działający kod pozostał niezmieniony.
