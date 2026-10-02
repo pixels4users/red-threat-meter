@@ -44,8 +44,10 @@ bez nadzoru.
 5. Sprawdź RTB i pewność oddzielnie. W v0.4 niepełne źródło lub decyzja
    `defer` nie blokują liczby. Nie udawaj pełnej historii. GNSS po przeglądzie
    liczbowym zasila kontekst i pokrycie, bez punktów ani atrybucji.
-6. Przygotuj komentarz i przegląd redakcyjny tylko przy wystarczających
-   dowodach. Następnie `finish` i `publish --type daily` z identyfikatorem
+6. Przygotuj 1–3 zdania o sprawdzonych wydarzeniach i osobny przegląd redakcyjny.
+   Trend oraz skutki dla Polski dodawaj tylko przy własnych podstawach; ich
+   brak nie blokuje komentarza. Pomiń tekst wyłącznie przy braku użytecznych
+   sprawdzonych ustaleń. Następnie `finish` i `publish --type daily` z identyfikatorem
    tego cyklu. Wymagaj `verified_readback=true`; zachowaj identyczny eksport.
 7. Wykonaj replay z właściwej kopii kodu, kontrolę integralności bazy oraz
    zgodności odczytanego raportu. Zapisz dowód w prywatnym `verification.json`

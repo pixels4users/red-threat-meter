@@ -55,9 +55,11 @@ Przycisk na stronie odświeża tylko opublikowane wyniki.
    publikacji nie zwiększa liczby niezależnych potwierdzeń. Kilka zdarzeń
    w jednym artykule przechodzi razem kontrolę kompletności.
 5. Domyślna punktacja to `rtb-v0.4` z kontrolą 216 godzin historii; patrz [kontrakt](v0.4-implementation.md). Nowy wynik jest liczbowy, a niepełność obniża confidence. `RTB=null` zachowują wyłącznie wcześniejsze wersje. Pilotaże GNSS, logistyki i ADS-B nie zasilają punktacji.
-6. Komentarz wymaga ustaleń dotyczących sytuacji, działań i skutków oraz
-   przeglądu dokładnie tych trzech zdań. Nie wystarczy sam indeks. Przy braku
-   podstaw komentarz jest pomijany; nie powstaje zapewnienie o bezpieczeństwie.
+6. Komentarz zawiera 1–3 zdania o sprawdzonych wydarzeniach i wymaga osobnego
+   przeglądu dokładnego tekstu. Trend i skutki dla Polski są opcjonalne i mają
+   własne podstawy dowodowe; ich brak nie blokuje komentarza. Sam indeks nie
+   wystarczy. Tekst pomijamy przy braku jakiegokolwiek użytecznego sprawdzonego
+   ustalenia; nie powstaje zastępcze zapewnienie o bezpieczeństwie.
 7. Publikacja jest zakończona dopiero po odczytaniu z Supabase identycznego
    pakietu (`verified_readback=true`). Ponowienie nie tworzy duplikatu.
 

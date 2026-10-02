@@ -70,7 +70,9 @@ GeoJSON. Nieznany kraj pozostaje w dzienniku do uzupełnienia katalogu kotwic.
 
 ## Komentarz i wersjonowanie
 
-`commentary.text` zawiera trzy zdania zatwierdzonego podsumowania lub `null`.
+`commentary.text` zawiera 1–3 zdania zatwierdzonego podsumowania lub `null`.
+Opis sprawdzonych wydarzeń nie wymaga oceny trendu ani skutków dla Polski;
+takie oceny pojawiają się tylko przy osobnych podstawach.
 Niepusty tekst wymaga opcjonalnego obiektu `commentary.review`: skrótów
 prywatnego rekordu przeglądu, snapshotu i tekstu, `reviewer_type=agent` oraz
 `method=codex-editorial-v1`. Eksporter `dashboard-export-v2` sprawdza je
@@ -79,7 +81,7 @@ Wydawca ponownie wymaga tego pliku przed zapisem do Supabase.
 
 Sam status accepted i filtr językowy nie wystarczają. Cykl Codexa rozwiązuje
 odnośniki do konkretnych, aktualnych dowodów i zapisuje osobny przegląd
-znaczenia trzech zdań. To pochodzenie i ocena agenta, nie gwarancja prawdziwości
+znaczenia każdego zdania. To pochodzenie i ocena agenta, nie gwarancja prawdziwości
 ani kontrola człowieka. Surowy kontekst i audyt nie są eksportowane.
 Historyczny brak RTB lub brak podstaw do komentarza daje `text=null` bez obiektu review.
 Starsze publikacje z `text=null` zachowują zgodność z kontraktem.

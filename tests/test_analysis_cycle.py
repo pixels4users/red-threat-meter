@@ -111,6 +111,31 @@ def test_codex_cycle_review_commentary_publish_and_replay(prepared, tmp_path):
     assert "## Komentarz analityczny" in (folder / "report.md").read_text()
 
 
+@pytest.mark.parametrize("count", [1, 2])
+def test_short_commentary_without_trend_or_impact_survives_full_cycle(prepared, tmp_path, count):
+    data, cid = prepared
+    reviewed(prepared)
+    cycle.calculate(data, cid)
+    context, candidate, _ = commentary_for(data, cid)
+    candidate["sentences"] = candidate["sentences"][:count]
+    context["findings"] = context["findings"][:count]
+    for finding in context["findings"]:
+        finding["role"] = "action"
+    checked = cycle.editorial_input(data, cid, context, candidate)
+    audit = {"subject_sha256": checked["subject_sha256"], "verdict": "accept",
+             "checks": {key: True for key in ("supported_by_evidence", "no_false_reassurance", "no_inferred_actor_or_intent", "polish_civilian_prose", "current_and_in_scope")},
+             "reason": "Syntetyczny przegląd krótkiego komentarza, bez oceny trendu i wpływu na ludność."}
+    finished = cycle.finish(data, cid, context=context, candidate=candidate, audit=audit)
+    folder = Path(finished["snapshot_dir"])
+    snapshot, sources = load_snapshot(folder)
+    record = load_commentary_record(folder)
+    report = build_report(snapshot, sources, commentary_record=record)
+    repo = LocalPublications(tmp_path / "short-commentary.sqlite")
+    repo.publish(report, commentary_record=record)
+    assert repo.get(report["report_id"])["report"]["commentary"]["text"] == " ".join(candidate["sentences"])
+    assert replay(data, cid)["identical"]
+
+
 def test_wrong_quote_and_unknown_candidate_are_rejected(prepared):
     data, cid = prepared
     proposal = proposal_for(data, cid)

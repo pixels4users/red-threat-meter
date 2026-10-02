@@ -60,10 +60,11 @@ pozostaje widoczne na dużych ekranach.
 
 ## 3. Granica publikacji komentarza
 
-`prompts/dashboard-commentary-system.md` definiuje prompt `dashboard-commentary-v1`.
-Komentarz ma chłodny, bezpośredni ton i trzy zwięzłe zdania: stan oraz trend,
-konkretne działania w regionie, praktyczne znaczenie dla mieszkańców Polski
-lub gospodarki. Nie zawiera opisu procesu analitycznego. Przykłady w prompcie
+`prompts/dashboard-commentary-system.md` definiuje prompt `dashboard-commentary-v2`
+(zmiana zaakceptowana 02.10.2026). Komentarz ma chłodny, bezpośredni ton i 1–3
+zwięzłe zdania o sprawdzonych wydarzeniach. Trend i praktyczne znaczenie dla
+mieszkańców Polski lub gospodarki dodajemy tylko przy osobnych podstawach;
+ich brak nie blokuje podsumowania. Nie zawiera opisu procesu analitycznego. Przykłady w prompcie
 uczą stylu; nie są ustaleniami o bieżącej sytuacji. Sprawstwo, intencja,
 „rutynowość” działań i ocena bezpieczeństwa wymagają osobnej podstawy.
 Nie wyprowadzamy ich z samego RTB, zakłóceń GPS ani aktywacji strefy PAŻP.
@@ -71,9 +72,11 @@ Nie wyprowadzamy ich z samego RTB, zakłóceń GPS ani aktywacji strefy PAŻP.
 `scripts/build_dashboard_commentary_request.py` czyta prywatny kontekst zgodny
 z `schemas/dashboard/commentary-context.schema.json`. Kontekst przygotowuje
 zaufany proces przeglądu: wynik RTB, jego wersja, identyfikator odczytu i ustalenia
-w trzech rolach (`situation`, `action`, `impact`) z odnośnikami do dowodów.
+z rolami (`situation`, `action`, `impact`) i odnośnikami do dowodów. Role opisują
+treść; nie wymagamy kompletu, ustalonej kolejności ani unikalności ról.
 Skrypt usuwa ustalenia `uncertain` i `rejected` **przed** przygotowaniem wiadomości
-dla modelu. Niepełna analiza, brak wyniku lub którejkolwiek roli zwracają `null`.
+dla modelu. Niezakończone obliczenie, brak wyniku lub brak zaakceptowanych
+ustaleń opartych na dowodach innych niż sam indeks zwracają `null`.
 Nie zastępujemy brakującej oceny bezpieczeństwa interpretacją liczby RTB.
 
 Funkcja `build_generation_request` ładuje rzeczywistą treść promptu jako
@@ -101,7 +104,7 @@ zamrożonych wejść, oryginalnych materiałów ani historii ocen.
 
 Prywatny kandydat jest zgodny ze schematem JSON Schema 2020-12
 `schemas/dashboard/commentary-candidate.schema.json`: identyfikator odczytu,
-język `pl` i trzy zdania prozą, do 220 znaków każde i do 600 znaków łącznie.
+język `pl` i 1–3 zdania prozą, do 220 znaków każde i do 600 znaków łącznie.
 Każdy element zawiera jedno zdanie; prompt wyklucza skróty z kropką.
 Bieżący identyfikator, zakończenie analizy
 i zatwierdzenie są informacjami wydawcy, a nie polami kontrolowanymi przez LLM.
@@ -115,7 +118,7 @@ pozostają niepotwierdzone”, „wymaga przeglądu”, „dane wskazują na” 
 model AI”, bez względu na wielkość liter oraz wariant polskich znaków.
 
 Sam wykaz zakazanych fraz nie gwarantuje poprawności dowolnego tekstu. Dlatego
-publikacja wymaga również osobnego przeglądu języka, trzech zdań, dowodów
+publikacja wymaga również osobnego przeglądu języka, każdego zdania, dowodów
 i braku meta-komentarzy. Zatwierdzenie wiąże się przez `candidate_digest`
 z dokładną treścią oraz identyfikatorem odczytu. Zmieniony tekst wymaga nowego
 przeglądu. Jeśli przegląd wykonuje model, zapisujemy `reviewer.type=agent`.

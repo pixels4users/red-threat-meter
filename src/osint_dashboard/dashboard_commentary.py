@@ -19,7 +19,7 @@ from .review import validate_schema
 
 LOGGER = logging.getLogger(__name__)
 SYSTEM_PROMPT_PATH = ROOT / "prompts/dashboard-commentary-system.md"
-PROMPT_VERSION = "dashboard-commentary-v1"
+PROMPT_VERSION = "dashboard-commentary-v2"
 META = re.compile(
     r"\b(?:jako\s+(?:ai|model|asystent)|w\s+modelowym\s+scenariuszu|"
     r"as\s+an?\s+(?:ai|language\s+model)|nie\s+moge|nie\s+jestem\s+w\s+stanie|"
@@ -64,8 +64,8 @@ def build_generation_request(context: object) -> dict | None:
     if any(not item["evidence_refs"] for item in accepted):
         LOGGER.info("dashboard_generation_unavailable reason=evidence_missing")
         return None
-    if {item["role"] for item in accepted} != {"situation", "action", "impact"}:
-        LOGGER.info("dashboard_generation_unavailable reason=assessment_incomplete")
+    if not accepted or not any(ref != "rtb:score" for item in accepted for ref in item["evidence_refs"]):
+        LOGGER.info("dashboard_generation_unavailable reason=verified_findings_missing")
         return None
     # Exclude uncertain/rejected prose entirely, rather than asking the model
     # to filter it after reading it or infer the missing parts from the score.
@@ -133,7 +133,7 @@ def prepare_commentary(
         return _reject("control_characters")
     text = " ".join(sentence.strip() for sentence in sentences)
     if len(text) > 600 or any(SENTENCE_BREAK.search(sentence.strip()) for sentence in sentences):
-        return _reject("not_three_concise_sentences")
+        return _reject("not_concise_sentences")
     if any(not sentence.strip().endswith(".") for sentence in sentences):
         return _reject("incomplete_prose")
     if MARKUP.search(text) or META.search(_fold(text)):

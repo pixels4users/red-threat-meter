@@ -103,19 +103,22 @@ W v0.4 calculate zawsze zwraca liczbę, także przy defer i braku historii. Spra
 ## 3. Komentarz dla dashboardu
 
 Przeczytaj wynik, `draft.json` i `commentary-evidence.json`. Przy RTB=null
-albo braku podstaw do całej formuły trzech zdań pomiń komentarz. Nie zastępuj
+albo braku jakiegokolwiek sprawdzonego ustalenia pomiń komentarz. Nie zastępuj
 go twierdzeniem „brak zagrożeń” ani starym podsumowaniem.
 
 Jeśli są podstawy, przygotuj `context.json` według
-`schemas/dashboard/commentary-context.schema.json`: role situation, action,
-impact, z dosłownie istniejącymi evidence_refs. Użyj wyłącznie ustaleń, które
+`schemas/dashboard/commentary-context.schema.json`: 1–3 ustalenia z dosłownie
+istniejącymi evidence_refs. Role situation, action, impact są opisowe;
+nie wymagaj kompletu ani określonej kolejności. Użyj wyłącznie ustaleń, które
 rzeczywiście przejrzałeś, i instrukcji `prompts/analysis-findings.md`.
 RTB i metodologia muszą odpowiadać draft.json. Sam indeks nie uzasadnia
 bezpieczeństwa, rutynowości, intencji ani skutków gospodarczych.
 
 Według `prompts/dashboard-commentary-system.md` zapisz `candidate.json`
-(`schemas/dashboard/commentary-candidate.schema.json`): trzy krótkie zdania
-po polsku, bez meta-komentarzy. Następnie:
+(`schemas/dashboard/commentary-candidate.schema.json`): 1–3 krótkie zdania
+po polsku o sprawdzonych wydarzeniach, bez meta-komentarzy. Trend i skutki dla
+Polski dodawaj tylko przy osobnych podstawach; ich brak nie blokuje komentarza.
+Następnie:
 
 ```sh
 .venv/bin/python scripts/analysis_cycle.py editorial --cycle CYKL \

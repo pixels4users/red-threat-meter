@@ -41,6 +41,17 @@ def test_reviewed_prose_preserves_meaning_and_negation(candidate):
     assert "nie konieczność zmiany" in publish(candidate)["text"]
 
 
+@pytest.mark.parametrize("count", [1, 2, 3])
+def test_one_to_three_reviewed_sentences_can_be_published(candidate, count):
+    candidate["sentences"] = candidate["sentences"][:count]
+    assert publish(candidate) == {"text": " ".join(candidate["sentences"])}
+
+
+def test_empty_commentary_is_not_a_publishable_candidate(candidate):
+    candidate["sentences"] = []
+    assert publish(candidate) == {"text": None}
+
+
 @pytest.mark.parametrize("text", [
     "Jako AI nie mogę ocenić tej sytuacji.",
     "W modelowym scenariuszu obserwujemy wzrost aktywności.",
@@ -159,8 +170,32 @@ def test_generation_uses_system_prompt_and_only_accepted_findings(reviewed_conte
 
 
 @pytest.mark.parametrize("missing_role", ["situation", "action", "impact"])
-def test_no_invented_assessment_from_rtb_alone(reviewed_context, missing_role):
+def test_missing_optional_role_does_not_hide_verified_events(reviewed_context, missing_role):
     reviewed_context["findings"] = [item for item in reviewed_context["findings"] if item["role"] != missing_role]
+    request = build_generation_request(reviewed_context)
+    packet = json.loads(request["messages"][1]["content"])
+    assert missing_role not in {item["role"] for item in packet["findings"]}
+    assert len(packet["findings"]) == 2
+
+
+def test_action_only_context_and_repeated_roles_are_allowed(reviewed_context):
+    finding = next(item for item in reviewed_context["findings"] if item["role"] == "action" and item["status"] == "accepted")
+    reviewed_context["findings"] = [finding]
+    assert build_generation_request(reviewed_context) is not None
+    reviewed_context["findings"].append({**finding, "id": "another-action"})
+    assert build_generation_request(reviewed_context) is not None
+
+
+@pytest.mark.parametrize("status", ["uncertain", "rejected"])
+def test_only_unverified_findings_still_produce_no_commentary(reviewed_context, status):
+    for finding in reviewed_context["findings"]:
+        finding["status"] = status
+    assert build_generation_request(reviewed_context) is None
+
+
+def test_score_alone_cannot_generate_a_situation_assessment(reviewed_context):
+    for finding in reviewed_context["findings"]:
+        finding["evidence_refs"] = ["rtb:score"]
     assert build_generation_request(reviewed_context) is None
 
 
@@ -190,7 +225,7 @@ def test_generation_cli_loads_prompt_and_omits_uncertain_prose(tmp_path, reviewe
     path.write_text(json.dumps(reviewed_context), encoding="utf-8")
     result = subprocess.run(command, capture_output=True, text=True, check=True)
     assert json.loads(result.stdout) is None
-    assert "assessment_incomplete" in result.stderr
+    assert "verified_findings_missing" in result.stderr
 
 
 def test_cli_separates_payload_from_diagnostics(tmp_path, candidate):

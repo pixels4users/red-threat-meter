@@ -12,6 +12,8 @@ zamiaru. polish_civilian_prose: opanowany, prosty polski tekst, bez technicznego
 żargonu i meta-komentarzy. current_and_in_scope: właściwy czas, kraj i zakres,
 brak późniejszej wiedzy oraz odwołanych lub zastąpionych ustaleń.
 
-Dla komentarza sprawdź trzy role: stan/trend, fizyczne działania, praktyczny
-wpływ na Polskę. Zdania nie mogą rozszerzać zatwierdzonych ustaleń. Nie uznawaj
+Dla komentarza sprawdź 1–3 zdania o zatwierdzonych ustaleniach. Stan/trend
+i praktyczny wpływ na Polskę są opcjonalne i wymagają własnej podstawy;
+ich brak nie jest powodem wstrzymania opisu wydarzeń. Nie wymagaj kompletu
+ról ani dopełniania do trzech zdań. Zdania nie mogą rozszerzać ustaleń. Nie uznawaj
 tego wywołania za niezależne źródło OSINT ani kontrolę człowieka.
