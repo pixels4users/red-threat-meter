@@ -197,3 +197,21 @@ hostingu, domeny, harmonogramu ani danych w Supabase.
 - Nie wykonano ponownego przeglądu historycznych materiałów, więc m.in.
   przypisania Świnoujścia i Łowicza wymagają osobnych, udokumentowanych ocen.
   Nie oznaczamy ich jako ukończonych na podstawie samego tytułu publikacji.
+
+### Odizolowanie podglądu od harmonogramu
+
+Gałąź `codex/ux-regional-context` jest w osobnym, dołączonym katalogu roboczym
+`/Users/milosz/.codex/worktrees/rta-regional-ui/OSINT Dashboard`.
+Podgląd działa pod `http://127.0.0.1:8769/` i czyta dotychczasowe lokalne API
+na porcie 8765. Nie ma własnej bazy live ani skopiowanych sekretów.
+
+Katalog używany przez harmonogram (`/Users/milosz/Documents/Codex/OSINT Dashboard`)
+został na dotychczasowej wersji `ac17ea4`, na gałęzi `codex/analysis-runtime`.
+Samo utworzenie gałęzi w tym samym katalogu nie izolowałoby codziennego silnika.
+Nowe opcjonalne pola eksportu wymagają nowszego walidatora po stronie Sites,
+więc nie uruchamiamy nowego eksportera w harmonogramie przed publikacją strony.
+
+Kolejność wdrożenia po akceptacji: opublikować nowy frontend i Worker,
+sprawdzić odczyt dotychczasowych raportów, następnie przenieść zaakceptowany
+kod do katalogu silnika i zweryfikować pierwszy raport z nowymi polami.
+Nie trzeba zmieniać metody punktacji, uprawnień ani harmonogramu.
