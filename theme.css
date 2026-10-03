@@ -8,6 +8,7 @@
   --color-sidebar: light-dark(#f6f6f6, #141414);
   --color-surface: light-dark(#ffffff, #1e1e1e);
   --color-card: light-dark(#f6f6f6, #141414);
+  --color-card-inset: var(--color-surface);
   --surface-background: var(--color-canvas);
   --color-surface-hover: light-dark(#ededed, #292929);
   --color-text: light-dark(#171717, #f5f5f5);
@@ -60,6 +61,7 @@
   --sidebar-width: 200px;
   --content-max: 1440px;
   --card-padding: var(--space-xl);
+  --card-inset-padding: var(--space-lg);
   --card-radius: var(--radius-panel);
   --history-chart-height: 208px;
   --history-chart-min-width: 672px;
@@ -132,7 +134,7 @@
   .rtb-app { --page-gutter: var(--space-lg); --sidebar-width: 176px; --card-padding: var(--space-lg); }
 }
 @media (max-width: 620px) {
-  .rtb-app { --page-gutter: var(--space-md); --section-gap: var(--space-xl); --card-padding: var(--space-md); }
+  .rtb-app { --page-gutter: var(--space-md); --section-gap: var(--space-xl); --card-padding: var(--space-md); --card-inset-padding: var(--space-md); }
 }
 @media (prefers-reduced-motion: reduce) {
   .rtb-app { --motion-fast: 0ms; }

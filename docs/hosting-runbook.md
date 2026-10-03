@@ -7,6 +7,19 @@ Dostęp jest publiczny od 01.10.2026 na wyraźne polecenie użytkownika.
 Adres docelowy: [redthreatalert.pl](https://redthreatalert.pl).
 Design System pozostaje osobnym projektem.
 
+## Osobne tło komentarza — 03.10.2026
+
+Wersja Sites **19**, deployment `appgdep_6ac10d00d7b481918a564f61a4b65d2d`,
+źródło Sites `39bb28b32c3e0f6d47b795cce69590422cd14eec`.
+Publikacja zakończona `succeeded` o 14:11:30 UTC. Wspólny wariant
+`.r-card.r-card--inset` wydziela komentarz neutralnym tłem i odstępami;
+panel bez komentarza jest ukryty. Dostęp publiczny i konfiguracja bez zmian.
+
+Sprawdzono build frontendu i Workera, lokalne szerokości 1440 i 320 px,
+jasny i ciemny wygląd oraz zmianę komentarza wraz z datą raportu.
+Brak poziomego przepełnienia strony i błędów konsoli.
+Podgląd: `output/rta-commentary-panel-2026-10-03.jpg`.
+
 ## Historia indeksu i wspólna karta — 03.10.2026
 
 Wersja Sites **18**, deployment `appgdep_6ac10820177081919dacc18eaa733d58`,

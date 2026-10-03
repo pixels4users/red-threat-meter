@@ -20,6 +20,9 @@ zaakceptowany układ: **B — Chronologia**.
    Nie kopiuj jej tła, paddingu, promienia ani cienia do reguł widoku.
    Karta nie narzuca Grid/Flexbox ani szerokości kolumn. Pozostałe sekcje
    zachowują dotychczasowy układ bez dodatkowych kart.
+   Komentarz wewnątrz grupy korzysta z wariantu `.r-card.r-card--inset`
+   i tokenów `--color-card-inset` / `--card-inset-padding`. Nie twórz
+   lokalnego tła komentarza ani kolejnych kart dla jego poszczególnych zdań.
 10. Opis poziomu, pewność i rozwinięcie „Skąd ten wynik?” grupujemy obok
     liczby, na telefonie poniżej. Wkłady i opis częściowych obserwacji są
     w rozwinięciu. Brak wyniku, objaśnienie zera i istotne ostrzeżenia

@@ -198,6 +198,12 @@ Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
   do 900 px szerokości 24 px, do 620 px 16 px. Komponent nie narzuca kolumn.
   Nie dodajemy kart do liczników, osi ani mapy. To decyzja użytkownika
   z 03.10.2026, po pierwszym podglądzie historii.
+- Komentarz ma własną neutralną powierzchnię wewnątrz wspólnej karty:
+  wariant `.r-card.r-card--inset`, biały w jasnym wyglądzie i jaśniejszy
+  grafitowy w ciemnym. Odstęp 24 px, na telefonie 16 px, promień 8 px;
+  bez cienia i dodatkowej ramki. Na desktopie panel zajmuje wysokość grupy,
+  na telefonie przechodzi pod wykres. To rozwinięcie zaakceptowane
+  03.10.2026 na wzór wydzielonego komentarza w wizja-koncept.
 - Poziom zagrożenia, pewność i „Skąd ten wynik?” są po prawej stronie liczby.
   Na telefonie przechodzą pod nią. Wkłady Działania / Przygotowania,
   objaśnienie indeksu i opis częściowych obserwacji są wewnątrz rozwinięcia.

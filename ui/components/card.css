@@ -12,3 +12,9 @@
   border-radius: var(--card-radius);
   box-shadow: none;
 }
+
+/* A secondary surface within a card, for commentary or supporting context. */
+.rtb-app .r-card--inset {
+  --surface-background: var(--color-card-inset);
+  padding: var(--card-inset-padding);
+}

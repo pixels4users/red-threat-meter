@@ -442,6 +442,7 @@ function renderTopicCounts() {
 function renderCommentary() {
   const host = $('[data-commentary]'); host.replaceChildren();
   const rows = commentaryRows(report(), state.area, records());
+  host.closest('.r-analysis').hidden = !rows.length;
   host.hidden = !rows.length;
   host.previousElementSibling.hidden = !rows.length;
   for (const [label, text] of rows) { const row = el('p', 'r-commentary-row'); row.append(el('strong', '', label), el('span', '', text)); host.append(row); }
