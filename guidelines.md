@@ -39,6 +39,8 @@ zaakceptowany układ: **B — Chronologia**.
 ## Tekst i dane
 
 - Polski, krótkie zdania, konkretne znaczenie dla mieszkańca Polski.
+- Legenda mapy jest jedynym widocznym objaśnieniem symbolu flagi krajowej;
+  nie dopisuj powtarzającej ją instrukcji do szczegółów sygnału.
 - Metodyka, parsery, identyfikatory wersji i logi pozostają poza głównym UI.
 - Nie ukrywaj istotnej niepewności w szczegółach źródła. Niepewnych sygnałów
   nie używaj do tworzenia pewnie brzmiącego komentarza.
@@ -58,6 +60,8 @@ zaakceptowany układ: **B — Chronologia**.
 - „Postaw kawę” jest osobnym linkiem wsparcia w menu desktop i stopce, poza czterema
   widokami danych. Otwiera nową kartę, z etykietą dostępną i `noopener noreferrer`.
 - Przycisk ma czasownik lub jednoznaczną nazwę; ikona ma dostępną etykietę.
+- Przegląd używa jednego dropdowna „Obszar”: „Cały obszar” jest domyślną
+  opcją i sposobem powrotu z województwa. Bez dodatkowego przycisku obok pola.
 - Zachowuj widoczny fokus. Dialogi zamykają się przez Esc i przycisk, po
   zamknięciu zwracają fokus; Tab nie wychodzi za otwarte okno.
 - Cel dotykowy minimum 44 × 44 px. Nie pomniejszaj tekstu pól na telefonie.

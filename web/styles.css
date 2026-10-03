@@ -412,8 +412,6 @@ body { margin:0; }
 .rtb-app .r-hero { position:static; align-items:start; }
 .rtb-app .r-area-switch { grid-column:1/-1; display:flex; align-items:end; gap:var(--space-sm); flex-wrap:wrap; padding-bottom:var(--space-xs); }
 .rtb-app .r-area-switch .r-small { margin-left:auto; padding-bottom:var(--space-xs); }
-.rtb-app .r-area-switch button[aria-pressed=true],
-.rtb-app .r-area-switch button[aria-pressed=true]:hover:not(:disabled) { background:var(--r-text); color:var(--r-bg); border-color:var(--r-text); }
 .rtb-app .r-commentary-rows { display:grid; gap:var(--space-md); }
 .rtb-app .r-analysis .r-commentary-row { display:grid; grid-template-columns:minmax(0,1fr); gap:var(--space-2xs); max-width:none; }
 .rtb-app .r-commentary-row strong { font-size:var(--text-body-small); font-weight:var(--font-weight-strong); }
