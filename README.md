@@ -139,6 +139,7 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 
 - [Dashboard — obsługa](docs/dashboard-runbook.md) — publikacja, historia, korekty, uruchomienie i testy.
 - [Dashboard online i domena](docs/hosting-runbook.md) — wdrożenie Sites i przygotowane rekordy home.pl.
+- [Pilotaż nowych źródeł](docs/source-pilots.md) — ograniczone próby Sjöfartsverket i Meduzy poza punktacją i publikacją.
 - [Silnik Codexa](docs/analysis-runbook.md) — pełny cykl analizy, dowody, komentarz i publikacja, bez osobnego API modelu.
 - [Codzienny harmonogram](docs/automation-runbook.md) — warunki pracy, limity, odzyskiwanie po awarii i kontrola pierwszego wykonania.
 - [Kontrakt dashboardu](docs/dashboard-data-contract.md) — dozwolone pola, daty, braki, wersje i granica eksportu.

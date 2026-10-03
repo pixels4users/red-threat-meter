@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Isolated source pilot, not a report or reviewed incident",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "parser_version", "source_id", "publisher", "role", "fetched_at", "capture_sha256", "transport_status", "content_freshness", "runtime_enabled", "coverage", "records"],
+  "properties": {
+    "version": {"const": "source-pilot-1"},
+    "parser_version": {"const": "source-pilot-parser-1"},
+    "source_id": {"enum": ["sjofartsverket", "meduza"]},
+    "publisher": {"type": "string", "minLength": 1},
+    "role": {"enum": ["official_navigation_warning", "publisher_excerpt"]},
+    "fetched_at": {"type": "string", "format": "date-time"},
+    "capture_sha256": {"$ref": "#/$defs/hash"},
+    "transport_status": {"const": "ok"},
+    "content_freshness": {"const": "not_assessed"},
+    "runtime_enabled": {"const": false},
+    "coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["history_complete"],
+      "properties": {
+        "history_complete": {"const": false},
+        "page_update_raw": {"type": ["string", "null"]},
+        "page_update_timezone": {"type": "null"},
+        "page_kind": {"const": "swedish_warnings_in_force"},
+        "area_rows": {"type": "integer", "minimum": 0},
+        "duplicate_area_rows": {"type": "integer", "minimum": 0},
+        "explicit_empty_areas": {"type": "array", "items": {"type": "string"}},
+        "absence_means_cancelled": {"const": false},
+        "full_articles": {"const": false},
+        "excerpt_max_chars": {"const": 2000},
+        "feed_rows": {"type": "integer", "minimum": 1}
+      }
+    },
+    "records": {
+      "type": "array", "maxItems": 250,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["record_id", "title_original", "content_original", "url", "source_time_raw", "published_at", "observed_at", "valid_from", "valid_until", "validity_note", "areas_original", "content_sha256", "translation_status", "review_status", "origin_status", "priority_hint"],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 1},
+          "title_original": {"type": "string", "minLength": 1},
+          "content_original": {"type": "string", "maxLength": 20000},
+          "url": {"type": "string", "format": "uri", "pattern": "^https://"},
+          "source_time_raw": {"type": ["string", "null"]},
+          "published_at": {"type": ["string", "null"], "format": "date-time"},
+          "observed_at": {"type": "null"},
+          "valid_from": {"type": "null"},
+          "valid_until": {"type": "null"},
+          "validity_note": {"type": "string", "minLength": 1},
+          "areas_original": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "content_sha256": {"$ref": "#/$defs/hash"},
+          "translation_status": {"const": "pending"},
+          "review_status": {"const": "not_reviewed"},
+          "origin_status": {"const": "not_established"},
+          "priority_hint": {"enum": ["context_review", "scope_review"]}
+        }
+      }
+    }
+  },
+  "$defs": {"hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+}

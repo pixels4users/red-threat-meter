@@ -1,7 +1,7 @@
 {
-  "version": "source-candidates-11",
-  "checked_on": "2026-09-30",
-  "policy": "Rejestr integracji i kandydatów. Działający pilotaż GNSS/belzhd jest w config/early-warning.json, pilotaż jakości ADSB.lol w config/aviation.json, audyt historii w config/aviation-history.json, kolektory RTB w config/sources.json. Pozostałe wpisy nie uruchamiają adapterów. Daty wcześniejszych ocen dostępu zachowano w opisach. Kalibracja i niezależna weryfikacja są odrębną pracą. Rozszerzenie z 25.09.2026: kandydaci pierwotni PAŻP, kanały UA, RSO, media i siły zbrojne LT/LV/EE oraz semantyka istniejącego RCB zostały zaakceptowane do integracji 25.09.2026; nie uruchamiają nowych kolektorów. Strażnik jest wyłącznie odniesieniem architektonicznym. Grupa wydawcy nie zastępuje ustalenia pochodzenia każdego dowodu. proposal_status=accepted_for_integration i accepted_on oznaczają akceptację zakresu, nie gotowość adaptera; pole status nadal opisuje dostęp i wdrożenie. Akceptacja nie zmienia dat checked_on ani wyników oceny dostępu. Aktualizacja 29.09.2026: pansa_airspace i rso_public mają działające adaptery ograniczonego zakresu; szczegóły w ich statusach.",
+  "version": "source-candidates-12",
+  "checked_on": "2026-10-03",
+  "policy": "Rejestr integracji i kandydatów. Działający pilotaż GNSS/belzhd jest w config/early-warning.json, pilotaż jakości ADSB.lol w config/aviation.json, audyt historii w config/aviation-history.json, kolektory RTB w config/sources.json. Pozostałe wpisy nie uruchamiają adapterów. Daty wcześniejszych ocen dostępu zachowano w opisach. Kalibracja i niezależna weryfikacja są odrębną pracą. Rozszerzenie z 25.09.2026: kandydaci pierwotni PAŻP, kanały UA, RSO, media i siły zbrojne LT/LV/EE oraz semantyka istniejącego RCB zostały zaakceptowane do integracji 25.09.2026; nie uruchamiają nowych kolektorów. Strażnik jest wyłącznie odniesieniem architektonicznym. Grupa wydawcy nie zastępuje ustalenia pochodzenia każdego dowodu. proposal_status=accepted_for_integration i accepted_on oznaczają akceptację zakresu, nie gotowość adaptera; pole status nadal opisuje dostęp i wdrożenie. Akceptacja nie zmienia dat checked_on ani wyników oceny dostępu. Aktualizacja 29.09.2026: pansa_airspace i rso_public mają działające adaptery ograniczonego zakresu; szczegóły w ich statusach. Aktualizacja 03.10.2026: Sjöfartsverket i Meduza mają ograniczony ręczny pilotaż w config/source-pilots.json; nie są źródłami codziennego RTB.",
   "candidates": [
     {
       "id": "pl_special_services",
@@ -216,8 +216,13 @@
       "id": "maritime_ais_and_notices",
       "role": "observational_data",
       "priority": 3,
-      "status": "providers_and_access_to_select",
-      "purpose": "Komunikaty morskie, portowe i obserwacje AIS po wyborze źródeł. Bliskość infrastruktury nie dowodzi wrogiej intencji; mierzyć jakość pokrycia."
+      "status": "isolated_pilot_notices_ais_not_connected",
+      "purpose": "Komunikaty morskie, portowe i obserwacje AIS po wyborze źródeł. Bliskość infrastruktury nie dowodzi wrogiej intencji; mierzyć jakość pokrycia.",
+      "url": "https://navvarn.sjofartsverket.se/en/Navigationsvarningar/Navtexx",
+      "publisher": "Sjöfartsverket",
+      "checked_on": "2026-10-03",
+      "pilot_config": "config/source-pilots.json",
+      "access_note": "03.10.2026: jedna próba HTTP 200, 16 wystąpień w obszarach i 11 unikalnych ostrzeżeń; 3 do przeglądu kontekstu. Ręczny kolektor poza SQLite, RTB i Supabase; brak historii, oceny ciągłości i atrybucji. Powtórzenia jednego numeru ostrzeżenia łączone. AIS nie jest podłączony. docs/source-pilots.md."
     },
     {
       "id": "strategic_aviation_reports",
@@ -551,6 +556,20 @@
       "checked_on": "2026-09-30",
       "proposal_status": "accepted_for_integration",
       "accepted_on": "2026-09-30"
+    },
+    {
+      "id": "meduza_russia_context",
+      "url": "https://meduza.io/rss/en/all",
+      "publisher": "Meduza",
+      "role": "publisher_excerpt_discovery",
+      "priority": 2,
+      "status": "isolated_pilot_rss_not_integrated",
+      "purpose": "Odkrywanie doniesień o zdolnościach RU/BY, infrastrukturze i działaniach dotyczących Polski oraz flanki. Filtr tematu i geografii ustala wyłącznie kolejność przeglądu.",
+      "dependency_group": "publisher:meduza",
+      "origin_policy": "Identyfikować cytowanych pierwotnych autorów dla każdego twierdzenia; wydawca nie daje dodatkowej niezależności przedrukom.",
+      "pilot_config": "config/source-pilots.json",
+      "checked_on": "2026-10-03",
+      "access_note": "03.10.2026: pojedynczy HTTP 200, 30 pozycji RSS, 12 wstępnie wyróżnionych słowami kluczowymi. Wstępny przegląd wykazał fałszywe trafienia i pominięcia; bez importu do RTB. Brak pełnych artykułów i gwarancji kompletności. docs/source-pilots.md."
     }
   ],
   "design_status": "integration_registry_runtime_configs_are_separate"

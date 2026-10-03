@@ -1,4 +1,54 @@
-# Stan realizacji — 01.10.2026
+# Stan realizacji — 03.10.2026
+
+## Regionalny interfejs i zgodne dane — 03.10.2026, 13:05
+
+Nowy interfejs jest publicznie dostępny na [redthreatalert.pl](https://redthreatalert.pl).
+Wdrożono najpierw zgodny frontend i Worker Sites (wersja 15), następnie
+silnik w katalogu codziennej analizy i nowy raport. Starsze publikacje nadal
+się otwierają; nie zmieniono ich metodologii ani wyniku. Poniższe wcześniejsze
+sekcje są historią stanu z podanych dat, m.in. dawnego prywatnego dostępu.
+
+- Przejrzano i dopisano 34 rewizje metadanych istniejących sygnałów.
+  Regiony, rodzaj materiału i dwa punkty orientacyjne miast mają dowody.
+  Na kopii bazy potwierdzono, że same metadane nie zmieniają RTA ani pewności.
+- Raport zawiera 99 wpisów zdarzeń i kontekstu. Liczniki ostatnich 7 dni
+  pokazują 36 sygnałów lotniczych, 3 cyber i 4 pomiary nawigacji. Są to
+  zapisane sygnały; liczby nie oznaczają liczby ataków.
+- Dzień pomiaru GNSS pozostaje dniem UTC, bez fikcyjnej godziny publikacji.
+  Wybór województwa działa w indeksie, komentarzu, licznikach, osi i mapie.
+  Brak dowodu lokalizacji nie tworzy sztucznego punktu. Pewność regionalna
+  nie jest jeszcze obliczana. Brak zalecenia oznacza pominięcie wiersza.
+- Potwierdzono układ mobilny 390 × 844 bez przewijania poziomego, dolną
+  nawigację, filtry, powiększanie mapy, Escape i powrót fokusu oraz czytnik
+  raportu v0.2. Konsola publicznej strony bez błędów i ostrzeżeń.
+
+Cykl `2026-10-03T110349Z-7cc43b2c` ponownie przeanalizował **zapisane rano
+materiały**, bez nowego pobrania i bez dodatkowego kosztu X. Wynik na 13:05
+Europe/Warsaw: **RTA 2,2125248/100, pewność 22%, 10 odroczeń**. Różnica względem
+porannego 2,26 wynika z upływu czasu i wygaszania, nie z nowej punktacji.
+Komentarz ma dwa sprawdzone zdania o pomiarze z 02.10 i zapowiedzianej misji
+szwedzkich Gripenów. Brak podstaw do zalecenia nie został wypełniony poradą.
+
+Publikacja `rpt_04c6debe14cb3814d57ea49c890cefff6e2171a3f257555e77de0877b8e7fbd7`
+ma `verified_readback=true`; publiczne API zwróciło identyczny pakiet.
+Replay z archiwum kodu `0ac4b66176dfa3e2256d82bfa2b1eeb70aee86704b61f5ebab50fe6bdbacbcfa`
+jest identyczny, bez sieci. Kopia bazy i archiwum kodu zachowane. Dowody:
+`data/analysis/cycles/2026-10-03T110349Z-7cc43b2c/verification.json` oraz
+`data/sites/regional-ui-verification-2026-10-03.json`.
+
+Walidacja: 391 testów Python (test lokalnego HTTP wymagał uruchomienia z
+dostępem do portu poza sandboxem), 22 testy dashboardu, 14 testów Workera,
+poprawny build Sites. Nie zmieniano wag `rtb-v0.4` ani codziennego harmonogramu.
+Ten ręczny przebieg nie poświadcza samodzielnego wykonania kolejnego harmonogramu.
+
+## Pierwsze próby nowych źródeł — 03.10.2026
+
+Po jednym odczycie bezpośrednim, poza główną bazą: Sjöfartsverket — 11
+unikalnych ostrzeżeń z 16 wystąpień w obszarach; Meduza — 30 pozycji RSS.
+Wytypowano odpowiednio 3 i 12 do wcześniejszego przeglądu. To kandydaci do
+analizy, nie nowe zdarzenia. Filtr Meduzy wymaga dalszej oceny; wykryto
+fałszywe trafienia i pominięcia. Żaden z tych materiałów nie trafił do
+RTA, Supabase ani publicznych liczników. [Obsługa i kryteria włączenia](source-pilots.md).
 
 ## Podłączenie domeny — 01.10.2026, 14:59
 

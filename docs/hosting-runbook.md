@@ -1,11 +1,32 @@
 # Dashboard online — hosting i domena
 
-Stan: 01.10.2026. Właściwy frontend **B — Chronologia** działa pod adresem
+Stan: 03.10.2026. Właściwy frontend **B — Chronologia z wyborem regionu** działa pod adresem
 [Red Threat Alert](https://red-threat-alert.michalomski.chatgpt.site).
 Projekt Sites: `appgprj_6abe3ae4ab688191ade3a1f128a64451`.
 Dostęp jest publiczny od 01.10.2026 na wyraźne polecenie użytkownika.
 Adres docelowy: [redthreatalert.pl](https://redthreatalert.pl).
 Design System pozostaje osobnym projektem.
+
+## Zgodność regionalnego interfejsu — 03.10.2026
+
+Wersja Sites **15**, deployment `appgdep_6ac0e019f0988191802d218993193def`,
+źródło minimalnego repozytorium Sites `30f1b0ed93f29946f486d937396b76f273c94b22`.
+Publikacja zakończona `succeeded`. Frontend i Worker przyjmują opcjonalne
+metadane `signals-v1` z eksportera `dashboard-export-v5` oraz stare raporty.
+W paczce builda znajduje się wspólna taksonomia `config/signal-presentation.json`.
+
+Najpierw wdrożono zgodny odczyt i sprawdzono poprzedni raport, potem
+zaktualizowano kod w katalogu harmonogramu i opublikowano nowe dane z 13:05.
+Publiczne API zwróciło pakiet identyczny z zamrożonym eksportem, a Supabase
+potwierdziło `verified_readback=true`. Nie była potrzebna migracja tabel,
+zmiana domeny, sekretów ani uprawnień. Codzienna publikacja nadal zmienia
+dane w Supabase; nie wymaga nowego wdrożenia frontendu.
+
+Sprawdzono wybór regionu, liczniki, mapę, czytnik raportu v0.2 i mobilny
+widok 390 × 844. Wyniki i granice testu:
+`data/sites/regional-ui-verification-2026-10-03.json`.
+Instrukcje dotyczące pierwotnej publikacji i domeny poniżej zachowują
+daty historycznych wdrożeń.
 
 ## Przepływ danych
 
