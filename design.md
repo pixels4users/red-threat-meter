@@ -1,9 +1,9 @@
 # RTB — Design System
 
-Wersja: **0.4 — prototyp historii**, 03.10.2026. Żywy dokument: aktualizowany razem z interfejsem.
-Zakres: lokalny prototyp na gałęzi `codex/ux-index-history`.
-Kierunek zaakceptowany przez użytkownika; wykonanie czeka na ocenę i iterację,
-bez publikacji. Publiczny dashboard pozostaje w dotychczasowej wersji.
+Wersja: **0.4 — historia indeksu i wspólna karta**, 03.10.2026. Żywy dokument: aktualizowany razem z interfejsem.
+Zakres: wdrożony frontend; prototyp z `codex/ux-index-history` został włączony
+do `codex/analysis-runtime` po akceptacji użytkownika.
+Publiczny dashboard korzysta z tego interfejsu od 03.10.2026, wersja Sites 18.
 Stan połączenia z chmurą: `supabase/README.md`. Silnik od 30.09.2026 wykonuje rtb-v0.4.
 
 ## Kierunek i decyzje
@@ -337,3 +337,17 @@ To sprawdzenie wymienionych par, nie pełny audyt dostępności.
 
 Przeszło 31 istniejących testów JS/PostgreSQL oraz build. Wersja nadal jest
 lokalnym prototypem bez publikacji; automatyczny wygląd został przywrócony.
+
+## Publikacja 0.4 — 03.10.2026
+
+Po akceptacji użytkownika wdrożono historię i wspólną kartę w istniejącym
+projekcie Sites, wersja 18. Stan publikacji: `succeeded`; strona pozostała
+publiczna pod `https://redthreatalert.pl`. Minimalne repozytorium hostingu
+zawiera także `ui/components/card.css`, importowane przez wspólny arkusz.
+
+W publicznym widoku potwierdzono raport z 3 października 13:05: indeks 2,2,
+pewność 22%, liczniki 36 / 3 / 4. Wybór 2 października przywraca 2,7,
+25%, liczniki 16 / 2 / 3 oraz ówczesny komentarz, mapę i oś. Działa powrót
+do najnowszego raportu; konsola bez ostrzeżeń i błędów. Nie zmieniono
+punktacji ani sposobu publikowania kolejnych raportów. Szczegóły wdrożenia:
+`docs/hosting-runbook.md`.

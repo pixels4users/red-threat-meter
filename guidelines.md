@@ -1,7 +1,7 @@
 # RTB — zasady UI
 
 Powiązane: `design.md`, `theme.css`, `docs/dashboard-presentation.md`.
-Wersja 0.4 (prototyp lokalny), 03.10.2026. Zasady kolorów wynikają z decyzji użytkownika;
+Wersja 0.4 (wdrożona po akceptacji), 03.10.2026. Zasady kolorów wynikają z decyzji użytkownika;
 zaakceptowany układ: **B — Chronologia**.
 
 ## Hierarchia i układ

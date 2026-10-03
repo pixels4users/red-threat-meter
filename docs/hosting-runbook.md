@@ -1,11 +1,34 @@
 # Dashboard online — hosting i domena
 
-Stan: 03.10.2026. Właściwy frontend **B — Chronologia z wyborem regionu** działa pod adresem
+Stan: 03.10.2026. Właściwy frontend **B — Chronologia z historią indeksu i wyborem regionu** działa pod adresem
 [Red Threat Alert](https://red-threat-alert.michalomski.chatgpt.site).
 Projekt Sites: `appgprj_6abe3ae4ab688191ade3a1f128a64451`.
 Dostęp jest publiczny od 01.10.2026 na wyraźne polecenie użytkownika.
 Adres docelowy: [redthreatalert.pl](https://redthreatalert.pl).
 Design System pozostaje osobnym projektem.
+
+## Historia indeksu i wspólna karta — 03.10.2026
+
+Wersja Sites **18**, deployment `appgdep_6ac10820177081919dacc18eaa733d58`,
+źródło minimalnego repozytorium Sites `e9c8dcb3fc3572140e04dafdd75e76d937c343cb`.
+Publikacja zakończona `succeeded` o 13:50:41 UTC. Dostęp pozostaje publiczny,
+domena `redthreatalert.pl` i konfiguracja odczytu Supabase bez zmian.
+
+Zaakceptowane commity `25c6df2` i `ef2256d` włączono do `codex/analysis-runtime`.
+Commit `5de73aa` dodaje wspólny komponent `ui/components/card.css` do listy
+plików kopiowanych do minimalnego repozytorium Sites. Pakiet nadal pomija
+dane analityczne, klucze i historyczne makiety. Obie gałęzie są na GitHubie.
+
+Sprawdzono 31 testów frontendu/bazy, 14 testów adaptera oraz build z minimalnego
+repozytorium. W publicznym interfejsie najnowszy raport z 03.10, 13:05 pokazuje
+indeks 2,2, pewność 22% i liczniki 36 / 3 / 4. Wybór 02.10, 09:25 zmienia je
+na 2,7, 25% i 16 / 2 / 3, razem z komentarzem, osią oraz punktami mapy.
+Powrót przywraca najnowszy raport. Konsola bez ostrzeżeń i błędów.
+
+Dowód: `data/sites/index-history-card-verification-2026-10-03.json`.
+Nie uruchamiano nowego cyklu analitycznego, nie zapisywano nowych raportów,
+nie zmieniano harmonogramu ani metodologii. Kolejne publikacje w Supabase
+automatycznie zasilają ten sam interfejs.
 
 ## Zgodność regionalnego interfejsu — 03.10.2026
 
