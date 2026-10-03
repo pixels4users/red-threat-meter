@@ -151,7 +151,23 @@
   .rtb-app .r-operational .r-map-stage { height:432px; }
   .rtb-app .r-toolbar { display:flex;gap:var(--space-md);align-items:end;flex-wrap:wrap;margin-bottom:var(--space-lg); }
   .rtb-app .r-field { display:grid;gap:var(--space-xs);font-size:var(--text-caption);color:var(--r-muted);min-width:0; }
-  .rtb-app .r-select { background:var(--r-surface);border:1px solid var(--r-line);border-radius:var(--radius-small);padding:var(--space-xs) var(--space-xl) var(--space-xs) var(--space-sm);font-size:var(--text-caption);min-height:40px;max-width:100%; }
+  .rtb-app .r-select { background:var(--r-surface);border:1px solid var(--r-line);border-radius:var(--radius-small);padding:var(--space-xs) var(--space-md);font-size:var(--text-caption);min-height:var(--target-size);min-width:0;max-width:100%;cursor:pointer; }
+  /* One grid cell keeps the decorative chevron centered at any field height. */
+  .rtb-app .r-field:has(> .r-select) { grid-template-columns:minmax(0,1fr); }
+  .rtb-app .r-field > .r-select { grid-area:2 / 1;appearance:none;-webkit-appearance:none;padding-inline-end:calc(var(--select-icon-inset) + var(--select-icon-size) + var(--select-text-gap)); }
+  .rtb-app .r-field:has(> .r-select)::after {
+    content:"";grid-area:2 / 1;align-self:center;justify-self:end;
+    width:var(--select-icon-size);height:var(--select-icon-size);margin-inline-end:var(--select-icon-inset);
+    background:currentColor;pointer-events:none;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  }
+  .rtb-app .r-select:hover:not(:disabled) { border-color:var(--r-muted);background-color:var(--r-soft); }
+  .rtb-app .r-select:disabled { opacity:.55;cursor:default; }
+  .rtb-app .r-field:has(> .r-select:disabled)::after { opacity:.55; }
+  @media (forced-colors: active) {
+    .rtb-app .r-field > .r-select { appearance:auto;-webkit-appearance:auto; }
+    .rtb-app .r-field:has(> .r-select)::after { display:none; }
+  }
   .rtb-app .r-result-count { margin-left:auto;font-size:var(--text-caption);color:var(--r-muted);padding-bottom:var(--space-xs); }
   .rtb-app .r-journal-row { display:grid;grid-template-columns:52px minmax(0,1fr) 104px;gap:var(--space-md);padding:var(--space-md) 0;border-top:1px solid var(--r-line); }
   .rtb-app .r-journal-row time { font-size:var(--text-caption);color:var(--r-muted);padding-top:var(--space-2xs);font-variant-numeric:tabular-nums; }

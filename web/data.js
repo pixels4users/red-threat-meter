@@ -1,3 +1,5 @@
+import { signalTime } from './signal-time.js';
+
 export const categories = {
   cross_border_air_pressure: { label: 'Ataki w zachodniej Ukrainie', icon: 'plane' },
   sabotage: { label: 'Sabotaż', icon: 'flame' },
@@ -35,9 +37,11 @@ export const shortDate = key => `${key.slice(8, 10)}.${key.slice(5, 7)}`;
 export const fullTime = value => value ? new Intl.DateTimeFormat('pl-PL', { timeZone, day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value)) : 'Nieustalony';
 export const signalCount = n => `${n} ${n === 1 ? 'sygnał' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'sygnały' : 'sygnałów'}`;
 
+export const signalTimeText = event => { const t = signalTime(event); return t.precision === 'day' ? `Pomiar dobowy · ${new Intl.DateTimeFormat('pl-PL', { timeZone: 'UTC', day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(t.value))} (UTC)` : fullTime(t.value); };
+
 export function timelineGroups(records, asOf, scale) {
   const today = dateKey(asOf), start = scale === 'day' ? today : scale === 'week' ? weekStart(today) : today.slice(0, 8) + '01';
-  const eligible = records.filter(e => e.published_at && Date.parse(e.published_at) <= Date.parse(asOf) && dateKey(e.published_at) >= start);
+  const eligible = records.filter(e => { const t = signalTime(e); return t.value && Date.parse(t.value) <= Date.parse(asOf) && (t.day ?? dateKey(t.value)) >= start; });
   const buckets = new Map();
   if (scale === 'day') {
     for (let h = 0; h <= Number(parts(asOf).hour); h++) buckets.set(`${today}T${String(h).padStart(2, '0')}`, []);
@@ -47,7 +51,8 @@ export function timelineGroups(records, asOf, scale) {
     for (let day = weekStart(start); day <= today; day = shiftDay(day, 7)) buckets.set(day, []);
   }
   for (const event of eligible) {
-    const day = dateKey(event.published_at), key = scale === 'day' ? `${day}T${parts(event.published_at).hour}` : scale === 'week' ? day : weekStart(day);
+    const t = signalTime(event), day = t.day ?? dateKey(t.value);
+    const key = scale === 'day' ? `${day}T${t.precision === 'day' ? 'daily' : parts(t.value).hour}` : scale === 'week' ? day : weekStart(day);
     if (!buckets.has(key)) buckets.set(key, []);
     buckets.get(key).push(event);
   }

@@ -1,5 +1,6 @@
 // One presentation model for the overview, journal and operational map.
 import taxonomy from '../config/signal-presentation.json' with { type: 'json' };
+import { signalTime } from './signal-time.js';
 import { dateKey, weekStart, checkEnvelope } from './data.js';
 export const topics = taxonomy.topics;
 export const regions = taxonomy.regions;
@@ -50,15 +51,15 @@ export function periodRange(asOf, period) {
   return { dateStart, start: Date.parse(dateStart + 'T00:00:00Z') - 86400000, end };
 }
 export function inPeriod(event, asOf, period) {
-  const range = periodRange(asOf, period), t = Date.parse(event.published_at);
-  if (range.undated) return !event.published_at;
-  if (period === 'all') return !event.published_at || t <= range.end;
+  const range = periodRange(asOf, period), date = signalTime(event), t = Date.parse(date.value);
+  if (range.undated) return !date.value;
+  if (period === 'all') return !date.value || t <= range.end;
   if (!Number.isFinite(t) || t > range.end) return false;
-  return range.rolling ? t >= range.start && t < range.end : dateKey(event.published_at) >= range.dateStart;
+  return range.rolling ? t >= range.start && t < range.end : (date.day ?? dateKey(date.value)) >= range.dateStart;
 }
 export function filterSignals(records, { asOf, area = 'macro', topic = 'all', period = 'all', source = 'all', includeNational = true }) {
   return records.filter(e => matchesArea(e, area, includeNational) && matchesTopic(e, topic) && inPeriod(e, asOf, period) && (source === 'all' || e.sources.some(s => s.source_id === source)))
-    .sort((a, b) => (b.published_at ?? '').localeCompare(a.published_at ?? '') || a.id.localeCompare(b.id));
+    .sort((a, b) => (signalTime(b).value ?? '').localeCompare(signalTime(a).value ?? '') || a.id.localeCompare(b.id));
 }
 export function mergeSignals(reports, asOf) {
   const cutoff = Date.parse(asOf), byId = new Map();
@@ -83,22 +84,19 @@ export function mergeSignals(reports, asOf) {
   }
   return [...episodes.values()];
 }
-export function comparisonState(reports, asOf, { failed = false, loading = false } = {}) {
+export function comparisonState(reports, asOf, { failed = false, loading = false, earliestLoaded = Infinity, records = [] } = {}) {
   if (loading) return 'loading';
-  if (failed) return 'unavailable';
   const end = Date.parse(asOf), start = end - 2 * WEEK;
-  const rows = [...new Map(reports.filter(r => Date.parse(r.as_of) <= end).map(r => [Date.parse(r.as_of), r])).values()].sort((a, b) => Date.parse(a.as_of) - Date.parse(b.as_of));
-  const before = rows.filter(r => Date.parse(r.as_of) <= start).at(-1);
-  if (!before) return 'unavailable';
-  const covered = [before, ...rows.filter(r => Date.parse(r.as_of) > start)];
-  if (end - Date.parse(covered.at(-1).as_of) > 36 * 3600000 || covered.some((r, i) => i && Date.parse(r.as_of) - Date.parse(covered[i - 1].as_of) > 36 * 3600000)) return 'unavailable';
-  const latest = covered.at(-1), key = r => `${r.provenance.source_config_hash}:${r.provenance.exporter_version}`;
-  if (covered.some(r => key(r) !== key(latest))) return 'unavailable';
-  if (covered.some(r => r.coverage.pending_review || r.sources.some(s => s.status !== 'current' || !s.window_complete))) return 'partial';
-  return 'available';
+  // Finish reading the archive before treating an absent record as a zero.
+  if (failed || !Number.isFinite(end) || !(earliestLoaded <= start)) return 'unavailable';
+  // Older signals may be preserved in a newer report. They are still real
+  // comparison data. An archive reaching the window start also allows zero.
+  const hasPreviousSignals = records.some(event => inPeriod(event, asOf, 'previous7'));
+  const historyReachesStart = reports.some(report => Date.parse(report.as_of) <= start);
+  return hasPreviousSignals || historyReachesStart ? 'available' : 'unavailable';
 }
 export function topicCounts(records, reports, asOf, area, options) {
-  const status = comparisonState(reports, asOf, options);
+  const status = comparisonState(reports, asOf, { ...options, records });
   return ['aviation', 'cyber', 'navigation'].map(topic => {
     const current = filterSignals(records, { asOf, area, topic, period: 'current7' });
     const previous = filterSignals(records, { asOf, area, topic, period: 'previous7' });

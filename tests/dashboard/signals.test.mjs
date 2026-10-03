@@ -47,17 +47,40 @@ test('reports, revisions, reprints and episodes count once; future knowledge is 
   assert.equal(filterSignals(merged,{asOf,period:'current7',topic:'cyber'}).length,0);
   assert.equal(filterSignals(merged,{asOf,period:'previous7',topic:'cyber'}).length,1);
 });
-test('comparison needs retained daily coverage, same source scope and complete collection/review', () => {
-  const history=Array.from({length:15},(_,i)=>report(iso(end-i*86400000)));
-  assert.equal(comparisonState(history,asOf),'available');
-  const events=[event('a',iso(end-1)),event('b',iso(end-WEEK-1))];
-  const cyber=topicCounts(events,history,asOf,'macro',{})[1]; assert.equal(cyber.delta,0); assert.equal(cyber.current.length,1);
-  assert.equal(comparisonState(history.slice(0,5),asOf),'unavailable');
-  assert.equal(comparisonState(history.filter((_,i)=>i!==5),asOf),'unavailable');
-  const changed=structuredClone(history); changed[3].provenance.source_config_hash='changed'; assert.equal(comparisonState(changed,asOf),'unavailable');
-  changed[3]=structuredClone(history[3]); changed[3].sources[0].status='partial'; assert.equal(comparisonState(changed,asOf),'partial');
-  assert.equal(topicCounts(events,changed,asOf,'macro',{})[1].delta,null);
-  assert.equal(comparisonState(history,asOf,{failed:true}),'unavailable');
+const loadedHistory = { earliestLoaded: end - 2 * WEEK };
+test('counts compare recorded signals despite source changes, partial feeds, review backlog and report gaps', () => {
+  const history = [report(iso(end - 2 * WEEK), [], {
+    provenance: { source_config_hash: 'old', exporter_version: 'old' },
+    sources: [{ id: 'cert_pl', status: 'partial', window_complete: false }],
+    coverage: { pending_review: 12 },
+  }), report(asOf)];
+  const signal = (id, time, source) => event(id, time, { sources: [{ source_id: source }] });
+  const events = [
+    ...Array.from({ length: 7 }, (_, i) => signal(`current-${i}`, iso(end - 1), 'pansa_airspace')),
+    ...Array.from({ length: 5 }, (_, i) => signal(`previous-${i}`, iso(end - WEEK - 1), 'pansa_airspace')),
+    ...Array.from({ length: 3 }, (_, i) => signal(`cyber-${i}`, iso(end - WEEK - 1), 'cert_pl')),
+  ];
+  assert.equal(comparisonState(history, asOf, loadedHistory), 'available');
+  const counts = topicCounts(events, history, asOf, 'macro', loadedHistory);
+  assert.deepEqual(counts.map(c => [c.current.length, c.previous.length, c.delta]), [[7, 5, 2], [0, 3, -3], [0, 0, 0]]);
+});
+test('older signals retained in newer reports provide actual comparison history', () => {
+  const events = [event('current', iso(end - 1)), event('previous', iso(end - WEEK - 1))];
+  const history = [report(asOf, events)];
+  const cyber = topicCounts(events, history, asOf, 'macro', loadedHistory)[1];
+  assert.equal(cyber.current.length, 1); assert.equal(cyber.previous.length, 1); assert.equal(cyber.delta, 0);
+});
+test('a known zero in an existing archive compares normally, but missing or unread history does not', () => {
+  const events = [event('current', iso(end - 1))], current = report(asOf, events);
+  const history = [report(iso(end - 2 * WEEK)), current];
+  assert.equal(topicCounts(events, history, asOf, 'macro', loadedHistory)[1].delta, 1);
+  assert.equal(topicCounts([], history, asOf, 'macro', loadedHistory)[1].delta, 0);
+  assert.equal(topicCounts(events, [current], asOf, 'macro', loadedHistory)[1].delta, null);
+  for (const options of [{}, { earliestLoaded: end - WEEK }, { ...loadedHistory, failed: true }, { ...loadedHistory, loading: true }]) {
+    const count = topicCounts(events, history, asOf, 'macro', options)[1];
+    assert.equal(count.current.length, 1); assert.equal(count.delta, null);
+  }
+  assert.equal(comparisonState(history, asOf, { ...loadedHistory, loading: true }), 'loading');
 });
 test('archive paginates with fixed publication anchor, uses latest corrections and caches reads', async () => {
   const latest=report(asOf,[event('a',iso(end-1))]), prior=report(iso(end-WEEK),[event('b',iso(end-WEEK-1))],{report_id:'rpt_'+'b'.repeat(64)});
@@ -80,4 +103,23 @@ test('an explicit reviewed date correction wins over a superseded timestamp', ()
   const items=mergeSignals([report(iso(end-1000),[old]),report(asOf,[corrected])],asOf);
   assert.equal(items[0].published_at,null);
   assert.equal(filterSignals(items,{asOf,period:'previous7'}).length,0);
+});
+
+test('daily GNSS measurements count and filter by observed day without inventing a publication hour', async () => {
+  const { signalTime } = await import('../../web/signal-time.js');
+  const { timelineGroups, signalTimeText } = await import('../../web/data.js');
+  const gnss = event('gnss-day', null, { occurred_on: '2026-10-02', sources: [{ source_id: 'gpsjam_reviewed' }] });
+  assert.equal(inPeriod(gnss, asOf, 'current7'), true);
+  assert.equal(inPeriod(gnss, asOf, 'undated'), false);
+  assert.equal(filterSignals([gnss], { asOf, topic: 'navigation', period: 'current7' }).length, 1);
+  assert.equal(topicCounts([gnss], [report(iso(end - 2 * WEEK))], asOf, 'macro', loadedHistory)[2].current.length, 1);
+  const groups = timelineGroups([gnss], '2026-10-02T19:00:00Z', 'day');
+  assert.deepEqual(groups.groups.filter(([, items]) => items.length).map(([key]) => key), ['2026-10-02Tdaily']);
+  assert.equal(signalTime(gnss).precision, 'day');
+  assert.equal(signalTimeText(gnss), 'Pomiar dobowy · 02.10.2026 (UTC)');
+  assert.equal(gnss.published_at, null);
+  assert.equal(inPeriod({ ...gnss, occurred_on: '2026-10-04' }, asOf, 'current7'), false);
+  assert.equal(inPeriod({ ...gnss, occurred_on: '2026-02-31' }, asOf, 'undated'), true);
+  const ordinary = { ...gnss, sources: [{ source_id: 'cert_pl' }] };
+  assert.equal(inPeriod(ordinary, asOf, 'undated'), true);
 });

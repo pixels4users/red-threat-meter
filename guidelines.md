@@ -50,7 +50,8 @@ zaakceptowany układ: **B — Chronologia**.
   kompletną wartość udającą bieżący wynik. Awaria odczytu zachowuje ostatni
   raport z jego datą i informacją o braku odświeżenia.
 - Nie wymyślaj procentu pewności. W v0.4 odczytuj go z confidence.percent; jest heurystyką jakości danych. Zero RTB to poprawna liczba; wyjaśnij, że brak naliczonych sygnałów nie potwierdza bezpieczeństwa. Historyczny null i brak odpowiedzi serwera nadal nie mogą być zastępowane zerem.
-- Wykres i delta łączą tylko wyniki tej samej metodologii i konfiguracji.
+- Wykres i delta indeksu RTA łączą tylko wyniki tej samej metodologii i konfiguracji.
+  Liczniki sygnałów stosują odrębne, prostsze reguły opisane poniżej.
 
 ## Interakcje i dostępność
 
@@ -60,6 +61,13 @@ zaakceptowany układ: **B — Chronologia**.
 - Zachowuj widoczny fokus. Dialogi zamykają się przez Esc i przycisk, po
   zamknięciu zwracają fokus; Tab nie wychodzi za otwarte okno.
 - Cel dotykowy minimum 44 × 44 px. Nie pomniejszaj tekstu pól na telefonie.
+- Wszystkie selektory korzystają ze wspólnego `.r-field > .r-select`
+  w `web/styles.css` oraz tokenów `--select-*` w `theme.css`; nie twórz
+  osobnych chevronów ani odstępów dla konkretnego ekranu. Zachowują natywną
+  obsługę klawiatury i listy opcji.
+  Chevron 16 px ma odstęp 16 px od prawej krawędzi oraz 12 px od tekstu;
+  jest wycentrowany względem pola i nie przechwytuje kliknięć. W trybie
+  wymuszonych kolorów przywracamy strzałkę systemową.
 - Docelowo kontrast tekstu minimum 4,5:1, dużego tekstu oraz istotnych
   wskaźników i kontrolek 3:1. Sprawdzaj oba motywy, także na stanach hover.
 - Mapa: plus/minus/reset/duży widok, przesuwanie, pinch; zwykłe przewijanie
@@ -90,6 +98,16 @@ i że zmiana układu nie zmieniła danych. Zapisz decyzję i ograniczenia w
   jest dopiero oddzielny odnośnik do źródła lub szczegółów.
 - Liczniki pokazują zapisane sygnały, a nie liczbę ataków. Neutralne strzałki
   opisują zmianę liczby, bez automatycznych ocen „rutynowo” lub „anomalia”.
+- Porównanie pokazujemy tylko wtedy, gdy jest dostępne. Bez niego zostaje
+  sama liczba sygnałów, bez komunikatu zastępczego, strzałki i opisu porównania.
+  Ukrywamy też podpis niedostępnego trendu indeksu. Informacje o niepełnym
+  pokryciu źródeł pozostają dostępne osobno.
+- Licznik porównuje zapisane sygnały po zakończeniu odczytu archiwum.
+  Wcześniejsze sygnały mogą być zachowane także w nowszym raporcie.
+  Gdy poprzedni okres nie ma wpisów, zero wolno przyjąć dopiero, gdy
+  archiwum sięga początku obu okien. Błąd lub niezakończony odczyt ukrywa
+  różnicę. Nie wymagamy identycznej konfiguracji źródeł, codziennych raportów,
+  kompletności każdego kolektora ani pustej kolejki przeglądu.
 - Okna tygodniowe to dwa rozłączne okresy po 168 h do daty raportu.
   Data publikacji i data zdarzenia pozostają rozdzielone.
 - Region, temat, okres i źródło stosują te same reguły w licznikach i listach.

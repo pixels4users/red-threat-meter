@@ -111,6 +111,13 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
   Zamknięcie podglądu zwraca fokus do przycisku otwierającego.
 - Kontrolki: przycisk neutralny, link, pole wyboru, przełącznik okresu,
   stany hover/pressed/disabled/focus. Cel dotykowy co najmniej 44 × 44 px.
+- Selektory (03.10.2026): wspólny chevron 16 px, odsunięty o 16 px od
+  prawej krawędzi, z rezerwą 12 px między tekstem i ikoną. Dotyczy
+  wyboru regionu, filtrów Mapy i Dziennika oraz rodzaju raportu.
+  Wszystkie instancje korzystają z `.r-field > .r-select` w `web/styles.css`
+  i tokenów `--select-*` w `theme.css`. Ikona dziedziczy
+  neutralny kolor etykiety w obu motywach; wybór opcji i klawiatura pozostają
+  natywne. Wymuszone kolory korzystają ze strzałki systemowej.
 
 ## Pliki i utrzymanie
 
@@ -128,6 +135,9 @@ Przed większą zmianą czytamy te trzy pliki systemu. Nowy wzorzec dodajemy
 do wspólnych zasad i pokazujemy w podglądzie przed rozszerzaniem go na kolejne
 widoki. Zmianę koloru lub odstępu wykonujemy w tokenie, nie w kopii komponentu.
 Nie przenosimy danych przykładowych do publikacji live.
+Poprawka wspólnego komponentu obejmuje wszystkie jego instancje w danej
+wersji kodu. Osobne gałęzie mają własne kopie; przed odbiorem przenosimy
+również przyjęte poprawki Design Systemu z pozostałych gałęzi.
 
 ## Przegląd regionalny — zaakceptowany 02–03.10.2026
 
@@ -146,6 +156,12 @@ Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
 - Trzy neutralne liczniki Lotnictwo / Cyber / Nawigacja, ostatnie 7 dni
   względem poprzednich 7. Kliknięcie prowadzi do tego samego zbioru w Dzienniku.
   Brak porównania zachowuje znaną liczbę, bez strzałki i bez etykiety normy.
+  Zmianę i opis porównania pokazujemy dopiero, gdy jest ono dostępne;
+  nie zastępujemy ich komunikatem o braku danych. Porównujemy same zapisane
+  sygnały: częściowe źródło, zmiana konfiguracji i kolejka przeglądu nie
+  blokują różnicy. Nieodczytana lub nieistniejąca historia nie udaje zera.
+  Tak samo ukrywamy pusty
+  trend indeksu i jego podpis — doprecyzowanie użytkownika z 03.10.
 - „Skąd ten wynik?” ujawnia wkłady Działania / Przygotowania.
 - Każdy wpis osi i listy ma etykietę obszaru; nieustalone przypisanie nie
   zmienia się automatycznie w zasięg ogólnopolski.

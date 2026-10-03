@@ -2,7 +2,7 @@
 
 Wersja `dashboard-v1`, uzupełnienie 29.09.2026. Schemat: `schemas/dashboard/report.schema.json`
 (JSON Schema 2020-12). Eksporter: `src/osint_dashboard/dashboard/contract.py`.
-Ten kontrakt nie zmienia metodologii punktacji. Aktualny silnik liczy **rtb-v0.2**.
+Ten kontrakt nie zmienia metodologii punktacji. Aktualny silnik liczy **rtb-v0.4**; wcześniejsze wydania zachowują swoje wersje.
 
 ## Granica danych
 
@@ -130,11 +130,12 @@ Identyfikator sygnału/epizodu jest liczony raz. Jawna korekta daty publikacji
 w nowej rewizji obowiązuje w aktualnym widoku; nie odtwarzamy błędnej starej
 daty. Przedruki są łączone w procesie analizy, nie przez podobieństwo tytułu.
 
-Porównanie liczników wymaga raportu sięgającego początku obu okien,
-ciągłości odczytów (przerwa maksymalnie 36 h), tej samej konfiguracji źródeł
-i wersji eksportera, ukończonego przeglądu oraz pełnych odczytów źródeł.
-To ostrożny warunek dostępności porównania, nie dowód pełnej obserwacji świata.
-Częściowe dane zachowują liczby i etykietę „Brak danych do porównania”.
+Liczniki zestawiają zapisane sygnały, nie rzeczywistą liczbę wszystkich zdarzeń.
+Niepełność pojedynczego źródła, zmiana jego konfiguracji ani zaległy przegląd
+nie blokują porównania. Wymagamy odczytanej historii obejmującej oba okna
+(także sygnałów zachowanych w nowszym raporcie). Niepobrana lub nieistniejąca
+historia nie udaje zera: wtedy widoczny jest sam licznik, bez delty i komunikatu
+„Brak danych do porównania”.
 Okna: `[as_of−336h, as_of−168h)` i `[as_of−168h, as_of)`.
 Filtry kalendarzowe używają Europe/Warsaw i daty raportu; bez daty to osobny
 zbiór. Archiwum jest ładowane na żądanie, z limitem 800 metadanych raportów;
@@ -143,3 +144,34 @@ niepowodzenie zachowuje najnowsze dane i jawnie opisuje niepełną historię.
 Regionalna pewność procentowa nie jest jeszcze obliczana. UI pokazuje
 „Nieustalona dla regionu”; wynik regionalny czyta z silnika (również null),
 a osobno podpisana pewność całego obszaru pozostaje globalna.
+
+## Dzień pomiaru i punkty orientacyjne — 03.10.2026
+
+Dobowe pomiary GPSJAM mają `occurred_on`, lecz nie udają publikacji z godziną.
+Wspólny `web/signal-time.js` wybiera ich dzień UTC; porządkowanie i przydział
+do okien używają początku tej doby jako klucza, nie czasu wykonania pomiaru.
+UI wyświetla „Pomiar dobowy” i datę UTC. Dla innych rekordów pozostaje czas
+publikacji; braków nie uzupełniamy datą pobrania lub zapisu w bazie.
+
+Opcjonalne `dashboard_context.place_id` wskazuje sprawdzone miasto z
+`config/map-places.json`. Walidacja wymaga zgodnego kraju, regionu, nazwy
+miasta i dowodu lokalizacji. Eksporter zapisuje `presentation.map_anchor`
+ze współrzędnymi, precyzją `city` i adresem źródła. To osobny punkt orientacyjny;
+`location.geometry` i plik GeoJSON nie otrzymują fikcyjnego miejsca zdarzenia.
+Panel mapy wyjaśnia dokładność. Katalog i taksonomia są objęte hashem kodu;
+zmiana w trakcie analizy wymaga nowego przygotowania pakietu.
+
+Aktualizacja metadanych starszych zdarzeń jest dopisywaną rewizją z przeglądem
+agenta; nie zmienia dawnych raportów. Nieznany obszar pozostaje nieznany.
+Brak ustalenia o wpływie lub zalecenia oznacza pominięcie odpowiedniego wiersza
+komentarza. Frontend nie dopisuje instrukcji na podstawie samego indeksu.
+
+## Kolejność wdrożenia
+
+Najpierw wdrażamy frontend i adapter odczytu akceptujące stare oraz nowe pola.
+Po teście istniejących raportów aktualizujemy silnik w katalogu harmonogramu.
+Pierwszy nowy eksport przechodzi walidację, publikację i kontrolę zgodności
+odczytu. Cofnięcie do poprzedniej strony po publikacji v5 wymaga zachowania
+nowego walidatora adaptera — nie należy cofać go do schematu odrzucającego v5.
+Źródła pilotażowe pozostają poza produkcyjnym rejestrem i bazą do zakończenia
+oceny. Nie zmieniamy przy tym wag ani metodologii `rtb-v0.4`.

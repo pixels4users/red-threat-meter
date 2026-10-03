@@ -54,7 +54,7 @@ def code_hash() -> str:
     # The GNSS bridge reuses these numerical contracts; freeze them for replay.
     files += list((ROOT / "src/osint_dashboard/early_warning").glob("*.py"))
     files += list((ROOT / "schemas/early-warning").glob("*.json"))
-    files += [ROOT / 'requirements.lock']
+    files += [ROOT / 'requirements.lock', ROOT / 'config/signal-presentation.json', ROOT / 'config/map-places.json']
     return digest([(str(p.relative_to(ROOT)), digest(p.read_bytes())) for p in sorted(files)])
 
 

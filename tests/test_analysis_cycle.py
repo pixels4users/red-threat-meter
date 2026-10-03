@@ -394,3 +394,33 @@ def test_recommendation_cannot_be_inferred_from_an_incident_or_the_score(prepare
     context['findings'][1]['role'] = 'recommendation'
     with pytest.raises(AnalysisError, match='without_current_instruction'):
         cycle.editorial_input(data, cid, context, candidate)
+
+
+def test_city_reference_is_reviewed_metadata_not_incident_coordinates(prepared):
+    from osint_dashboard.review import validate_evidence
+    from osint_dashboard.dashboard.presentation import signal_presentation
+    from copy import deepcopy
+    data, cid = prepared
+    event = proposal_for(data, cid)['decisions'][0]['incident']
+    event['country'] = 'PL'
+    event['location'].update(label='Łowicz', precision='city')
+    event['dashboard_context'] = {'topics':['military'], 'kind':'event', 'scope':'regional',
+                                 'region_ids':['PL-10'], 'evidence_ids':['place'], 'place_id':'lowicz'}
+    # Metadata extraction must not overwrite the original event geometry.
+    event['location']['geometry'] = None
+    event['incident_id'] = 'evt_synthetic_city_reference'
+    event['criteria'] = {p['key']:p['evidence_ids'] for p in event['criteria']}
+    public = signal_presentation(event, [])
+    assert public['map_anchor']['label'] == 'Łowicz'
+    assert public['map_anchor']['precision'] == 'city'
+    assert event['location']['geometry'] is None
+    assert 'place_id' not in public and 'evidence_ids' not in public
+    # Use real fixture materials to exercise evidence validation before mapping.
+    from osint_dashboard.store import Store
+    with Store(data) as store:
+        materials = {e['material_id']:store.material(e['material_id']) for e in event['evidence']}
+    validate_evidence(event, materials)
+    for patch in ({'place_id':'missing-city'}, {'region_ids':['PL-18']}, {'evidence_ids':['occurrence']}):
+        invalid = deepcopy(event); invalid['dashboard_context'].update(patch)
+        with pytest.raises(ValueError, match='Map city|location evidence'):
+            validate_evidence(invalid, materials)

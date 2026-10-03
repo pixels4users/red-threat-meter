@@ -171,7 +171,7 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
     # National markers are presentation anchors, not coordinates assigned to an
     # incident. The frontend may place only explicitly country-level records at a
     # documented capital; no city/region guessing is performed here.
-    exporter_files = sorted(Path(__file__).parent.glob("*.py")) + [ROOT / "schemas/dashboard/report.schema.json", ROOT / "config/signal-presentation.json"]
+    exporter_files = sorted(Path(__file__).parent.glob("*.py")) + [ROOT / "schemas/dashboard/report.schema.json", ROOT / "config/signal-presentation.json", ROOT / "config/map-places.json"]
     result = {"contract_version": VERSION, "mode": snapshot["mode"], "report_type": report_type,
               "supersedes": supersedes, "as_of": snapshot["as_of"], "window": deepcopy(snapshot["window"]),
               "provenance": {**{k: snapshot[k] for k in ("run_id", "methodology_version", "config_hash", "source_config_hash", "code_hash")},
@@ -240,6 +240,11 @@ def validate_report(report: dict) -> None:
         if safe_url(source["url"]) != source["url"]:
             raise ValueError("Source URL must be sanitized before publication")
     for incident in report["incidents"]:
+        anchor = incident.get('presentation', {}).get('map_anchor')
+        if anchor and (safe_url(anchor['reference_url']) != anchor['reference_url'] or
+                       incident['location']['precision'] != 'city' or
+                       incident['location']['label'] != anchor['label']):
+            raise ValueError('Map reference requires a matching city and sanitized source URL')
         for ref in incident["sources"]:
             if safe_url(ref["url"]) != ref["url"]:
                 raise ValueError("Source URL must be sanitized before publication")

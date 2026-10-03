@@ -22,5 +22,9 @@ def signal_presentation(event, refs):
         kinds = {taxonomy['source_kinds'][sid] for sid in source_ids if sid in taxonomy['source_kinds']}
         kind = 'warning' if event.get('official_warning') else next(iter(kinds)) if len(kinds) == 1 else 'context' if event['category'] == 'context' else 'event'
         result = {'topics': sorted(topics) or ['other'], 'kind': kind, 'scope': scope, 'region_ids': regions}
+    if reviewed and reviewed.get('place_id'):
+        place = read_json(ROOT / 'config/map-places.json')['places'][reviewed['place_id']]
+        result['map_anchor'] = {'type': 'Point', 'coordinates': place['coordinates'], 'label': place['label'],
+                                'precision': 'city', 'reference_url': place['reference_url']}
     return {'version': taxonomy['version'], **result,
             'episode_id': assessment.get('episode_key') or event['incident_id']}

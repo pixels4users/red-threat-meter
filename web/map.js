@@ -13,6 +13,11 @@ export function mapPoints(report) {
   const byId = new Map(report.incidents.map(e => [e.id, e]));
   const points = report.geojson.features.map(f => ({ id: f.id, coordinates: f.geometry.coordinates, event: byId.get(f.id), national: false }));
   for (const e of report.incidents) {
+    const anchor = presentation(e).map_anchor;
+    if (!e.location.geometry && anchor?.type === 'Point') {
+      points.push({ id: e.id, coordinates: anchor.coordinates, event: e, national: false, city: anchor.label });
+      continue;
+    }
     if (presentation(e).scope !== 'national' || e.location.geometry) continue;
     const capital = capitals.find(c => c.country_code === e.country);
     if (capital) points.push({ id: e.id, coordinates: capital.coordinates, event: e, national: true, capital: capital.name });
@@ -55,7 +60,7 @@ export function initializeMaps(root, getReport, getSelected, onSelect, icons, on
       const button = document.createElement('button'); button.type = 'button'; button.className = 'r-marker'; button.dataset.pointIds = ids.join(',');
       button.style.left = `${group.xy[0]}px`; button.style.top = `${group.xy[1]}px`; button.dataset.national = String(Boolean(national));
       button.setAttribute('aria-pressed', String(ids.includes(getSelected())));
-      button.setAttribute('aria-label', group.points.map(p => `${p.event.title}${p.national ? ', informacja o zasięgu krajowym' : ''}`).join('; '));
+      button.setAttribute('aria-label', group.points.map(p => `${p.event.title}${p.national ? ', informacja o zasięgu krajowym' : p.city ? ', przybliżone położenie: ' + p.city : ''}`).join('; '));
       const glyph = document.createElement('span'); glyph.className = 'r-marker-glyph';
       if (ids.length > 1 && !national) glyph.textContent = String(ids.length);
       else { const i = document.createElement('i'); i.dataset.lucide = national ? 'flag' : (topics[presentation(first.event).topics[0]]?.icon ?? 'circle-dot'); i.setAttribute('aria-hidden', 'true'); glyph.append(i); }

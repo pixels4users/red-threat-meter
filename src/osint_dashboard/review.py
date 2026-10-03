@@ -82,6 +82,13 @@ def validate_evidence(incident: dict, materials: dict[str, dict]) -> None:
             raise ValueError('Dashboard geographic scope requires location evidence')
         if presentation['scope'] == 'regional' and incident['country'] != 'PL':
             raise ValueError('Polish regional scope requires country PL')
+        if presentation.get('place_id'):
+            place = read_json(ROOT / 'config/map-places.json')['places'].get(presentation['place_id'])
+            if (not place or place['country'] != incident['country'] or
+                    place['region_id'] not in presentation['region_ids'] or
+                    location['precision'] != 'city' or location['label'] != place['label'] or
+                    not any(by_id[r]['claim'] == 'location' for r in refs)):
+                raise ValueError('Map city reference requires a matching reviewed location and region')
 
 
 def import_review(store, batch: dict) -> dict:

@@ -1,6 +1,9 @@
+import { commentaryRows } from './commentary.js';
 import { createIcons, Radar, Menu, X, LayoutDashboard, Map as MapIcon, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee } from 'lucide';
 import { select, scaleLinear, line, extent } from 'd3';
 import { categories, statuses, sourceStatuses, scoreLabel, threatLevel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, comparable, checkEnvelope, safeLink, reportText } from './data.js';
+import { signalTime } from './signal-time.js';
+import { signalTimeText } from './data.js';
 import { initializeMaps, mapPoints } from './map.js';
 import { topics, regions, kinds, presentation, regionLabel, filterSignals, topicCounts, periodRange, mapReport, SignalArchive, WEEK } from './signals.js';
 
@@ -98,12 +101,15 @@ function renderMetric() {
 
 function drawTrend() {
   const r = report(), target = $('.r-spark'), svg = select(target); svg.selectAll('*').remove();
-  if (state.area !== 'macro') { target.hidden = true; $('[data-history-note]').textContent = 'Brak danych do porównania indeksu regionalnego'; return; }
+  const note = $('[data-history-note]'), footer = note.parentElement;
+  target.hidden = true; footer.hidden = true; note.textContent = '';
+  if (state.area !== 'macro') return;
   const all = dailyHistory.slice(0, 14).reverse();
   const compatible = all.map(row => ({ ...row, valid: r && comparable(row, r.provenance) && (r.provenance.methodology_version !== 'rtb-v0.4' || row.confidence_key === r.rtb.confidence.comparison_key) && row.score !== null }));
   const values = compatible.filter(p => p.valid);
   target.hidden = values.length < 2;
-  $('[data-history-note]').textContent = values.length < 2 ? 'Brak danych do porównania indeksu' : 'Historia RTA · przerwy oznaczają brak porównywalnego wyniku';
+  footer.hidden = values.length < 2;
+  if (values.length >= 2) note.textContent = 'Historia RTA · przerwy oznaczają brak porównywalnego wyniku';
   if (values.length < 2 || target.clientWidth < 10) return;
   const w = target.clientWidth, h = 40, bounds = extent(values, d => d.score);
   const x = scaleLinear().domain([0, Math.max(1, compatible.length - 1)]).range([4, w - 4]);
@@ -131,13 +137,22 @@ function renderDetails() {
     panel.hidden = !event; if (!event) continue;
     const set = (sel, value) => { panel.querySelector(sel).textContent = value; };
     set('[data-detail-title]', event.title); set('[data-detail-summary]', event.summary);
-    set('[data-detail-time]', fullTime(event.published_at));
+    set('[data-detail-time]', signalTimeText(event));
+    panel.querySelector('[data-detail-time]').previousElementSibling.textContent = signalTime(event).basis === 'measurement' ? 'Pomiar' : 'Publikacja';
     set('[data-detail-status]', `${statuses[event.status]}${event.review_current ? '' : ' · dostępna nowsza wersja materiału'}`);
     set('[data-detail-tag] span:last-child', presentation(event).topics.map(t => topics[t].label).join(' · '));
     const precision = { unknown: 'dokładność nieustalona', country: 'zasięg krajowy', region: 'region', city: 'miasto', approximate: 'położenie przybliżone', exact: 'miejsce wskazane w źródle' };
     set('[data-detail-location]', `${event.location.label ?? 'Miejsce nieustalone'} · ${precision[event.location.precision]}`);
     const national = panel.querySelector('[data-national-note]'); national.hidden = presentation(event).scope !== 'national';
     national.textContent = 'Flaga w stolicy reprezentuje cały kraj. Nie oznacza miejsca incydentu.';
+    let cityNote = panel.querySelector('[data-city-note]');
+    if (!cityNote) { cityNote = el('p', 'r-small'); cityNote.dataset.cityNote = ''; national.after(cityNote); }
+    const anchor = presentation(event).map_anchor; cityNote.hidden = !anchor; cityNote.replaceChildren();
+    if (anchor) {
+      cityNote.append(document.createTextNode(`Punkt wskazuje miasto ${anchor.label}, nie dokładne miejsce zdarzenia. `));
+      const href = safeLink(anchor.reference_url);
+      if (href) { const a = el('a', 'r-source-link', 'Źródło położenia miasta'); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; cityNote.append(a); }
+    }
     const sources = panel.querySelector('[data-detail-source]'); sources.replaceChildren();
     for (const source of event.sources) {
       const href = safeLink(source.url); if (!href) continue;
@@ -162,10 +177,10 @@ function renderTimeline() {
   const data = timelineGroups(scoped(), r.as_of, state.scale);
   host.append(el('p', 'r-timeline-period', `${shortDate(data.start)} – ${shortDate(data.today)} · ${signalCount(data.eligible.length)}`));
   const rail = el('div', 'r-timeline-rail'); rail.setAttribute('role', 'list'); host.append(rail);
-  if (!data.eligible.length) host.append(el('p', 'r-empty', 'Brak wpisów z datą publikacji w tym okresie.'));
+  if (!data.eligible.length) host.append(el('p', 'r-empty', 'Brak sygnałów w wybranym okresie.'));
   for (const [key, events] of data.groups.filter(([, events]) => data.eligible.length && (state.scale !== 'day' || events.length))) {
     const row = el('div', 'r-time-row'); row.setAttribute('role', 'listitem'); row.dataset.empty = String(!events.length); row.dataset.count = events.length;
-    row.append(el('span', 'r-time-label', state.scale === 'day' ? key.slice(11) + ':00' : state.scale === 'week' ? shortDate(key) : `T${isoWeek(key)}`));
+    row.append(el('span', 'r-time-label', state.scale === 'day' ? key.endsWith('Tdaily') ? 'Pomiar dobowy' : key.slice(11) + ':00' : state.scale === 'week' ? shortDate(key) : `T${isoWeek(key)}`));
     const dot = el('span', 'r-time-node'); dot.append(el('i')); row.append(dot);
     if (!events.length) row.append(el('span', 'r-time-empty', 'Brak wpisów'));
     else {
@@ -183,9 +198,9 @@ function renderTimeline() {
     }
     rail.append(row);
   }
-  const foot = el('div', 'r-timeline-footer'); foot.append(el('span', 'r-small', 'Według czasu publikacji'), button('Zobacz w dzienniku', () => { state.journalArea = state.area; state.journalPeriod = state.scale; state.category = state.source = 'all'; navigate('journal'); }, 'r-link')); host.append(foot);
-  const undated = scoped().filter(r => !r.published_at).length;
-  if (undated) host.append(el('p', 'r-small', `${signalCount(undated)} bez daty publikacji znajdziesz w dzienniku.`));
+  const foot = el('div', 'r-timeline-footer'); foot.append(el('span', 'r-small', 'Według publikacji i dni pomiarów'), button('Zobacz w dzienniku', () => { state.journalArea = state.area; state.journalPeriod = state.scale; state.category = state.source = 'all'; navigate('journal'); }, 'r-link')); host.append(foot);
+  const undated = scoped().filter(r => !signalTime(r).value).length;
+  if (undated) host.append(el('p', 'r-small', `${signalCount(undated)} bez ustalonej daty znajdziesz w dzienniku.`));
 }
 
 function signalButton(event) {
@@ -198,7 +213,8 @@ function renderList(host, filtered) {
   host.replaceChildren();
   for (const event of filtered) {
     const row = el('article', 'r-journal-row'), text = el('div'); row.dataset.signalId = event.id;
-    row.append(el('time', '', event.published_at ? shortDate(dateKey(event.published_at)) : 'Bez daty'));
+    const date = signalTime(event), time = el('time', '', date.value ? shortDate(date.day ?? dateKey(date.value)) : 'Bez daty');
+    time.title = signalTimeText(event); row.append(time);
     text.append(button(event.title, () => selectSignals([event.id]), 'r-journal-title'));
     const meta = el('p', 'r-journal-meta'); meta.append(el('span', 'r-region-badge', regionLabel(event)), el('span', '', presentation(event).topics.map(t => topics[t].label).join(' · ')), el('span', '', kinds[presentation(event).kind]));
     if (!mapPoints(mapReport(report(), [event])).length) meta.append(el('span', '', 'Bez punktu na mapie'));
@@ -215,7 +231,7 @@ function areaSummary(filtered, area) {
 function renderJournal() {
   const filtered = journalRecords();
   $('[data-journal-count]').textContent = areaSummary(filtered, state.journalArea);
-  $('[data-journal-period-note]').textContent = periodCaption(state.journalPeriod) + ' · według publikacji';
+  $('[data-journal-period-note]').textContent = periodCaption(state.journalPeriod) + ' · publikacje i dni pomiarów';
   renderList($('[data-journal]'), filtered);
 }
 function renderOperational() {
@@ -326,7 +342,7 @@ function setOptions(select, values, selected) {
 function periodCaption(period) {
   if (!report()) return '';
   const range = periodRange(report().as_of, period);
-  if (range.undated) return 'Bez ustalonej daty publikacji';
+  if (range.undated) return 'Bez ustalonej daty';
   if (range.rolling) return `${fullTime(new Date(range.start))} – ${fullTime(new Date(range.end))}`;
   return range.dateStart ? `${shortDate(range.dateStart)} – ${fullTime(report().as_of)}` : 'Całe dostępne archiwum';
 }
@@ -344,28 +360,27 @@ function renderFilters() {
 function renderTopicCounts() {
   const host = $('[data-topic-counts]'); host.replaceChildren();
   $('[data-count-period]').textContent = report() ? periodCaption('current7') : '';
-  $('[data-count-note]').textContent = archive?.loading ? 'Wczytywanie historii…' : archive?.failed ? 'Nie udało się pobrać całej historii. Liczby mogą być niepełne.' : 'Liczba zapisanych sygnałów, nie liczba ataków. Porównanie z poprzednimi 7 dniami.';
+  $('[data-count-note]').textContent = archive?.loading ? 'Wczytywanie historii…' : archive?.failed ? 'Nie udało się pobrać całej historii. Liczby mogą być niepełne.' : 'Liczba zapisanych sygnałów, nie liczba ataków.';
   if (!report()) return;
-  const counts = topicCounts(records(), [...(archive?.reports.values() ?? [report()])], report().as_of, state.area, { failed: archive?.failed, loading: archive?.loading });
+  const counts = topicCounts(records(), [...(archive?.reports.values() ?? [report()])], report().as_of, state.area, { failed: archive?.failed, loading: archive?.loading, earliestLoaded: archive?.earliestLoaded });
   for (const item of counts) {
     const b = button('', () => { state.journalArea = state.area; state.category = item.topic; state.source = 'all'; state.journalPeriod = 'current7'; navigate('journal'); }, 'r-topic-button');
     const label = el('span', 'r-topic-label'), icon = el('i'); icon.dataset.lucide = topics[item.topic].icon; label.append(icon, el('span', '', topics[item.topic].label));
-    const delta = item.delta == null ? (item.status === 'loading' ? 'Wczytywanie porównania…' : 'Brak danych do porównania') : item.delta > 0 ? `↑ ${item.delta} więcej` : item.delta < 0 ? `↓ ${Math.abs(item.delta)} mniej` : '— bez zmian';
-    b.append(label, el('strong', 'r-topic-number', String(item.current.length)), el('span', 'r-small', delta));
-    b.setAttribute('aria-label', `${topics[item.topic].label}: ${signalCount(item.current.length)}. ${delta}. Zobacz w dzienniku.`);
+    const delta = item.delta == null ? null : item.delta > 0 ? `↑ ${item.delta} więcej` : item.delta < 0 ? `↓ ${Math.abs(item.delta)} mniej` : '— bez zmian';
+    b.append(label, el('strong', 'r-topic-number', String(item.current.length)));
+    if (delta !== null) b.append(el('span', 'r-small', delta));
+    b.setAttribute('aria-label', `${topics[item.topic].label}: ${signalCount(item.current.length)}.${delta !== null ? ` ${delta}.` : ''} Zobacz w dzienniku.`);
     if (item.delta !== null) b.title = `Poprzednie 7 dni: ${item.previous.length}. ${periodCaption('previous7')}`;
     host.append(b);
   }
+  if (counts.some(item => item.delta !== null)) $('[data-count-note]').append(document.createTextNode(' Porównanie z poprzednimi 7 dniami.'));
   if (report().sources.some(s => s.status !== 'current')) $('[data-count-note]').append(document.createTextNode(' Dane częściowe.'));
 }
 function renderCommentary() {
   const host = $('[data-commentary]'); host.replaceChildren();
-  const r = report(), regional = state.area !== 'macro';
-  const sections = r?.commentary.sections ?? (r?.commentary.text ? { situation: r.commentary.text } : {});
-  const local = r ? filterSignals(r.incidents, { asOf: r.as_of, area: state.area, period: 'current7', includeNational: false }).find(e => e.review_current && ['confirmed_primary', 'corroborated'].includes(e.status)) : null;
-  const rows = [['Sytuacja', sections.situation ?? 'Brak podsumowania w tym raporcie.'],
-    [regional ? 'Twój region' : 'Wpływ na Polskę', regional ? (local ? local.title : 'Brak lokalnych informacji z ostatnich 7 dni.') : sections.impact ?? 'Brak osobnej oceny wpływu na Polskę.'],
-    ['Co zrobić', regional ? 'Sprawdź komunikaty służb dotyczące Twojej miejscowości.' : sections.recommendation ?? 'Sprawdź komunikaty służb dotyczące Twojej miejscowości.']];
+  const rows = commentaryRows(report(), state.area, records());
+  host.hidden = !rows.length;
+  host.previousElementSibling.hidden = !rows.length;
   for (const [label, text] of rows) { const row = el('p', 'r-commentary-row'); row.append(el('strong', '', label), el('span', '', text)); host.append(row); }
   // Recommendations are prose, with no underline or pretend-link behavior.
 }

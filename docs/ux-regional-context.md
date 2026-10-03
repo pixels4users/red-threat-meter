@@ -82,8 +82,9 @@ Zasady liczenia:
 2. O przypisaniu do okna decyduje `published_at`, czyli data publikacji materiału przyjęta dla sygnału, zgodnie z obecną osią czasu. Nie nazywamy tego liczbą ataków, które wydarzyły się w danym tygodniu. Oba okna liczymy według wiedzy i przejrzanych rewizji dostępnych w chwili raportu; nowy odczyt nie edytuje starych eksportów. Przedziały są rozłączne: poprzedni `[as_of−336h, as_of−168h)`, bieżący `[as_of−168h, as_of)`.
 3. Sygnały bez daty pozostają w Dzienniku i są wskazane w szczegółach licznika jako „Bez daty”; nie dopisujemy im daty pobrania. Przy wielu tematach wpis może należeć do kilku liczników, dlatego sumy tematów nie przedstawiamy jako liczby odrębnych sygnałów całego raportu.
 4. Oba okresy stosują te same reguły tematu i obszaru, w tym jawne traktowanie komunikatów ogólnopolskich. Przypisania lokalizacji nie powstają z domyślnego adresu wydawcy.
-5. Zero po poprawnym odczycie to prawidłowa liczba. Przy poprzednim zerze działa zwykła różnica, np. `3 − 0 = +3`; nie potrzebujemy procentu. Brak historii porównawczej daje „Brak danych do porównania”, ale nie ukrywa znanej liczby z bieżącego okresu ani nie blokuje RTA.
-6. Niepełne pobrania oznaczamy krótko: „Dane częściowe”. Gdy zmiana źródeł lub brakujące dni uniemożliwiają porównanie, zachowujemy dostępny licznik i nie pokazujemy strzałki sugerującej porównywalny spadek/wzrost. Szczegóły mogą wyjaśniać np. „W poprzednim okresie brakowało danych”. Nie jest potrzebna kalibracja norm ani zgodność klucza porównania wyniku RTA; potrzebna jest zgodność zbioru i reguł zliczania.
+5. Zero w odczytanym archiwum to prawidłowa liczba. Przy poprzednim zerze działa zwykła różnica, np. `3 − 0 = +3`; nie potrzebujemy procentu. Brak historii porównawczej pozostawia sam bieżący licznik, bez strzałki, komunikatu zastępczego ani blokady RTA.
+6. Decyzja użytkownika z 03.10.2026: porównujemy zapisane sygnały. Częściowy status źródła, zmiana konfiguracji lub wersji eksportera, brak codziennego raportu i oczekujące przeglądy nie blokują różnicy. Zakres obserwacji pozostaje osobną informacją.
+7. Zabezpieczenie dotyczy odczytu historii: pobieranie archiwum obu okien musi zakończyć się bez błędu. Sygnały z poprzedniego okresu mogą być zachowane w nowszym raporcie. Jeśli poprzedni okres nie ma żadnych wpisów, zero wolno przyjąć dopiero, gdy istniejące archiwum sięga początku tego okresu. Bez tej podstawy poprzednia liczba pozostaje nieznana. Nie wymagamy kalibracji norm ani zgodności klucza porównania RTA.
 
 Pasek opisuje liczbę zarejestrowanych sygnałów. Regularny pomiar GNSS jest wpisem pomiarowym, nie kolejnym potwierdzonym atakiem; zmiana liczby pomiarów nie jest zmianą siły zakłóceń. Strzałki są neutralne kolorystycznie. Nie nadajemy etykiet „Anomalia”, „Rutynowe” ani „Poniżej normy” i nie zmieniamy punktacji. Pomiar natężenia poszczególnych zjawisk oraz badanie norm pozostają poza pierwszą wersją.
 
@@ -113,8 +114,8 @@ Kwartał i rok wymagają odczytu historii, wyboru właściwych rewizji i usunię
 
 | Unikamy | Pokazujemy |
 | --- | --- |
-| „Brak oceny zmiany” | „Brak danych do porównania” |
-| „Ten widok nie zawiera porównania pomiarów dla wspólnego obszaru i okresu…” | „Brak danych do porównania” |
+| „Brak oceny zmiany” | Sam licznik, bez porównania |
+| „Ten widok nie zawiera porównania pomiarów dla wspólnego obszaru i okresu…” | Sam licznik, bez porównania |
 | „To aktualizacja wiedzy o konkretnej kampanii; raport nie ustala wzrostu liczby ataków” | „CERT ostrzega przed fałszywymi wiadomościami podatkowymi” |
 | „Normalnie” wywnioskowane z pustego zbioru | „Brak nowych sygnałów w wybranym okresie” — tylko po poprawnym odczycie |
 | „Zagrożenie 0%” | „RTA 0/100” z informacją o pewności |
@@ -135,10 +136,10 @@ Nie dokładamy do każdej informacji zdania o procesie analizy. Opis mówi o wyd
 - CERT jest widoczny pod Cyberbezpieczeństwem i otwiera ten sam wpis z każdego widoku; może nadal mieć 0 punktów.
 - Łowicz otrzymuje obszar łódzkiego; źródło MON nie czyni go wydarzeniem w Warszawie.
 - Wynik, pewność, komentarz i trend dotyczą tego samego obszaru i raportu. Pewności krajowej nie kopiujemy do województw.
-- Brak zdarzeń, brak odczytu, brak porównania i odwołanie ostrzeżenia mają różne, krótkie komunikaty. Plan nie staje się wykonanym atakiem.
+- Brak zdarzeń, błąd odczytu i odwołanie ostrzeżenia mają różne, krótkie komunikaty. Brak porównania nie dodaje komunikatu zastępczego. Plan nie staje się wykonanym atakiem.
 - Liczniki, mapa i lista używają jednego zbioru. Komunikaty krajowe, bezdatowe wpisy i brak współrzędnych nie giną bez informacji. Jeden sygnał w dziesięciu raportach nie staje się dziesięcioma zdarzeniami.
 - „0” przy regionie oznacza zero pasujących wpisów, nie poziom bezpieczeństwa. Kwartał i rok pokazują rzeczywisty zakres historii.
-- Pasek ma etykietę „ostatnie 7 dni”; oba okresy są równe i rozłączne. Aktualizacja starego sygnału nie tworzy nowego, a brak daty nie jest uzupełniany datą pobrania. Różnica działa również przy poprzednim zerze. Brak historii lub nieporównywalne pobrania nie są przedstawiane jako spadek; znana liczba nadal jest widoczna. Liczba pomiarów GNSS nie jest opisywana jako liczba ataków ani siła zakłóceń.
+- Pasek ma etykietę „ostatnie 7 dni”; oba okresy są równe i rozłączne. Aktualizacja starego sygnału nie tworzy nowego, a brak daty nie jest uzupełniany datą pobrania. Różnica działa również przy poprzednim zerze. Brak lub błąd odczytu historii nie jest przedstawiany jako spadek; znana liczba nadal jest widoczna. Częściowe źródło i zmiana konfiguracji nie blokują porównania zapisanych sygnałów. Liczba pomiarów GNSS nie jest opisywana jako liczba ataków ani siła zakłóceń.
 - Oś i mapa zachowują siatkę i proporcje. Przy 320 px kontrolki zawijają się, etykiety nie zasłaniają tytułów, działa klawiatura i dolna nawigacja.
 - Nowy kontrakt nie psuje archiwum, zatwierdzania komentarza ani publikacji w Supabase.
 
@@ -177,8 +178,10 @@ części nie dopisuje frontend. Rekomendacja jest zwykłą prozą bez podkreśle
 Metadane geograficzne starszych raportów są niepełne: część wpisów pozostaje
 bez przypisanego województwa lub punktu. Nowy przegląd może nadać jawne
 `dashboard_context` z dowodami. Nie wykonano automatycznego przeglądu starej
-historii ani jej publikacji. Obecna krótka/częściowa historia nie daje
-wiarygodnych strzałek tygodniowych; stan ten jest obsłużony w interfejsie.
+historii ani jej publikacji. Porównanie liczników od 03.10.2026 opisuje
+różnicę liczby zapisanych sygnałów według uproszczonych zasad powyżej.
+Nie ocenia zmiany poziomu zagrożenia; brak odczytanej historii pozostawia
+sam licznik bez komunikatu zastępczego.
 
 Publikacja tej zmiany jest osobnym krokiem po lokalnym odbiorze. Nie zmieniano
 hostingu, domeny, harmonogramu ani danych w Supabase.
@@ -215,3 +218,16 @@ Kolejność wdrożenia po akceptacji: opublikować nowy frontend i Worker,
 sprawdzić odczyt dotychczasowych raportów, następnie przenieść zaakceptowany
 kod do katalogu silnika i zweryfikować pierwszy raport z nowymi polami.
 Nie trzeba zmieniać metody punktacji, uprawnień ani harmonogramu.
+
+### Liczniki i wspólne selektory — doprecyzowanie 03.10.2026
+
+- Porównanie sygnałów nie wymaga pełnych źródeł, identycznej konfiguracji,
+  pustej kolejki przeglądu ani raportu każdego dnia. Nadal wymaga ukończonego
+  odczytu i rzeczywistej historii, zgodnie z zasadami liczenia powyżej.
+- Do tej gałęzi przeniesiono wspólną poprawkę selektorów z `6e5231a`.
+  Jeden styl i tokeny obejmują region, Mapę, Dziennik oraz Raporty.
+- Kompilacja i 19 testów frontendu przeszły. Sprawdzono różnice 5 → 7,
+  spadek, równe liczniki, poprawne zero i brak historii. W przeglądarce
+  potwierdzono 22 vs 8 sygnałów Lotnictwa oraz zgodny filtr Dziennika,
+  odstępy wszystkich selektorów, klawiaturę i widok przy szerokości 320 px.
+- Zmiany pozostają na gałęzi UX, bez publikacji i modyfikacji metodologii RTA.

@@ -176,6 +176,10 @@ Mapowanie pól i procedura: `docs/v0.3-implementation.md`.
 
 Przy przeglądzie nowych lub aktualizowanych sygnałów uzupełniaj opcjonalne
 `dashboard_context`: `topics`, `kind`, `scope`, `region_ids`, `evidence_ids`.
+Opcjonalne `place_id` wolno wybrać z `config/map-places.json` wyłącznie po
+sprawdzeniu konkretnego miasta w dowodzie lokalizacji. Punkt wskazuje miasto,
+nie obiekt wojskowy, adres ani miejsce trafienia. Nie przypisuj go całemu
+województwu lub zdarzeniu obejmującemu wiele miejsc.
 Tematy i identyfikatory województw są w `config/signal-presentation.json`.
 To opis do filtrowania, bez zmiany punktacji lub automatycznej atrybucji.
 Rozróżniaj `event`, `warning`, `plan`, `measurement`, `context`.
