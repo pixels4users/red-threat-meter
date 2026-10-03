@@ -100,3 +100,46 @@ effective_at, valid_until, area i instruction_pl. Aktywne i nieustalone
 instrukcje są wyświetlane także przy niewyliczonym indeksie. Brak audytu
 216 godzin historii to publiczna luka event_history_unverified.
 Wcześniejsze wydania v0.2 pozostają poprawnymi pakietami bez tych rozszerzeń.
+
+## Rozwinięcie prezentacji — 03.10.2026
+
+`dashboard-v1` pozostaje kompatybilny ze starszymi publikacjami. Eksporter
+`dashboard-export-v5` dodaje opcjonalne `incidents[].presentation` w wersji
+`signals-v1`: `topics`, `kind`, `scope`, `region_ids`, `episode_id`.
+To opis do nawigacji; `category` i punktacja zachowują znaczenie.
+
+Metadane pochodzą z przejrzanego `dashboard_context`, ocen regionalnych
+albo jawnej, wspólnej taksonomii `config/signal-presentation.json`. Reguły
+dla wyspecjalizowanych źródeł przypisują temat (np. CERT → Cyber), nie
+wykonanie ataku, intencję czy sprawcę. Regiony wymagają dowodu lokalizacji.
+Przegląd przyjmuje nieznany zasięg; zakres krajowy RSO nie jest przyjmowany
+bez jawnych metadanych. Backend nie dodaje współrzędnych.
+
+Komentarz może mieć `sections.situation`, `sections.impact` i
+`sections.recommendation`. Prywatny kandydat wiąże je z indeksami zdań,
+a audyt obejmuje również ten podział. `review.sections_sha256` zabezpiecza
+dokładną treść pól. Każde zdanie jest przypisane raz; pozostaje limit 1–3.
+Wpływ wymaga osobnego zaakceptowanego ustalenia, a rekomendacja aktualnej
+instrukcji służb. Brak pól nie unieważnia historycznego komentarza.
+
+Frontend scala wyłącznie publiczne raporty przez istniejące endpointy.
+Stronicowanie historii ma stałą kotwicę `published_at`; raporty i rewizje
+z przyszłości względem otwartego raportu są pomijane. Korekta z tego samego
+czasu analizy zastępuje starszą wersję w roboczym zbiorze, nie w archiwum.
+Identyfikator sygnału/epizodu jest liczony raz. Jawna korekta daty publikacji
+w nowej rewizji obowiązuje w aktualnym widoku; nie odtwarzamy błędnej starej
+daty. Przedruki są łączone w procesie analizy, nie przez podobieństwo tytułu.
+
+Porównanie liczników wymaga raportu sięgającego początku obu okien,
+ciągłości odczytów (przerwa maksymalnie 36 h), tej samej konfiguracji źródeł
+i wersji eksportera, ukończonego przeglądu oraz pełnych odczytów źródeł.
+To ostrożny warunek dostępności porównania, nie dowód pełnej obserwacji świata.
+Częściowe dane zachowują liczby i etykietę „Brak danych do porównania”.
+Okna: `[as_of−336h, as_of−168h)` i `[as_of−168h, as_of)`.
+Filtry kalendarzowe używają Europe/Warsaw i daty raportu; bez daty to osobny
+zbiór. Archiwum jest ładowane na żądanie, z limitem 800 metadanych raportów;
+niepowodzenie zachowuje najnowsze dane i jawnie opisuje niepełną historię.
+
+Regionalna pewność procentowa nie jest jeszcze obliczana. UI pokazuje
+„Nieustalona dla regionu”; wynik regionalny czyta z silnika (również null),
+a osobno podpisana pewność całego obszaru pozostaje globalna.

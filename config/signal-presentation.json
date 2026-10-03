@@ -1,0 +1,72 @@
+{
+  "version": "signals-v1",
+  "regions": {
+    "PL-02": "dolnośląskie",
+    "PL-04": "kujawsko-pomorskie",
+    "PL-06": "lubelskie",
+    "PL-08": "lubuskie",
+    "PL-10": "łódzkie",
+    "PL-12": "małopolskie",
+    "PL-14": "mazowieckie",
+    "PL-16": "opolskie",
+    "PL-18": "podkarpackie",
+    "PL-20": "podlaskie",
+    "PL-22": "pomorskie",
+    "PL-24": "śląskie",
+    "PL-26": "świętokrzyskie",
+    "PL-28": "warmińsko-mazurskie",
+    "PL-30": "wielkopolskie",
+    "PL-32": "zachodniopomorskie"
+  },
+  "topics": {
+    "aviation": {
+      "label": "Lotnictwo",
+      "icon": "plane"
+    },
+    "cyber": {
+      "label": "Cyber",
+      "icon": "shield-alert"
+    },
+    "navigation": {
+      "label": "Nawigacja",
+      "icon": "satellite"
+    },
+    "infrastructure": {
+      "label": "Infrastruktura",
+      "icon": "landmark"
+    },
+    "border": {
+      "label": "Granica",
+      "icon": "flag"
+    },
+    "military": {
+      "label": "Wojsko",
+      "icon": "radar"
+    },
+    "other": {
+      "label": "Pozostałe",
+      "icon": "newspaper"
+    }
+  },
+  "category_topics": {
+    "cross_border_air_pressure": "aviation",
+    "airspace_breach": "aviation",
+    "air_activity": "aviation",
+    "cyberattack": "cyber",
+    "gps_jamming": "navigation",
+    "sabotage": "infrastructure",
+    "arms_explosion": "infrastructure",
+    "border_pressure": "border",
+    "military_preparation": "military"
+  },
+  "source_topics": {
+    "cert_pl": "cyber",
+    "gpsjam_reviewed": "navigation",
+    "pansa_airspace": "aviation",
+    "ua_air_force_public": "aviation"
+  },
+  "source_kinds": {
+    "gpsjam_reviewed": "measurement",
+    "pansa_airspace": "plan"
+  }
+}

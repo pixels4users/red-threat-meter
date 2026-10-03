@@ -332,3 +332,65 @@ def test_analysis_config_cannot_disable_audits_or_enable_model_api():
                            ("external_model_api", True), ("methodology_version", "rtb-v99")):
         with pytest.raises(ValidationError):
             validate_schema("analysis/config", {**config, key: value})
+
+
+def test_presentation_metadata_survives_review_snapshot_and_publication(prepared):
+    from osint_dashboard.dashboard.presentation import signal_presentation
+    data, cid = prepared
+    proposal = proposal_for(data, cid)
+    event = proposal['decisions'][0]['incident']
+    event['dashboard_context'] = {'topics': ['aviation'], 'kind': 'event', 'scope': 'national', 'region_ids': [], 'evidence_ids': ['place']}
+    checked = cycle.check(data, cid, proposal, 'Codex — test syntetyczny')
+    cycle.apply(data, cid, checked['proposal_sha256'], audit_for(checked))
+    result = cycle.calculate(data, cid)
+    assert result['score'] == 15  # Presentation is not a scoring input.
+    folder, _ = cycle.load_cycle(data, cid)
+    snap = read_json(folder / 'draft.json')['snapshot']
+    assert snap['incidents'][0]['dashboard_context'] == event['dashboard_context']
+    public = signal_presentation(snap['incidents'][0], [])
+    assert public['version'] == 'signals-v1'
+    assert public['topics'] == ['aviation']
+    assert public['scope'] == 'national'
+    assert 'evidence_ids' not in public
+
+
+def test_regional_metadata_rejects_missing_evidence_or_unknown_regions(prepared):
+    data, cid = prepared
+    proposal = proposal_for(data, cid)
+    event = proposal['decisions'][0]['incident']
+    event['dashboard_context'] = {'topics': ['aviation'], 'kind': 'event', 'scope': 'regional', 'region_ids': ['PL-14'], 'evidence_ids': ['occurrence']}
+    with pytest.raises((ValueError, AnalysisError), match='location|evidence|preview'):
+        cycle.check(data, cid, proposal, 'Codex — test syntetyczny')
+    event['dashboard_context']['evidence_ids'] = ['place']
+    event['dashboard_context']['region_ids'] = ['PL-00']
+    with pytest.raises(ValidationError):
+        cycle.check(data, cid, proposal, 'Codex — test syntetyczny')
+
+
+def test_reviewed_sections_are_exported_with_hash_and_tampering_is_rejected(prepared):
+    data, cid = prepared
+    reviewed(prepared); cycle.calculate(data, cid)
+    context, candidate, audit = commentary_for(data, cid)
+    candidate['sentences'] = [candidate['sentences'][0], candidate['sentences'][2]]
+    candidate['sections'] = {'situation': 0, 'impact': 1}
+    checked = cycle.editorial_input(data, cid, context, candidate)
+    audit['subject_sha256'] = checked['subject_sha256']
+    receipt = cycle.finish(data, cid, context=context, candidate=candidate, audit=audit)
+    path = Path(receipt['snapshot_dir']); snap, cfg = load_snapshot(path)
+    public = build_report(snap, cfg, commentary_record=load_commentary_record(path))
+    assert public['commentary']['sections']['impact'] == candidate['sentences'][1]
+    assert public['commentary']['review']['sections_sha256'] == digest(public['commentary']['sections'])
+    validate_report(public)
+    public['commentary']['sections']['impact'] = 'Podmienione zdanie bez przeglądu redakcyjnego.'
+    public['report_id'] = 'rpt_' + digest({k:v for k,v in public.items() if k != 'report_id'})
+    with pytest.raises(ValueError, match='sections'):
+        validate_report(public)
+
+
+def test_recommendation_cannot_be_inferred_from_an_incident_or_the_score(prepared):
+    data, cid = prepared
+    reviewed(prepared); cycle.calculate(data, cid)
+    context, candidate, audit = commentary_for(data, cid)
+    context['findings'][1]['role'] = 'recommendation'
+    with pytest.raises(AnalysisError, match='without_current_instruction'):
+        cycle.editorial_input(data, cid, context, candidate)

@@ -40,6 +40,12 @@ def evidence_catalog(snapshot: dict, inputs: dict) -> dict:
                 "title": event["title"], "summary": event["summary"],
                 "attribution": event["attribution"], "evidence": evidence,
                 "material": public_material(materials[evidence["material_id"]])}
+            warning = event.get('official_warning')
+            if (warning and warning['status'] == 'active' and evidence['id'] in warning['evidence_ids']
+                    and instant(warning['effective_at']) <= instant(snapshot['as_of'])
+                    and (not warning['valid_until'] or instant(snapshot['as_of']) <= instant(warning['valid_until']))):
+                catalog[event['revision_id'] + ':' + evidence['id']]['current_instruction'] = {
+                    k: warning[k] for k in ('authority', 'area', 'effective_at', 'valid_until', 'instruction_pl')}
     return catalog
 
 
@@ -54,13 +60,25 @@ def check_context(snapshot, inputs, context):
     for finding in context["findings"]:
         if finding["status"] == "accepted" and not set(finding["evidence_refs"]) <= catalog.keys():
             raise AnalysisError("commentary_unknown_evidence")
+        if finding['status'] == 'accepted' and finding['role'] == 'recommendation' and not any(
+                catalog[ref].get('current_instruction') for ref in finding['evidence_refs']):
+            raise AnalysisError('commentary_recommendation_without_current_instruction')
     if build_generation_request(context) is None:
         raise AnalysisError("commentary_incomplete_findings")
     return catalog
 
 
+def check_sections(context, candidate):
+    """A physical action finding is not a civilian recommendation."""
+    roles = {item['role'] for item in context['findings'] if item['status'] == 'accepted'}
+    for role in candidate.get('sections', {}):
+        if role in ('impact', 'recommendation') and role not in roles:
+            raise AnalysisError('commentary_section_without_finding')
+
+
 def make_record(snapshot, inputs, context, candidate, audit, reviewer_name):
     check_context(snapshot, inputs, context)
+    check_sections(context, candidate)
     validate_schema("analysis/editorial-audit", audit)
     subject = {"context": context, "candidate": candidate}
     if audit["subject_sha256"] != digest(subject):
@@ -96,9 +114,13 @@ def public_commentary(record: dict, snapshot_hash: str, run_id: str, score) -> d
                                  approved_sha256=candidate_digest(record["candidate"]))
     if result["text"] is None:
         raise AnalysisError("invalid_editorial_text")
-    return {**result, "review": {"record_sha256": digest(record), "snapshot_sha256": snapshot_hash,
+    check_sections(record['context'], record['candidate'])
+    receipt = {"record_sha256": digest(record), "snapshot_sha256": snapshot_hash,
                                 "text_sha256": digest(result["text"]), "reviewer_type": "agent",
-                                "method": "codex-editorial-v1"}}
+                                "method": "codex-editorial-v1"}
+    if 'sections' in result:
+        receipt['sections_sha256'] = digest(result['sections'])
+    return {**result, 'review': receipt}
 
 
 def verify_publication_record(report, record):

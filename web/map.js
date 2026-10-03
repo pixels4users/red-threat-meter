@@ -2,7 +2,7 @@ import { select, zoom, zoomIdentity, geoMercator, geoPath, geoCentroid } from 'd
 import { feature } from 'topojson-client';
 import atlasText from './assets/countries.topojson?raw';
 import capitals from './assets/capitals.json';
-import { categories } from './data.js';
+import { topics, presentation } from './signals.js';
 
 const atlas = JSON.parse(atlasText);
 const countries = feature(atlas, atlas.objects.features).features;
@@ -13,7 +13,7 @@ export function mapPoints(report) {
   const byId = new Map(report.incidents.map(e => [e.id, e]));
   const points = report.geojson.features.map(f => ({ id: f.id, coordinates: f.geometry.coordinates, event: byId.get(f.id), national: false }));
   for (const e of report.incidents) {
-    if (e.location.precision !== 'country' || e.location.geometry) continue;
+    if (presentation(e).scope !== 'national' || e.location.geometry) continue;
     const capital = capitals.find(c => c.country_code === e.country);
     if (capital) points.push({ id: e.id, coordinates: capital.coordinates, event: e, national: true, capital: capital.name });
   }
@@ -35,7 +35,7 @@ export function initializeMaps(root, getReport, getSelected, onSelect, icons, on
     svg.append('defs').append('clipPath').attr('id', clip).append('rect').attr('width', w).attr('height', h);
     const layer = svg.append('g').attr('clip-path', `url(#${clip})`);
     layer.selectAll('path').data(countries).join('path').attr('d', path);
-    const points = mapPoints(getReport()).map(p => ({ ...p, xy: projection(p.coordinates) })).filter(p => p.xy[0] >= 18 && p.xy[0] <= w - 18 && p.xy[1] >= 18 && p.xy[1] <= h - 18);
+    const points = mapPoints(getReport(slot.dataset.mapSlot)).map(p => ({ ...p, xy: projection(p.coordinates) })).filter(p => p.xy[0] >= 18 && p.xy[0] <= w - 18 && p.xy[1] >= 18 && p.xy[1] <= h - 18);
     const occupied = points.map(p => ({ x: p.xy[0] - 20, y: p.xy[1] - 20, width: 40, height: 52 }));
     occupied.push({ x: w - 64, y: 0, width: 64, height: 220 });
     for (const country of countries.filter(c => labels[c.properties.id])) {
@@ -58,7 +58,7 @@ export function initializeMaps(root, getReport, getSelected, onSelect, icons, on
       button.setAttribute('aria-label', group.points.map(p => `${p.event.title}${p.national ? ', informacja o zasięgu krajowym' : ''}`).join('; '));
       const glyph = document.createElement('span'); glyph.className = 'r-marker-glyph';
       if (ids.length > 1 && !national) glyph.textContent = String(ids.length);
-      else { const i = document.createElement('i'); i.dataset.lucide = national ? 'flag' : (categories[first.event.category]?.icon ?? 'circle-dot'); i.setAttribute('aria-hidden', 'true'); glyph.append(i); }
+      else { const i = document.createElement('i'); i.dataset.lucide = national ? 'flag' : (topics[presentation(first.event).topics[0]]?.icon ?? 'circle-dot'); i.setAttribute('aria-hidden', 'true'); glyph.append(i); }
       button.append(glyph);
       if (national) { const label = document.createElement('span'); label.className = 'r-marker-label'; label.textContent = national.capital; button.append(label); }
       if (national && ids.length > 1) { const n = document.createElement('span'); n.className = 'r-marker-count'; n.textContent = String(ids.length); button.append(n); }

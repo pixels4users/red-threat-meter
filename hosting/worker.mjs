@@ -51,6 +51,7 @@ function checked(row) {
   if (r.commentary.text !== null && (!r.commentary.review ||
       r.commentary.review.snapshot_sha256 !== r.provenance.snapshot_sha256 || r.rtb.score === null)) throw new Error('invalid_commentary');
   if (r.commentary.text === null && r.commentary.review) throw new Error('invalid_commentary');
+  if (r.commentary.sections && (!r.commentary.text || !r.commentary.review?.sections_sha256 || Object.values(r.commentary.sections).some(t => !r.commentary.text.includes(t)))) throw new Error('invalid_commentary');
   return { report: r, published_at: row.published_at };
 }
 

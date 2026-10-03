@@ -19,7 +19,7 @@ from .review import validate_schema
 
 LOGGER = logging.getLogger(__name__)
 SYSTEM_PROMPT_PATH = ROOT / "prompts/dashboard-commentary-system.md"
-PROMPT_VERSION = "dashboard-commentary-v2"
+PROMPT_VERSION = "dashboard-commentary-v3"
 META = re.compile(
     r"\b(?:jako\s+(?:ai|model|asystent)|w\s+modelowym\s+scenariuszu|"
     r"as\s+an?\s+(?:ai|language\s+model)|nie\s+moge|nie\s+jestem\s+w\s+stanie|"
@@ -144,4 +144,10 @@ def prepare_commentary(
         or not hmac.compare_digest(approved_sha256, candidate_digest(candidate))
     ):
         return _reject("approval_missing_or_changed")
-    return {"text": text}
+    result = {"text": text}
+    if 'sections' in candidate:
+        indices = list(candidate['sections'].values())
+        if len(set(indices)) != len(indices) or set(indices) != set(range(len(sentences))):
+            return _reject('invalid_section_assignment')
+        result['sections'] = {key: sentences[index].strip() for key, index in candidate['sections'].items()}
+    return result

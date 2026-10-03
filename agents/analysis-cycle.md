@@ -108,7 +108,7 @@ go twierdzeniem „brak zagrożeń” ani starym podsumowaniem.
 
 Jeśli są podstawy, przygotuj `context.json` według
 `schemas/dashboard/commentary-context.schema.json`: 1–3 ustalenia z dosłownie
-istniejącymi evidence_refs. Role situation, action, impact są opisowe;
+istniejącymi evidence_refs. Role situation, action, impact oraz recommendation są opisowe;
 nie wymagaj kompletu ani określonej kolejności. Użyj wyłącznie ustaleń, które
 rzeczywiście przejrzałeś, i instrukcji `prompts/analysis-findings.md`.
 RTB i metodologia muszą odpowiadać draft.json. Sam indeks nie uzasadnia
@@ -118,6 +118,11 @@ Według `prompts/dashboard-commentary-system.md` zapisz `candidate.json`
 (`schemas/dashboard/commentary-candidate.schema.json`): 1–3 krótkie zdania
 po polsku o sprawdzonych wydarzeniach, bez meta-komentarzy. Trend i skutki dla
 Polski dodawaj tylko przy osobnych podstawach; ich brak nie blokuje komentarza.
+Do nowych kandydatów dodaj `sections` zgodnie z promptem v3.
+Każde zdanie ma jeden numer i jedną rolę. Brak wpływu lub zalecenia oznacza
+pominięcie pola, nie wymyślanie treści. Ustalenie `recommendation` musi wskazać
+aktualną instrukcję odpowiednich służb oraz jej obszar i termin; samo działanie
+wojska ani liczba punktów nie są zaleceniem dla mieszkańców.
 Następnie:
 
 ```sh
@@ -165,3 +170,18 @@ według schematu zapisuj wyłącznie po rzeczywistym sprawdzeniu historii zdarze
 oraz rewizji w pełnym horyzoncie 216 godzin. Nie twórz poświadczenia z samej
 daty najstarszej publikacji. Brak podstaw oznacza brak pliku i RTB=null.
 Mapowanie pól i procedura: `docs/v0.3-implementation.md`.
+
+
+## Metadane widoków regionalnych (signals-v1)
+
+Przy przeglądzie nowych lub aktualizowanych sygnałów uzupełniaj opcjonalne
+`dashboard_context`: `topics`, `kind`, `scope`, `region_ids`, `evidence_ids`.
+Tematy i identyfikatory województw są w `config/signal-presentation.json`.
+To opis do filtrowania, bez zmiany punktacji lub automatycznej atrybucji.
+Rozróżniaj `event`, `warning`, `plan`, `measurement`, `context`.
+Zasięg `regional` wymaga jawnych województw oraz dowodu lokalizacji;
+`national` oznacza zasięg konkretnego sygnału, nie kraju wydawcy.
+RSO ze Świnoujścia nie jest przez to informacją ogólnopolską.
+Gdy nie ma podstaw, wybierz `unknown` i pustą listę regionów. Nie wyznaczaj
+współrzędnych z nazwy regionu. Metadane obejmuje istniejący krytyczny audyt
+`category_and_scope`; korekty tworzą nową rewizję, a historia pozostaje bez zmian.
