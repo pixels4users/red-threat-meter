@@ -43,6 +43,10 @@ function checked(row) {
   for (const s of r.sources) sourceURL(s.url);
   for (const i of r.incidents) {
     for (const s of i.sources) sourceURL(s.url);
+    if (i.presentation?.map_anchor) {
+      const a = i.presentation.map_anchor; sourceURL(a.reference_url);
+      if (i.location.precision !== 'city' || i.location.label !== a.label) throw new Error('invalid_report');
+    }
     if (i.published_at && Date.parse(i.published_at) > Date.parse(r.as_of)) throw new Error('invalid_report');
   }
   const expected = new Map(r.incidents.filter(i => i.location.geometry).map(i => [i.id, i.location.geometry]));
@@ -51,6 +55,7 @@ function checked(row) {
   if (r.commentary.text !== null && (!r.commentary.review ||
       r.commentary.review.snapshot_sha256 !== r.provenance.snapshot_sha256 || r.rtb.score === null)) throw new Error('invalid_commentary');
   if (r.commentary.text === null && r.commentary.review) throw new Error('invalid_commentary');
+  if (r.commentary.sections && (!r.commentary.text || !r.commentary.review?.sections_sha256 || Object.values(r.commentary.sections).some(t => !r.commentary.text.includes(t)))) throw new Error('invalid_commentary');
   return { report: r, published_at: row.published_at };
 }
 

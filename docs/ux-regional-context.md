@@ -1,6 +1,6 @@
 # UX: spójny Przegląd i Mapa Operacyjna
 
-Status: ocena wykonalności i propozycja do akceptacji, 02.10.2026. Ten plan zastępuje wcześniejszą propozycję osobnych sekcji regionalnych ponad osią czasu i mapą. Makiety `ui/experiments/rta-ux-directions.html` są zapisem wcześniejszego eksperymentu, nie docelową specyfikacją.
+Status: interaktywny prototyp do oceny, 02.10.2026. Ten plan zastępuje wcześniejszą propozycję osobnych sekcji regionalnych ponad osią czasu i mapą. Aktualny podgląd: `ui/experiments/rta-overview-prototype.html`. Makiety `ui/experiments/rta-ux-directions.html` są zapisem wcześniejszego eksperymentu, nie docelową specyfikacją.
 
 ## Zakres
 
@@ -28,7 +28,7 @@ Sprawdzono lokalny dashboard, kod frontendu i publikacji oraz eksport `data/anal
 | --- | --- | --- |
 | Trzy krótkie wiersze komentarza | Zalecana; niewielka zmiana widoku, średnia procesu publikacji | Nazwane pola, dowody dla treści, regionalna wersja i proste stany braku danych |
 | Makro / województwo obok indeksu | Wykonalne; większa zmiana danych niż wyglądu | Przypisania, wynik i pewność regionalna oraz wspólny wybór sygnałów |
-| Małe wskaźniki odchyleń | Zalecany układ; liczby zależą od danych porównawczych | Miara, okres odniesienia i porównywalność; norma wymaga osobnego ustalenia |
+| Liczniki sygnałów: ostatnie 7 dni vs poprzednie 7 dni | Rekomendowana prosta wersja początkowa | Wspólne tematy, odrębne sygnały i dostępna historia obu okresów; bez wyznaczania norm |
 | Etykiety regionów na osi | Mała zmiana widoku po uzupełnieniu danych | Zweryfikowane obszary i jedna reguła dla wszystkich widoków |
 | Filtry → mapa → lista | Średnia zmiana widoku; większa dla długiej historii | Jeden zbiór wyników dla mapy, listy i liczników; usuwanie powtórzeń |
 | Spójne pojęcie sygnału | Pierwszy etap i warunek reszty | Rozdzielenie tematu, rodzaju, zasięgu i wkładu do indeksu |
@@ -68,13 +68,25 @@ Obliczenia regionalne istnieją, ale przed ich prezentacją trzeba uzupełnić p
 
 Region może być zapamiętany lokalnie, bez konta i geolokalizacji. Komunikaty ogólnopolskie pozostają widoczne z taką etykietą. Nieustalonego zasięgu nie przypisujemy do wszystkich województw. Sygnał z sąsiedniego obszaru nie dostaje etykiety wybranego województwa tylko dlatego, że punktacja uwzględnia wpływ pośredni.
 
-### Wskaźniki dziedzin
+### Liczba sygnałów według tematu — uproszczona wersja początkowa
 
 „Działania / Przygotowania” przenosimy do rozwijanych szczegółów indeksu. W ich miejscu: Lotnictwo, Cyber, Nawigacja — ikona i krótka wartość, bez kart. Układ zawija się na telefonie; odstępy 8/12/16 px. Rozbicie punktów nadal istnieje w metodyce i danych.
 
-Przykłady języka, nie dzisiejsze ustalenia: „Cyber: więcej zdarzeń niż tydzień temu”, „Nawigacja: mniej zakłóceń niż w poprzedniej dobie”, „Lotnictwo: brak danych do porównania”. Każde porównanie wymaga zaakceptowanej miary dla właściwego obszaru i okresów. Więcej publikacji nie daje etykiety „Anomalia”. Procent ma wskazaną podstawę; przy zerze w poprzednim okresie pokazujemy liczbę nowych zdarzeń, nie procent. GNSS może wymagać różnicy w punktach procentowych, nie procentu liczby ataków. Strzałka oznacza zmianę mierzonego zjawiska, nie automatycznie zmianę bezpieczeństwa. Szczegóły są rozwijane.
+Uproszczenie zaproponowane przez użytkownika: w pierwszej wersji liczymy sygnały w danym temacie i wybranym obszarze. Rekomendacja: **ostatnie 7 dni do chwili raportu vs bezpośrednio poprzednie 7 dni**. Dwa równe okna po 168 godzin kończą się na zamrożonym `as_of`; ponowne otwarcie strony nie przesuwa ich względem danych. Daty i godziny prezentujemy w Europe/Warsaw. Nie porównujemy rozpoczętego tygodnia kalendarzowego z całym poprzednim tygodniem. Widok dzień do dnia można dodać później jako dwa analogiczne okna po 24 godziny.
 
-„Rutynowe” wymaga ustalonego charakteru działań. „Poniżej normy” wymaga zweryfikowanej normy. Obecne dane nie uzasadniają tych etykiet automatycznie. Opisowe porównanie GNSS można wykorzystać po włączeniu do sprawdzonego eksportu, nadal bez punktacji i atrybucji. Brak danych daje dokładnie: „Brak danych do porównania”.
+Wspólna etykieta paska: **„Sygnały · ostatnie 7 dni”**. Pod liczbą pokazujemy zmianę liczbową względem poprzednich 7 dni, bez procentów. Przykłady demonstracyjne: „Lotnictwo: 12 · ↑ 3”, „Cyber: 5 · ↓ 2”, „Nawigacja: 7 · bez zmian”. Rozwinięcie pokazuje poprzednią liczbę, oba przedziały czasu i odnośniki do odpowiednich wpisów w Dzienniku. Indeks RTA pozostaje dobowy; pasek ma wyraźnie opisany własny okres.
+
+Zasady liczenia:
+
+1. Liczymy odrębne opublikowane sygnały z Dziennika, według tematu niezależnego od kategorii punktacji. Każdy wspólny identyfikator/epizod występuje najwyżej raz w danym temacie i okresie. Przedruk, kolejne źródło, aktualizacja i powtórzenie wpisu w następnym raporcie nie są nowym sygnałem.
+2. O przypisaniu do okna decyduje `published_at`, czyli data publikacji materiału przyjęta dla sygnału, zgodnie z obecną osią czasu. Nie nazywamy tego liczbą ataków, które wydarzyły się w danym tygodniu. Oba okna liczymy według wiedzy i przejrzanych rewizji dostępnych w chwili raportu; nowy odczyt nie edytuje starych eksportów. Przedziały są rozłączne: poprzedni `[as_of−336h, as_of−168h)`, bieżący `[as_of−168h, as_of)`.
+3. Sygnały bez daty pozostają w Dzienniku i są wskazane w szczegółach licznika jako „Bez daty”; nie dopisujemy im daty pobrania. Przy wielu tematach wpis może należeć do kilku liczników, dlatego sumy tematów nie przedstawiamy jako liczby odrębnych sygnałów całego raportu.
+4. Oba okresy stosują te same reguły tematu i obszaru, w tym jawne traktowanie komunikatów ogólnopolskich. Przypisania lokalizacji nie powstają z domyślnego adresu wydawcy.
+5. Zero w odczytanym archiwum to prawidłowa liczba. Przy poprzednim zerze działa zwykła różnica, np. `3 − 0 = +3`; nie potrzebujemy procentu. Brak historii porównawczej pozostawia sam bieżący licznik, bez strzałki, komunikatu zastępczego ani blokady RTA.
+6. Decyzja użytkownika z 03.10.2026: porównujemy zapisane sygnały. Częściowy status źródła, zmiana konfiguracji lub wersji eksportera, brak codziennego raportu i oczekujące przeglądy nie blokują różnicy. Zakres obserwacji pozostaje osobną informacją.
+7. Zabezpieczenie dotyczy odczytu historii: pobieranie archiwum obu okien musi zakończyć się bez błędu. Sygnały z poprzedniego okresu mogą być zachowane w nowszym raporcie. Jeśli poprzedni okres nie ma żadnych wpisów, zero wolno przyjąć dopiero, gdy istniejące archiwum sięga początku tego okresu. Bez tej podstawy poprzednia liczba pozostaje nieznana. Nie wymagamy kalibracji norm ani zgodności klucza porównania RTA.
+
+Pasek opisuje liczbę zarejestrowanych sygnałów. Regularny pomiar GNSS jest wpisem pomiarowym, nie kolejnym potwierdzonym atakiem; zmiana liczby pomiarów nie jest zmianą siły zakłóceń. Strzałki są neutralne kolorystycznie. Nie nadajemy etykiet „Anomalia”, „Rutynowe” ani „Poniżej normy” i nie zmieniamy punktacji. Pomiar natężenia poszczególnych zjawisk oraz badanie norm pozostają poza pierwszą wersją.
 
 ### Etykiety osi czasu
 
@@ -102,8 +114,8 @@ Kwartał i rok wymagają odczytu historii, wyboru właściwych rewizji i usunię
 
 | Unikamy | Pokazujemy |
 | --- | --- |
-| „Brak oceny zmiany” | „Brak danych do porównania” |
-| „Ten widok nie zawiera porównania pomiarów dla wspólnego obszaru i okresu…” | „Brak danych do porównania” |
+| „Brak oceny zmiany” | Sam licznik, bez porównania |
+| „Ten widok nie zawiera porównania pomiarów dla wspólnego obszaru i okresu…” | Sam licznik, bez porównania |
 | „To aktualizacja wiedzy o konkretnej kampanii; raport nie ustala wzrostu liczby ataków” | „CERT ostrzega przed fałszywymi wiadomościami podatkowymi” |
 | „Normalnie” wywnioskowane z pustego zbioru | „Brak nowych sygnałów w wybranym okresie” — tylko po poprawnym odczycie |
 | „Zagrożenie 0%” | „RTA 0/100” z informacją o pewności |
@@ -116,7 +128,7 @@ Nie dokładamy do każdej informacji zdania o procesie analizy. Opis mówi o wyd
 2. **Kontrakt publikacji.** Wersjonowane pola tematów, obszarów, komentarza, regionalnej kompletności i porównań. Zmiany obejmują `schemas/dashboard/report.schema.json`, `src/osint_dashboard/dashboard/contract.py`, generator komentarza i przegląd redakcyjny. Zachować odczyt starych raportów; nie dopisywać luźnych pól do ścisłego schematu.
 3. **Jedna makieta na obecnej siatce.** Trzy wiersze komentarza, przełącznik, pasek dziedzin i etykiety; te same rekordy w każdym miejscu, bez nowych sekcji nad osią i mapą. Po wyborze zaktualizować `design.md`, `guidelines.md` i ewentualnie `theme.css`.
 4. **Frontend i mapa.** `web/index.html`, `web/app.js`, `web/data.js`, `web/map.js`, `web/styles.css`: wspólne filtrowanie i prezentacja wpisu. Historia w warstwie publikacji i `hosting/worker.mjs` wymaga stronicowania i deduplikacji. Liczbowy widok regionalny udostępnić razem z ukończeniem danych regionalnych, nie wcześniej.
-5. **Porównania.** Włączać tylko gotowe, sprawdzone miary dziedzin. Ustalenie norm i etykiet „Anomalia” jest osobnym zadaniem analitycznym; nie blokuje pozostałych ulepszeń UI ani indeksu krajowego.
+5. **Proste porównanie tygodniowe.** Wyliczyć liczbę odrębnych sygnałów tematu w dwóch kolejnych oknach po 7 dni, pokazać bieżącą liczbę i różnicę bez procentów. Sprawdzić powtórzenia, granice okien, zero i brak historii. Nie czekamy na kalibrację norm; ich badanie i pomiary natężenia zjawisk są poza pierwszą wersją.
 6. **Odbiór → akceptacja → publikacja.** Sprawdzić eksport i odczyt, stare raporty, puste stany, okresy, regiony i mobile. Dopiero potem publikacja, bez powiadomień.
 
 ## Kryteria odbioru
@@ -124,13 +136,98 @@ Nie dokładamy do każdej informacji zdania o procesie analizy. Opis mówi o wyd
 - CERT jest widoczny pod Cyberbezpieczeństwem i otwiera ten sam wpis z każdego widoku; może nadal mieć 0 punktów.
 - Łowicz otrzymuje obszar łódzkiego; źródło MON nie czyni go wydarzeniem w Warszawie.
 - Wynik, pewność, komentarz i trend dotyczą tego samego obszaru i raportu. Pewności krajowej nie kopiujemy do województw.
-- Brak zdarzeń, brak odczytu, brak porównania i odwołanie ostrzeżenia mają różne, krótkie komunikaty. Plan nie staje się wykonanym atakiem.
+- Brak zdarzeń, błąd odczytu i odwołanie ostrzeżenia mają różne, krótkie komunikaty. Brak porównania nie dodaje komunikatu zastępczego. Plan nie staje się wykonanym atakiem.
 - Liczniki, mapa i lista używają jednego zbioru. Komunikaty krajowe, bezdatowe wpisy i brak współrzędnych nie giną bez informacji. Jeden sygnał w dziesięciu raportach nie staje się dziesięcioma zdarzeniami.
 - „0” przy regionie oznacza zero pasujących wpisów, nie poziom bezpieczeństwa. Kwartał i rok pokazują rzeczywisty zakres historii.
-- Procent ma konkretną miarę i podstawę; poprzednie zero nie daje nieskończonego procentu. GNSS zachowuje ograniczenia metodyki.
+- Pasek ma etykietę „ostatnie 7 dni”; oba okresy są równe i rozłączne. Aktualizacja starego sygnału nie tworzy nowego, a brak daty nie jest uzupełniany datą pobrania. Różnica działa również przy poprzednim zerze. Brak lub błąd odczytu historii nie jest przedstawiany jako spadek; znana liczba nadal jest widoczna. Częściowe źródło i zmiana konfiguracji nie blokują porównania zapisanych sygnałów. Liczba pomiarów GNSS nie jest opisywana jako liczba ataków ani siła zakłóceń.
 - Oś i mapa zachowują siatkę i proporcje. Przy 320 px kontrolki zawijają się, etykiety nie zasłaniają tytułów, działa klawiatura i dolna nawigacja.
 - Nowy kontrakt nie psuje archiwum, zatwierdzania komentarza ani publikacji w Supabase.
 
 ## Stan wykonania oceny
 
-Zmieniono tylko ten dokument na gałęzi `codex/ux-regional-context`. Nie zmieniono makiet, kodu, danych, metodologii, harmonogramu ani hostingu. Nowa wersja UI nie jest wdrożona. Sprawdzenie obejmowało kod, kontrakty, eksport i odtworzenie problemu filtra w przeglądarce. Przywrócono Przegląd i wszystkie tematy. Nie pobierano nowych źródeł ani nie uruchamiano pełnej regresji, bo działający kod pozostał niezmieniony.
+Pierwsza ocena obejmowała kod, kontrakty, eksport i odtworzenie problemu filtra w przeglądarce. Następnie, na prośbę użytkownika, przygotowano jeden spójny prototyp na gałęzi `codex/ux-regional-context`.
+
+### Prototyp — 02.10.2026
+
+`ui/experiments/rta-overview-prototype.html` jest samodzielnym fragmentem do podglądu w rozmowie. Zachowuje układ Chronologia: duży indeks i komentarz, zwarty pasek trzech tematów, oś po lewej i mapa po prawej. Dane oraz wyniki regionalne są wyłącznie przykładami do testowania interakcji, opisanymi w interfejsie; nie pochodzą z publikacji live i nie dowodzą gotowości kontraktu regionalnego.
+
+- Działają: wybór regionu, wspólny komentarz i indeks, liczniki dwóch kolejnych okien 7-dniowych, przejście do właściwych wpisów Dziennika i poprzedniego okresu, grupowanie osi, etykiety regionów, filtry mapy i lista tych samych sygnałów.
+- Jeden zbiór przykładowych rekordów zasila wszystkie widoki. Przykładowe porównanie lotnictwa: 12 vs 9 wpisów; cyber: 5 vs 7; nawigacja: 7 vs 7. Odrębne identyfikatory reprezentują odrębne przykładowe sygnały. To nie pomiar rzeczywistego wzrostu aktywności.
+- Wszystkie województwa są dostępne. Łódzkie pokazuje zero lokalnych wpisów w krótkim okresie i osobny komunikat ogólnopolski. Wpis bez daty jest dostępny przez filtr „Bez daty”; brak punktu nie usuwa wpisu z listy.
+- Podkład i katalog stolic pochodzą z istniejących zasobów Natural Earth w `web/assets/`. Mapa korzysta z osadzonego D3 7.9.0 i geometrii 25 państw. Flagi krajowe nie udają lokalizacji incydentów. Nie ma żądań do zewnętrznych API ani połączenia z Supabase.
+- Kontrolka projektowa pozwala obejrzeć stan „Brak danych do porównania”. Bieżące liczby pozostają widoczne. Raporty zawierają jedynie przejście do przykładowego podsumowania; pobierania i historii produkcyjnej nie przebudowywano.
+- Sprawdzono w przeglądarce szerokości treści 320, 736 i 1024 px (bez przewijania w poziomie), jasny i ciemny wygląd, liczniki i listy porównywanych okresów, filtr CERT, wybór szczegółów z mapy i z Dziennika, skupisko dwóch wpisów, zamknięcie przez Escape, puste filtry, brak daty, brak historii oraz odtworzenie wyboru województwa po przeładowaniu. Indeks nie pojawia się jako główny element na Mapie, w Dzienniku ani Raportach. Nie zaobserwowano błędów JavaScript.
+
+Podgląd jest do akceptacji. Pliki `web/`, metodologia, baza, publikowanie, harmonogram i hosting pozostają bez zmian. Nie pobierano nowych źródeł. Produkcyjnego Design Systemu nie przemianowano na zaakceptowaną nową wersję; aktualizacja wzorców nastąpi po wyborze użytkownika. Walidacja dotyczy prototypu, nie integracji nowych pól z silnikiem ani Supabase.
+
+## Realizacja zaakceptowanego prototypu — 03.10.2026
+
+Użytkownik zaakceptował koncepcję i poprosił o usunięcie podkreślenia
+rekomendacji. Implementacja jest na `codex/ux-regional-context`, w `web/`,
+z rzeczywistym odczytem opublikowanych raportów i bez danych demonstracyjnych
+w interfejsie produkcyjnym. Zachowany prototyp w `ui/experiments/` nadal
+oznacza wszystkie swoje dane jako przykładowe.
+
+Dodano wspólny model sygnału, kotwiczoną historię, filtry obszaru i okresu,
+liczniki tygodniowe, regionalny wynik i etykiety, listę pod mapą oraz nazwane
+części nowych komentarzy. Krajowa pewność nie jest kopiowana do regionów;
+regionalny null pozostaje brakiem oceny. Nie zmieniono punktacji ani progów.
+Starsze komentarze pozostają pełnym tekstem w polu Sytuacja; ich brakujących
+części nie dopisuje frontend. Rekomendacja jest zwykłą prozą bez podkreślenia.
+
+Metadane geograficzne starszych raportów są niepełne: część wpisów pozostaje
+bez przypisanego województwa lub punktu. Nowy przegląd może nadać jawne
+`dashboard_context` z dowodami. Nie wykonano automatycznego przeglądu starej
+historii ani jej publikacji. Porównanie liczników od 03.10.2026 opisuje
+różnicę liczby zapisanych sygnałów według uproszczonych zasad powyżej.
+Nie ocenia zmiany poziomu zagrożenia; brak odczytanej historii pozostawia
+sam licznik bez komunikatu zastępczego.
+
+Publikacja tej zmiany jest osobnym krokiem po lokalnym odbiorze. Nie zmieniano
+hostingu, domeny, harmonogramu ani danych w Supabase.
+
+### Odbiór implementacji
+
+- 369 testów Pythona, 17 testów JS/PostgreSQL i 14 testów warstwy hostingu
+  przeszło. Sprawdzają między innymi dowody przypisań regionalnych, zatwierdzone
+  części komentarza, rozłączne okna tygodniowe, korekty dat, deduplikację,
+  stronicowanie historii, częściowy odczyt i zgodność starych raportów.
+- Przeglądarka: 1440/736/390/320 px, jasny i ciemny wygląd, filtr regionu,
+  liczniki i te same wpisy w dzienniku, CERT w Cyber, mapa z listą, powiększanie,
+  szczegóły i Escape, brak daty, puste filtry, powrót fokusu oraz czytnik raportów.
+- Rekomendacja nie jest przyciskiem ani linkiem i nie ma podkreślenia.
+  Indeks nadal występuje tylko w Przeglądzie, a na telefonie działa dolna nawigacja.
+- Nie wykonano ponownego przeglądu historycznych materiałów, więc m.in.
+  przypisania Świnoujścia i Łowicza wymagają osobnych, udokumentowanych ocen.
+  Nie oznaczamy ich jako ukończonych na podstawie samego tytułu publikacji.
+
+### Odizolowanie podglądu od harmonogramu
+
+Gałąź `codex/ux-regional-context` jest w osobnym, dołączonym katalogu roboczym
+`/Users/milosz/.codex/worktrees/rta-regional-ui/OSINT Dashboard`.
+Podgląd działa pod `http://127.0.0.1:8769/` i czyta dotychczasowe lokalne API
+na porcie 8765. Nie ma własnej bazy live ani skopiowanych sekretów.
+
+Katalog używany przez harmonogram (`/Users/milosz/Documents/Codex/OSINT Dashboard`)
+został na dotychczasowej wersji `ac17ea4`, na gałęzi `codex/analysis-runtime`.
+Samo utworzenie gałęzi w tym samym katalogu nie izolowałoby codziennego silnika.
+Nowe opcjonalne pola eksportu wymagają nowszego walidatora po stronie Sites,
+więc nie uruchamiamy nowego eksportera w harmonogramie przed publikacją strony.
+
+Kolejność wdrożenia po akceptacji: opublikować nowy frontend i Worker,
+sprawdzić odczyt dotychczasowych raportów, następnie przenieść zaakceptowany
+kod do katalogu silnika i zweryfikować pierwszy raport z nowymi polami.
+Nie trzeba zmieniać metody punktacji, uprawnień ani harmonogramu.
+
+### Liczniki i wspólne selektory — doprecyzowanie 03.10.2026
+
+- Porównanie sygnałów nie wymaga pełnych źródeł, identycznej konfiguracji,
+  pustej kolejki przeglądu ani raportu każdego dnia. Nadal wymaga ukończonego
+  odczytu i rzeczywistej historii, zgodnie z zasadami liczenia powyżej.
+- Do tej gałęzi przeniesiono wspólną poprawkę selektorów z `6e5231a`.
+  Jeden styl i tokeny obejmują region, Mapę, Dziennik oraz Raporty.
+- Kompilacja i 19 testów frontendu przeszły. Sprawdzono różnice 5 → 7,
+  spadek, równe liczniki, poprawne zero i brak historii. W przeglądarce
+  potwierdzono 22 vs 8 sygnałów Lotnictwa oraz zgodny filtr Dziennika,
+  odstępy wszystkich selektorów, klawiaturę i widok przy szerokości 320 px.
+- Zmiany pozostają na gałęzi UX, bez publikacji i modyfikacji metodologii RTA.

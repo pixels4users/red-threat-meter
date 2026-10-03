@@ -1,18 +1,18 @@
 # RTB — zasady UI
 
 Powiązane: `design.md`, `theme.css`, `docs/dashboard-presentation.md`.
-Wersja 0.2, 27.09.2026. Zasady kolorów wynikają z decyzji użytkownika;
+Wersja 0.3, 03.10.2026. Zasady kolorów wynikają z decyzji użytkownika;
 zaakceptowany układ: **B — Chronologia**.
 
 ## Hierarchia i układ
 
 1. Tylko w Przeglądzie indeks RTA pozostaje największą liczbą, razem z trendem i mniejszą pewnością danych.
-2. Trzy zdania komentarza są obok wyniku; na telefonie bezpośrednio pod nim.
+2. Komentarz ma trzy nazwane miejsca: Sytuacja, Wpływ na Polskę / Twój region, Co zrobić. Nie dopisujemy zdań bez podstaw. Na telefonie jest pod wynikiem.
 3. Mapa oraz oś czasu tworzą asymetryczny układ; nie kolekcję identycznych kart.
 4. Cztery pozycje menu zachowują nazwy i kolejność. Mobile używa dolnego paska: Przegląd, Mapa, Dziennik, Raporty.
 5. Każdy odstęp ma rolę z `theme.css`. Stosuj `gap` w szeregach i grupach.
 6. Przy 320 px treść się zawija, bez poziomego przewijania i uciętych kontrolek.
-7. Indeks pozostaje przy przewijaniu tylko w Przeglądzie. W B oś czasu poprzedza mapę, również na telefonie.
+7. Indeks występuje tylko w Przeglądzie i przewija się z treścią. W B oś czasu poprzedza mapę, również na telefonie.
 8. Rozwijany zakres obserwacji umieszczamy po treści widoku, przed stopką;
    w Przeglądzie po osi czasu i mapie. Skrót pewności pozostaje przy RTB.
 
@@ -50,7 +50,8 @@ zaakceptowany układ: **B — Chronologia**.
   kompletną wartość udającą bieżący wynik. Awaria odczytu zachowuje ostatni
   raport z jego datą i informacją o braku odświeżenia.
 - Nie wymyślaj procentu pewności. W v0.4 odczytuj go z confidence.percent; jest heurystyką jakości danych. Zero RTB to poprawna liczba; wyjaśnij, że brak naliczonych sygnałów nie potwierdza bezpieczeństwa. Historyczny null i brak odpowiedzi serwera nadal nie mogą być zastępowane zerem.
-- Wykres i delta łączą tylko wyniki tej samej metodologii i konfiguracji.
+- Wykres i delta indeksu RTA łączą tylko wyniki tej samej metodologii i konfiguracji.
+  Liczniki sygnałów stosują odrębne, prostsze reguły opisane poniżej.
 
 ## Interakcje i dostępność
 
@@ -60,7 +61,10 @@ zaakceptowany układ: **B — Chronologia**.
 - Zachowuj widoczny fokus. Dialogi zamykają się przez Esc i przycisk, po
   zamknięciu zwracają fokus; Tab nie wychodzi za otwarte okno.
 - Cel dotykowy minimum 44 × 44 px. Nie pomniejszaj tekstu pól na telefonie.
-- Selektory w `.r-field` zachowują natywną obsługę klawiatury i listy opcji.
+- Wszystkie selektory korzystają ze wspólnego `.r-field > .r-select`
+  w `web/styles.css` oraz tokenów `--select-*` w `theme.css`; nie twórz
+  osobnych chevronów ani odstępów dla konkretnego ekranu. Zachowują natywną
+  obsługę klawiatury i listy opcji.
   Chevron 16 px ma odstęp 16 px od prawej krawędzi oraz 12 px od tekstu;
   jest wycentrowany względem pola i nie przechwytuje kliknięć. W trybie
   wymuszonych kolorów przywracamy strzałkę systemową.
@@ -87,3 +91,30 @@ Sprawdź desktop i telefon, oba motywy, klawiaturę, kliknięcie punktu, zmianę
 okresu i pusty komentarz. Weryfikuj, że żadna akcja nie otrzymała czerwieni
 i że zmiana układu nie zmieniła danych. Zapisz decyzję i ograniczenia w
 `design.md`; wybór użytkownika odróżniaj od rekomendacji projektowej.
+
+## Liczniki i kontekst regionalny
+
+- Proza rekomendacji nie ma podkreślenia ani pozornej klikalności. Linkiem
+  jest dopiero oddzielny odnośnik do źródła lub szczegółów.
+- Liczniki pokazują zapisane sygnały, a nie liczbę ataków. Neutralne strzałki
+  opisują zmianę liczby, bez automatycznych ocen „rutynowo” lub „anomalia”.
+- Porównanie pokazujemy tylko wtedy, gdy jest dostępne. Bez niego zostaje
+  sama liczba sygnałów, bez komunikatu zastępczego, strzałki i opisu porównania.
+  Ukrywamy też podpis niedostępnego trendu indeksu. Informacje o niepełnym
+  pokryciu źródeł pozostają dostępne osobno.
+- Licznik porównuje zapisane sygnały po zakończeniu odczytu archiwum.
+  Wcześniejsze sygnały mogą być zachowane także w nowszym raporcie.
+  Gdy poprzedni okres nie ma wpisów, zero wolno przyjąć dopiero, gdy
+  archiwum sięga początku obu okien. Błąd lub niezakończony odczyt ukrywa
+  różnicę. Nie wymagamy identycznej konfiguracji źródeł, codziennych raportów,
+  kompletności każdego kolektora ani pustej kolejki przeglądu.
+- Okna tygodniowe to dwa rozłączne okresy po 168 h do daty raportu.
+  Data publikacji i data zdarzenia pozostają rozdzielone.
+- Region, temat, okres i źródło stosują te same reguły w licznikach i listach.
+  Rozwinięcie mapy zachowuje jej filtry. Brak współrzędnych nie usuwa wpisu z listy.
+- Zera przy województwach oznaczają zero lokalnych wpisów dla filtrów.
+  Komunikaty ogólnopolskie są doliczane osobno i mają własną etykietę.
+- Pewność całego obszaru nie jest pewnością wybranego województwa.
+  Brak podstaw do obliczenia procentu regionalnego opisujemy słowem.
+- Starsze raporty mają niepełne metadane. Nie przypisuj regionu z tytułu
+  publikacji ani nie wymyślaj punktu w centrum województwa.

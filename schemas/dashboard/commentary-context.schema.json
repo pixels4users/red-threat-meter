@@ -80,7 +80,8 @@
             "enum": [
               "situation",
               "action",
-              "impact"
+              "impact",
+              "recommendation"
             ]
           },
           "status": {

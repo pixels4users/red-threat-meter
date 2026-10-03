@@ -1,7 +1,8 @@
 # RTB — Design System
 
-Wersja: **0.2**, 27.09.2026. Żywy dokument: aktualizowany razem z interfejsem.
-Zakres: działający lokalnie frontend, wspólne tokeny i kontrakt publikacji.
+Wersja: **0.3**, 03.10.2026. Żywy dokument: aktualizowany razem z interfejsem.
+Zakres: działający frontend i zaakceptowane rozwinięcie regionalne na gałęzi
+`codex/ux-regional-context`; lokalny odbiór przed publikacją.
 Stan połączenia z chmurą: `supabase/README.md`. Silnik od 30.09.2026 wykonuje rtb-v0.4.
 
 ## Kierunek i decyzje
@@ -65,7 +66,7 @@ korzystają z Grid, szeregi przycisków z Flexbox i `gap`. Nie otaczamy każdej
 sekcji kartą. Zaokrąglenie kontrolek i dużych powierzchni wynosi 8 px.
 Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
 
-## Komponenty v0.2
+## Komponenty v0.3
 
 - Indeks RTA (01.10.2026): nowa nazwa publiczna; kontrakt `rtb`, identyfikatory
   metodologii i archiwalne dane zachowują nazwy. Liczba i opis poziomu mają
@@ -112,7 +113,9 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
   stany hover/pressed/disabled/focus. Cel dotykowy co najmniej 44 × 44 px.
 - Selektory (03.10.2026): wspólny chevron 16 px, odsunięty o 16 px od
   prawej krawędzi, z rezerwą 12 px między tekstem i ikoną. Dotyczy
-  filtrów Dziennika oraz rodzaju raportu. Ikona dziedziczy
+  wyboru regionu, filtrów Mapy i Dziennika oraz rodzaju raportu.
+  Wszystkie instancje korzystają z `.r-field > .r-select` w `web/styles.css`
+  i tokenów `--select-*` w `theme.css`. Ikona dziedziczy
   neutralny kolor etykiety w obu motywach; wybór opcji i klawiatura pozostają
   natywne. Wymuszone kolory korzystają ze strzałki systemowej.
 
@@ -132,8 +135,49 @@ Przed większą zmianą czytamy te trzy pliki systemu. Nowy wzorzec dodajemy
 do wspólnych zasad i pokazujemy w podglądzie przed rozszerzaniem go na kolejne
 widoki. Zmianę koloru lub odstępu wykonujemy w tokenie, nie w kopii komponentu.
 Nie przenosimy danych przykładowych do publikacji live.
+Poprawka wspólnego komponentu obejmuje wszystkie jego instancje w danej
+wersji kodu. Osobne gałęzie mają własne kopie; przed odbiorem przenosimy
+również przyjęte poprawki Design Systemu z pozostałych gałęzi.
+
+## Przegląd regionalny — zaakceptowany 02–03.10.2026
+
+Użytkownik zaakceptował `ui/experiments/rta-overview-prototype.html`.
+To rozwinięcie B — Chronologia, z zachowaniem osi po lewej i mapy po prawej.
+Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
+
+- Przełącznik obszaru nad wynikiem, wszystkie województwa i lokalne zapamiętanie.
+  Wynik regionalny pochodzi z raportu; brak oceny pozostaje brakiem.
+  Pewność krajowa jest podpisana jako dotycząca całego obszaru, bez kopiowania
+  jej do województw. Przy regionie: „Nieustalona dla regionu”.
+- Komentarz: Sytuacja / Wpływ na Polskę lub Twój region / Co zrobić.
+  Nowe komentarze mogą mieć zatwierdzone nazwane części; stare pozostają
+  pełnym tekstem w „Sytuacja”. **Rekomendacja jest prozą bez podkreślenia,
+  klikalności i kursora linku** — poprawka użytkownika z 02.10.
+- Trzy neutralne liczniki Lotnictwo / Cyber / Nawigacja, ostatnie 7 dni
+  względem poprzednich 7. Kliknięcie prowadzi do tego samego zbioru w Dzienniku.
+  Brak porównania zachowuje znaną liczbę, bez strzałki i bez etykiety normy.
+  Zmianę i opis porównania pokazujemy dopiero, gdy jest ono dostępne;
+  nie zastępujemy ich komunikatem o braku danych. Porównujemy same zapisane
+  sygnały: częściowe źródło, zmiana konfiguracji i kolejka przeglądu nie
+  blokują różnicy. Nieodczytana lub nieistniejąca historia nie udaje zera.
+  Tak samo ukrywamy pusty
+  trend indeksu i jego podpis — doprecyzowanie użytkownika z 03.10.
+- „Skąd ten wynik?” ujawnia wkłady Działania / Przygotowania.
+- Każdy wpis osi i listy ma etykietę obszaru; nieustalone przypisanie nie
+  zmienia się automatycznie w zasięg ogólnopolski.
+- Mapa Operacyjna: Obszar / Okres / Temat, mapa, lista. W filtrach są też
+  województwa z zerem. Liczba lokalna jest oddzielona od komunikatów krajowych.
+  Dziennik dodaje filtr źródła oraz dostęp do sygnałów bez daty.
+- Indeks pozostaje tylko w Przeglądzie. Górna sekcja przewija się z treścią,
+  aby dłuższy komentarz nie zasłaniał mapy ani osi. Dolna nawigacja mobilna
+  nadal pozostaje przy dolnej krawędzi ekranu.
+- Kolory i bazowe tokeny nie zmieniają się; nowe kontrolki mają cel 44 px,
+  skala odstępów 4 px. Brak nowej palety i powiadomień.
 
 ## Historia
+
+- **0.3 / 03.10.2026:** zaakceptowany Przegląd regionalny, nazwane części
+  komentarza, liczniki sygnałów i filtry mapy. Wdrożenie na gałęzi, przed publikacją.
 
 - **0.2 / 27.09.2026:** użytkownik zaakceptował B — Chronologia. Frontend czyta
   wersjonowane raporty, zachowuje brak wyniku i odświeża odczyt co 30 sekund.
@@ -172,3 +216,20 @@ Witryna Sites pozostaje osobną wizualizacją do czasu wdrożenia aplikacji.
 ## Ciągły wynik — 30.09.2026
 
 Układ B pozostaje bez zmian. Nowe raporty pokazują RTB 0–100 i liczbową pewność według jawnej heurystyki. Zero ma neutralne wyjaśnienie i nie komunikuje bezpieczeństwa. Rozwijana sekcja opisuje osiem obszarów obserwacji. Historia zachowuje null i przerwy pomiędzy nieporównywalnymi seriami. Oficjalne ostrzeżenia pozostają nad indeksem.
+
+## Weryfikacja frontendu 0.3 — 03.10.2026
+
+Lokalny podgląd czyta rzeczywiste, opublikowane raporty. Sprawdzono szerokości
+1440, 736, 390 i 320 px, jasny i ciemny wygląd, bez poziomego przepełnienia.
+Odbiór obejmuje wybór województwa, wspólne filtrowanie osi i mapy, przejście
+z licznika Cyber do obu wpisów CERT, obszary z zerem lokalnych sygnałów,
+filtry okresu i tematu, szczegóły, zoom i powiększenie mapy, Escape oraz
+powrót fokusu. Czytnik raportu nadal przewija do treści i zwraca fokus
+do przycisku „Czytaj”. Rekomendacja jest elementem tekstowym bez podkreślenia.
+
+Przeszły 369 testów Pythona, 17 testów JS/PostgreSQL i 14 testów warstwy
+hostingu oraz oba buildy: lokalny i docelowy pakiet Sites. Dane testowe
+pozostały odizolowane od bazy live. Nowe pola są opcjonalne, a stare raporty
+i ich komentarze pozostają czytelne. Brakująca historia porównań oraz pewność
+regionalna są opisane wprost. To odbiór lokalny, bez zmiany publicznej wersji,
+harmonogramu ani danych Supabase.

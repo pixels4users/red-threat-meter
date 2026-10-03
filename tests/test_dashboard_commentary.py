@@ -245,3 +245,26 @@ def test_cli_separates_payload_from_diagnostics(tmp_path, candidate):
     invalid = subprocess.run(command, capture_output=True, text=True, check=True)
     assert json.loads(invalid.stdout) == {"text": None}
     assert "invalid private model response" not in invalid.stderr
+
+
+def test_named_sections_are_review_bound_and_cannot_duplicate_or_hide_sentences(candidate):
+    candidate['sections'] = {'situation': 0, 'impact': 1, 'recommendation': 2}
+    approved = candidate_digest(candidate)
+    result = publish(candidate)
+    assert result['sections']['recommendation'] == candidate['sentences'][2]
+    candidate['sections']['impact'] = 2
+    assert publish(candidate) == {'text': None}
+    candidate['sections'] = {'situation': 0}
+    assert publish(candidate) == {'text': None}
+    candidate['sections'] = {'situation': 0, 'recommendation': 1, 'impact': 2}
+    assert publish(candidate, approved_sha256=approved) == {'text': None}
+
+
+def test_section_roles_need_their_own_accepted_findings(candidate, reviewed_context):
+    from osint_dashboard.analysis.commentary import check_sections
+    from osint_dashboard.analysis.reviewer import AnalysisError
+    candidate['sections'] = {'situation': 0, 'impact': 1, 'recommendation': 2}
+    with pytest.raises(AnalysisError, match='section_without_finding'):
+        check_sections(reviewed_context, candidate)
+    reviewed_context['findings'][1]['role'] = 'recommendation'
+    check_sections(reviewed_context, candidate)

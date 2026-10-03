@@ -10,7 +10,7 @@ from ..dashboard_commentary import MARKUP, META, _fold
 from ..review import validate_schema
 
 VERSION = "dashboard-v1"
-EXPORTER = "dashboard-export-v4"
+EXPORTER = "dashboard-export-v5"
 
 GAPS = {
     'time_precision_limited': 'Część zdarzeń ma przybliżony czas; uwzględniamy najniższy uzasadniony wkład.',
@@ -162,6 +162,8 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
                 "sources": refs, "rtb_points": points.get(event["incident_id"], 0),
                 "review_current": exclusions.get(event["incident_id"]) not in ("superseded_review", "source_has_newer_version"),
                 "reviewer_type": event["reviewer"]["type"]}
+        from .presentation import signal_presentation
+        item['presentation'] = signal_presentation(event, refs)
         incidents.append(item)
         if geometry:
             features.append({"type": "Feature", "id": item["id"], "geometry": geometry,
@@ -169,7 +171,7 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
     # National markers are presentation anchors, not coordinates assigned to an
     # incident. The frontend may place only explicitly country-level records at a
     # documented capital; no city/region guessing is performed here.
-    exporter_files = sorted(Path(__file__).parent.glob("*.py")) + [ROOT / "schemas/dashboard/report.schema.json"]
+    exporter_files = sorted(Path(__file__).parent.glob("*.py")) + [ROOT / "schemas/dashboard/report.schema.json", ROOT / "config/signal-presentation.json", ROOT / "config/map-places.json"]
     result = {"contract_version": VERSION, "mode": snapshot["mode"], "report_type": report_type,
               "supersedes": supersedes, "as_of": snapshot["as_of"], "window": deepcopy(snapshot["window"]),
               "provenance": {**{k: snapshot[k] for k in ("run_id", "methodology_version", "config_hash", "source_config_hash", "code_hash")},
@@ -218,6 +220,12 @@ def validate_report(report: dict) -> None:
             raise ValueError("A matching commentary review registry receipt is required")
     elif "review" in report["commentary"]:
         raise ValueError("Empty commentary cannot claim a review")
+    sections = report['commentary'].get('sections')
+    if sections is not None:
+        if (not report['commentary']['text'] or
+                report['commentary'].get('review', {}).get('sections_sha256') != digest(sections) or
+                any(text not in report['commentary']['text'] for text in sections.values())):
+            raise ValueError('Commentary sections require a matching editorial receipt')
     if instant(report["window"]["end"]) != instant(report["as_of"]):
         raise ValueError("Window must end at the analysis cutoff")
     if instant(report["window"]["start"]) > instant(report["as_of"]):
@@ -232,6 +240,11 @@ def validate_report(report: dict) -> None:
         if safe_url(source["url"]) != source["url"]:
             raise ValueError("Source URL must be sanitized before publication")
     for incident in report["incidents"]:
+        anchor = incident.get('presentation', {}).get('map_anchor')
+        if anchor and (safe_url(anchor['reference_url']) != anchor['reference_url'] or
+                       incident['location']['precision'] != 'city' or
+                       incident['location']['label'] != anchor['label']):
+            raise ValueError('Map reference requires a matching city and sanitized source URL')
         for ref in incident["sources"]:
             if safe_url(ref["url"]) != ref["url"]:
                 raise ValueError("Source URL must be sanitized before publication")

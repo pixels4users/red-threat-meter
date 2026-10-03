@@ -71,6 +71,24 @@ def validate_evidence(incident: dict, materials: dict[str, dict]) -> None:
         from .scoring_v03 import validate_assessment, validate_warning
         validate_assessment(incident)
         validate_warning(incident, materials)
+    presentation = incident.get('dashboard_context')
+    if presentation:
+        refs = presentation['evidence_ids']
+        if any(ref not in by_id or by_id[ref]['stance'] != 'supports' for ref in refs):
+            raise ValueError('Dashboard context requires supporting evidence')
+        if bool(presentation['region_ids']) != (presentation['scope'] == 'regional'):
+            raise ValueError('Dashboard regional scope requires explicit region IDs')
+        if presentation['scope'] in ('national', 'regional') and not any(by_id[r]['claim'] == 'location' for r in refs):
+            raise ValueError('Dashboard geographic scope requires location evidence')
+        if presentation['scope'] == 'regional' and incident['country'] != 'PL':
+            raise ValueError('Polish regional scope requires country PL')
+        if presentation.get('place_id'):
+            place = read_json(ROOT / 'config/map-places.json')['places'].get(presentation['place_id'])
+            if (not place or place['country'] != incident['country'] or
+                    place['region_id'] not in presentation['region_ids'] or
+                    location['precision'] != 'city' or location['label'] != place['label'] or
+                    not any(by_id[r]['claim'] == 'location' for r in refs)):
+                raise ValueError('Map city reference requires a matching reviewed location and region')
 
 
 def import_review(store, batch: dict) -> dict:

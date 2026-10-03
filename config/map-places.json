@@ -1,0 +1,29 @@
+{
+  "version": "map-places-v1",
+  "checked_on": "2026-10-03",
+  "purpose": "City reference points only. Never exact incident coordinates or scoring inputs. Each use requires an explicit reviewed place_id and location evidence.",
+  "places": {
+    "lowicz": {
+      "label": "Łowicz",
+      "country": "PL",
+      "region_id": "PL-10",
+      "coordinates": [
+        19.933333333333334,
+        52.1
+      ],
+      "reference_url": "https://www.wikidata.org/wiki/Q109992",
+      "reference_value": "52°6′N, 19°56′E"
+    },
+    "nowa-deba": {
+      "label": "Nowa Dęba",
+      "country": "PL",
+      "region_id": "PL-18",
+      "coordinates": [
+        21.766666666666666,
+        50.43333333333333
+      ],
+      "reference_url": "https://www.wikidata.org/wiki/Q610917",
+      "reference_value": "50°26′N, 21°46′E"
+    }
+  }
+}

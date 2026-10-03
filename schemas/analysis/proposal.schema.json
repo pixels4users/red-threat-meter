@@ -1084,6 +1084,93 @@
                       "end_evidence_ids",
                       "correlation"
                     ]
+                  },
+                  "dashboard_context": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "topics": {
+                        "type": "array",
+                        "minItems": 1,
+                        "maxItems": 7,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "aviation",
+                            "cyber",
+                            "navigation",
+                            "infrastructure",
+                            "border",
+                            "military",
+                            "other"
+                          ]
+                        }
+                      },
+                      "kind": {
+                        "enum": [
+                          "event",
+                          "warning",
+                          "plan",
+                          "measurement",
+                          "context"
+                        ]
+                      },
+                      "scope": {
+                        "enum": [
+                          "national",
+                          "regional",
+                          "foreign",
+                          "unknown"
+                        ]
+                      },
+                      "region_ids": {
+                        "type": "array",
+                        "maxItems": 16,
+                        "uniqueItems": true,
+                        "items": {
+                          "enum": [
+                            "PL-02",
+                            "PL-04",
+                            "PL-06",
+                            "PL-08",
+                            "PL-10",
+                            "PL-12",
+                            "PL-14",
+                            "PL-16",
+                            "PL-18",
+                            "PL-20",
+                            "PL-22",
+                            "PL-24",
+                            "PL-26",
+                            "PL-28",
+                            "PL-30",
+                            "PL-32"
+                          ]
+                        }
+                      },
+                      "evidence_ids": {
+                        "type": "array",
+                        "minItems": 1,
+                        "uniqueItems": true,
+                        "items": {
+                          "type": "string",
+                          "minLength": 1
+                        }
+                      },
+                      "place_id": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 80,
+                        "pattern": "^[a-z0-9-]+$"
+                      }
+                    },
+                    "required": [
+                      "topics",
+                      "kind",
+                      "scope",
+                      "region_ids",
+                      "evidence_ids"
+                    ]
                   }
                 },
                 "required": [
