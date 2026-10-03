@@ -57,6 +57,9 @@
   --sidebar-width: 200px;
   --content-max: 1440px;
   --target-size: 44px;
+  --select-icon-size: var(--space-md);
+  --select-icon-inset: var(--space-md);
+  --select-text-gap: var(--space-sm);
   --radius-small: 4px;
   --radius-control: 8px;
   --radius-panel: 8px;

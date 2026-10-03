@@ -110,6 +110,11 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
   Zamknięcie podglądu zwraca fokus do przycisku otwierającego.
 - Kontrolki: przycisk neutralny, link, pole wyboru, przełącznik okresu,
   stany hover/pressed/disabled/focus. Cel dotykowy co najmniej 44 × 44 px.
+- Selektory (03.10.2026): wspólny chevron 16 px, odsunięty o 16 px od
+  prawej krawędzi, z rezerwą 12 px między tekstem i ikoną. Dotyczy
+  filtrów Dziennika oraz rodzaju raportu. Ikona dziedziczy
+  neutralny kolor etykiety w obu motywach; wybór opcji i klawiatura pozostają
+  natywne. Wymuszone kolory korzystają ze strzałki systemowej.
 
 ## Pliki i utrzymanie
 

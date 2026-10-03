@@ -60,6 +60,10 @@ zaakceptowany układ: **B — Chronologia**.
 - Zachowuj widoczny fokus. Dialogi zamykają się przez Esc i przycisk, po
   zamknięciu zwracają fokus; Tab nie wychodzi za otwarte okno.
 - Cel dotykowy minimum 44 × 44 px. Nie pomniejszaj tekstu pól na telefonie.
+- Selektory w `.r-field` zachowują natywną obsługę klawiatury i listy opcji.
+  Chevron 16 px ma odstęp 16 px od prawej krawędzi oraz 12 px od tekstu;
+  jest wycentrowany względem pola i nie przechwytuje kliknięć. W trybie
+  wymuszonych kolorów przywracamy strzałkę systemową.
 - Docelowo kontrast tekstu minimum 4,5:1, dużego tekstu oraz istotnych
   wskaźników i kontrolek 3:1. Sprawdzaj oba motywy, także na stanach hover.
 - Mapa: plus/minus/reset/duży widok, przesuwanie, pinch; zwykłe przewijanie
