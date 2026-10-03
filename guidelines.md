@@ -62,6 +62,8 @@ zaakceptowany układ: **B — Chronologia**.
 - Przycisk ma czasownik lub jednoznaczną nazwę; ikona ma dostępną etykietę.
 - Przegląd używa jednego dropdowna „Obszar”: „Cały obszar” jest domyślną
   opcją i sposobem powrotu z województwa. Bez dodatkowego przycisku obok pola.
+  Widoczną etykietę pomijamy tylko tutaj; dostępna nazwa pozostaje w
+  `aria-label`, a `.r-field-unlabeled` usuwa pusty wiersz nad selektorem.
 - Zachowuj widoczny fokus. Dialogi zamykają się przez Esc i przycisk, po
   zamknięciu zwracają fokus; Tab nie wychodzi za otwarte okno.
 - Cel dotykowy minimum 44 × 44 px. Nie pomniejszaj tekstu pól na telefonie.

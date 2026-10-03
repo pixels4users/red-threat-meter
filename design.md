@@ -146,7 +146,10 @@ To rozwinięcie B — Chronologia, z zachowaniem osi po lewej i mapy po prawej.
 Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
 
 - Jeden dropdown „Obszar” nad wynikiem: domyślnie „Cały obszar”, następnie
-  wszystkie województwa. Bez osobnego przycisku resetującego i pustej opcji
+  wszystkie województwa. Bez widocznej etykiety nad polem; nazwa „Obszar”
+  pozostaje dostępna dla czytników ekranu przez `aria-label`. Wariant
+  `.r-field-unlabeled` nie rezerwuje pustego wiersza po etykiecie.
+  Bez osobnego przycisku resetującego i pustej opcji
   „Wybierz województwo”. Zachowujemy lokalne zapamiętanie wyboru.
   Wynik regionalny pochodzi z raportu; brak oceny pozostaje brakiem.
   Pewność krajowa jest podpisana jako dotycząca całego obszaru, bez kopiowania
