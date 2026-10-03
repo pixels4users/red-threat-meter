@@ -1,8 +1,9 @@
 # RTB — Design System
 
-Wersja: **0.3**, 03.10.2026. Żywy dokument: aktualizowany razem z interfejsem.
-Zakres: działający frontend i zaakceptowane rozwinięcie regionalne na gałęzi
-`codex/ux-regional-context`; lokalny odbiór przed publikacją.
+Wersja: **0.4 — prototyp historii**, 03.10.2026. Żywy dokument: aktualizowany razem z interfejsem.
+Zakres: lokalny prototyp na gałęzi `codex/ux-index-history`.
+Kierunek zaakceptowany przez użytkownika; wykonanie czeka na ocenę i iterację,
+bez publikacji. Publiczny dashboard pozostaje w dotychczasowej wersji.
 Stan połączenia z chmurą: `supabase/README.md`. Silnik od 30.09.2026 wykonuje rtb-v0.4.
 
 ## Kierunek i decyzje
@@ -145,7 +146,7 @@ Użytkownik zaakceptował `ui/experiments/rta-overview-prototype.html`.
 To rozwinięcie B — Chronologia, z zachowaniem osi po lewej i mapy po prawej.
 Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
 
-- Jeden dropdown „Obszar” nad wynikiem: domyślnie „Cały obszar”, następnie
+- Jeden dropdown „Obszar” obok nagłówka „Przegląd”: domyślnie „Cały obszar”, następnie
   wszystkie województwa. Bez widocznej etykiety nad polem; nazwa „Obszar”
   pozostaje dostępna dla czytników ekranu przez `aria-label`. Wariant
   `.r-field-unlabeled` nie rezerwuje pustego wiersza po etykiecie.
@@ -181,7 +182,46 @@ Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
 - Kolory i bazowe tokeny nie zmieniają się; nowe kontrolki mają cel 44 px,
   skala odstępów 4 px. Brak nowej palety i powiadomień.
 
+## Historia indeksu — kierunek zaakceptowany 03.10.2026
+
+- Nagłówek Przegląd i istniejący dropdown tworzą jeden szereg. Data raportu
+  pozostaje po prawej. Usuwamy powtórzony tekst zakresu z góry strony.
+- Główna sekcja zastępuje wcześniejszy układ: około 3/4 na wartość i wykres,
+  1/4 na komentarz (minimum 280 px). Przy szerokości do 1120 px komentarz
+  przechodzi pod wykres, a na telefonie jego części ustawiają się pionowo.
+  Siatka osi czasu i mapy pozostaje bez zmian.
+- Wykres obejmuje 14 dni kalendarzowych Europe/Warsaw, kończących się datą
+  najnowszego raportu. Każdy dzień wskazuje ostatni dobowy raport z tego dnia;
+  korekty tego samego momentu rozstrzyga czas publikacji. Dawnych wydań nie usuwamy.
+- Liczba zachowuje swój kolor poziomu zagrożenia. Linia, wybór dnia i fokus
+  są neutralne. Stała skala 0–100 nie wyolbrzymia małych różnic. Brak wyniku
+  nie staje się zerem; dostępny raport bez wyniku można otworzyć przez datę.
+  Linia łączy tylko sąsiednie dni spełniające dotychczasowe reguły porównywalności.
+- Kliknięcie/Enter/Spacja otwiera raport; strzałki przenoszą fokus między
+  dostępnymi dniami, Home/End do krańców. Hover podgląda wartość i nie zmienia
+  wybranego dnia. Dotykowe pola mają co najmniej 44 px; w wąskim widoku sam
+  wykres przewija się poziomo, bez poszerzania strony.
+- Wartość, pewność, komentarz, mapa, oś i liczniki korzystają z jednego
+  zapisanego raportu. Okna liczników kończą się jego `as_of`. Odczyt starszych
+  sygnałów jest ograniczony czasem publikacji tego raportu; późniejsze korekty
+  nie dopisują wiedzy do historycznego widoku. Nie generujemy nowej prozy.
+- Przy województwie odczytujemy jego historyczny wynik; brak takiej oceny
+  nie jest zastępowany wynikiem kraju. Wybór regionu nie resetuje daty.
+- „Wróć do najnowszego” jest widoczne tylko podczas oglądania historii.
+  Mapa i Dziennik zachowują wybraną datę oraz jawnie nazywają okres jako
+  „Wybrany dzień” / „Tydzień raportu”. W Raportach nadal dostępne jest całe archiwum.
+- Nieudany odczyt zachowuje poprzedni, spójny widok; szybkie wybory stosują
+  wyłącznie ostatnie żądanie użytkownika. Odświeżanie najnowszego raportu
+  w tle nie wyrywa użytkownika z historii.
+
+Prototyp czyta wyłącznie istniejące publikacje przez dotychczasowe API.
+Nie zmienia wag, bazy, raportów, kolektorów ani harmonogramu. Wyjaśnianie
+przyczyn zmian indeksu pozostaje osobnym następnym rozszerzeniem.
+
 ## Historia
+
+- **0.4 / 03.10.2026 — prototyp lokalny:** główny wynik razem z wyborem dnia
+  na wykresie, komentarz po prawej oraz wspólna data wszystkich widoków.
 
 - **0.3 / 03.10.2026:** zaakceptowany Przegląd regionalny, nazwane części
   komentarza, liczniki sygnałów i filtry mapy. Wdrożenie na gałęzi, przed publikacją.
@@ -240,3 +280,24 @@ pozostały odizolowane od bazy live. Nowe pola są opcjonalne, a stare raporty
 i ich komentarze pozostają czytelne. Brakująca historia porównań oraz pewność
 regionalna są opisane wprost. To odbiór lokalny, bez zmiany publicznej wersji,
 harmonogramu ani danych Supabase.
+
+## Weryfikacja prototypu 0.4 — 03.10.2026
+
+Podgląd na `codex/ux-index-history` korzysta z rzeczywistych publikacji przez
+odczyt istniejącego API. Wybór 2 października przywraca indeks 2,7, ówczesny
+komentarz i liczniki 16 / 2 / 3; powrót do raportu z 3 października przywraca
+indeks 2,2 i liczniki 36 / 3 / 4. Sprawdzono również 1 października,
+wybór łódzkiego, przejście do Mapy z zachowaniem daty oraz powrót do
+najnowszego raportu z fokusem na nagłówku.
+
+Przeszło 31 testów JS/PostgreSQL i build frontendu. Testy obejmują brakujące
+daty, zero i null, korekty publikacji, granice doby Europe/Warsaw, paginację,
+wybór regionu, nieudany odczyt oraz wyścig szybkich wyborów. Potwierdzają też,
+że późniejsze korekty nie zmieniają komentarza, mapy ani liczników w dawnym
+raporcie. Testy PostgreSQL korzystają z odizolowanej bazy PGlite.
+
+Sprawdzono szerokości 1440, 390 i 320 px, jasny i ciemny wygląd, strzałki,
+Enter oraz widoczność wybranego dnia po zmianie szerokości. Strona nie ma
+poziomego przepełnienia; na telefonie przewija się wyłącznie historia.
+Przywrócono automatyczny wybór wyglądu. Konsola bez ostrzeżeń i błędów.
+Nie opublikowano prototypu ani nie zmieniono danych, silnika i harmonogramu.

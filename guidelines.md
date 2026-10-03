@@ -1,7 +1,7 @@
 # RTB — zasady UI
 
 Powiązane: `design.md`, `theme.css`, `docs/dashboard-presentation.md`.
-Wersja 0.3, 03.10.2026. Zasady kolorów wynikają z decyzji użytkownika;
+Wersja 0.4 (prototyp lokalny), 03.10.2026. Zasady kolorów wynikają z decyzji użytkownika;
 zaakceptowany układ: **B — Chronologia**.
 
 ## Hierarchia i układ
@@ -54,6 +54,13 @@ zaakceptowany układ: **B — Chronologia**.
 - Nie wymyślaj procentu pewności. W v0.4 odczytuj go z confidence.percent; jest heurystyką jakości danych. Zero RTB to poprawna liczba; wyjaśnij, że brak naliczonych sygnałów nie potwierdza bezpieczeństwa. Historyczny null i brak odpowiedzi serwera nadal nie mogą być zastępowane zerem.
 - Wykres i delta indeksu RTA łączą tylko wyniki tej samej metodologii i konfiguracji.
   Liczniki sygnałów stosują odrębne, prostsze reguły opisane poniżej.
+- Historyczne wartości mogą pozostać widoczne jako osobne punkty także przy
+  braku porównywalności. Nie łącz ich wtedy linią ani nie zastępuj braków zerami.
+- Wybór dnia stosuje się do indeksu, pewności, komentarza, mapy, osi i liczników.
+  Korzystaj z treści zapisanej wtedy, bez późniejszych rewizji i dopisywania porad.
+- Wykres ma stały zakres 14 dni kalendarzowych i skalę 0–100. Ponowne wydania
+  jednego dnia nie wypierają wcześniejszych dni. Data końcowa nie przesuwa się
+  po kliknięciu historycznego punktu. Brak raportu pozostaje przerwą.
 
 ## Interakcje i dostępność
 
@@ -62,11 +69,16 @@ zaakceptowany układ: **B — Chronologia**.
 - Przycisk ma czasownik lub jednoznaczną nazwę; ikona ma dostępną etykietę.
 - Przegląd używa jednego dropdowna „Obszar”: „Cały obszar” jest domyślną
   opcją i sposobem powrotu z województwa. Bez dodatkowego przycisku obok pola.
+  Kontrolka jest obok tytułu „Przegląd”; na innych ekranach działają ich własne filtry.
   Widoczną etykietę pomijamy tylko tutaj; dostępna nazwa pozostaje w
   `aria-label`, a `.r-field-unlabeled` usuwa pusty wiersz nad selektorem.
 - Zachowuj widoczny fokus. Dialogi zamykają się przez Esc i przycisk, po
   zamknięciu zwracają fokus; Tab nie wychodzi za otwarte okno.
 - Cel dotykowy minimum 44 × 44 px. Nie pomniejszaj tekstu pól na telefonie.
+- Wybór dnia: kliknięcie/Enter/Spacja zatwierdza, strzałki i Home/End przenoszą
+  fokus. Hover nie zmienia raportu. Wykres może przewijać się we własnym obszarze.
+- Powrót do najnowszego raportu ma widoczną akcję. Odczyt w tle nie zmienia
+  wybranego dnia; po niepowodzeniu pozostaw cały poprzedni raport wraz z datą.
 - Wszystkie selektory korzystają ze wspólnego `.r-field > .r-select`
   w `web/styles.css` oraz tokenów `--select-*` w `theme.css`; nie twórz
   osobnych chevronów ani odstępów dla konkretnego ekranu. Zachowują natywną

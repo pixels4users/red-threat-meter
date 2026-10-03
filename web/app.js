@@ -1,7 +1,8 @@
 import { commentaryRows } from './commentary.js';
 import { createIcons, Radar, Menu, X, LayoutDashboard, Map as MapIcon, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee } from 'lucide';
-import { select, scaleLinear, line, extent } from 'd3';
-import { categories, statuses, sourceStatuses, scoreLabel, threatLevel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, comparable, checkEnvelope, safeLink, reportText } from './data.js';
+import { select, scaleLinear } from 'd3';
+import { historyDays, canJoinDays, ReportHistory, SnapshotSelection } from './index-history.js';
+import { categories, statuses, sourceStatuses, scoreLabel, threatLevel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, checkEnvelope, safeLink, reportText } from './data.js';
 import { signalTime } from './signal-time.js';
 import { signalTimeText } from './data.js';
 import { initializeMaps, mapPoints } from './map.js';
@@ -16,7 +17,13 @@ const pages = { overview: 'Przegląd', map: 'Mapa Operacyjna', journal: 'Dzienni
 const state = { page: 'overview', selected: null, related: [], scale: 'day', expanded: new Set(), category: 'all', source: 'all', historyType: 'daily', area: 'macro', mapArea: 'macro', mapPeriod: 'day', mapTopic: 'all', journalArea: 'macro', journalPeriod: 'all' };
 try { const saved = localStorage.getItem('rta-region'); if (Object.hasOwn(regions, saved)) state.area = state.mapArea = state.journalArea = saved; } catch {}
 let archive = null, detailOpener = null, expandedFrom = 'overview';
-let envelope = null, loaded = false, failed = false, busy = false, history = [], dailyHistory = [], nextOffset = null, historyAnchor = null, historyGeneration = 0;
+let envelope = null, latestEnvelope = null, loaded = false, failed = false, busy = false, history = [], nextOffset = null, historyAnchor = null, historyGeneration = 0;
+const reportHistory = new ReportHistory(api);
+const historical = () => Boolean(envelope && latestEnvelope && envelope.report.report_id !== latestEnvelope.report.report_id);
+const selection = new SnapshotSelection(id => reportHistory.get(id), value => {
+  if (value.report.mode !== latestEnvelope?.report.mode || Date.parse(value.report.as_of) > Date.parse(latestEnvelope.report.as_of)) throw new Error('invalid_snapshot');
+  activateReport(value);
+}, () => drawTrend());
 let config = { refresh_seconds: 30, stale_after_hours: 30 };
 const report = () => envelope?.report ?? null;
 const records = () => archive?.records ?? report()?.incidents ?? [];
@@ -43,7 +50,7 @@ function freshness() {
   const r = report(), texts = [];
   if (failed) texts.push(r ? 'Nie udało się odświeżyć danych. Poniżej ostatni dostępny raport.' : 'Dane są chwilowo niedostępne. Spróbuj odświeżyć widok.');
   else if (loaded && !r) texts.push('Czekamy na pierwszy opublikowany raport.');
-  if (r && Date.now() - Date.parse(r.as_of) > config.stale_after_hours * 3600000) texts.push('Ten raport nie przedstawia bieżącej sytuacji. Sprawdź datę ostatniej analizy.');
+  if (r && !historical() && Date.now() - Date.parse(r.as_of) > config.stale_after_hours * 3600000) texts.push('Ten raport nie przedstawia bieżącej sytuacji. Sprawdź datę ostatniej analizy.');
   if (archive?.failed && ['map', 'journal'].includes(state.page)) texts.push('Część archiwum jest chwilowo niedostępna. Poniżej dostępne sygnały.');
   if (r?.mode === 'fixture') texts.push('Podgląd testowy · dane syntetyczne, bez oceny rzeczywistej sytuacji.');
   notice.textContent = texts.join(' '); notice.hidden = !texts.length;
@@ -57,10 +64,12 @@ function renderMetric() {
   $('[data-threat-level]').textContent = level.label;
   $('.r-kpi').setAttribute('aria-label', score === null ? 'Indeks niewyliczony' : `${score} na 100`);
   for (const e of $$('[data-dialog-score]')) e.textContent = scoreLabel(score);
-  $('[data-as-of]').textContent = r ? `Stan na ${fullTime(r.as_of)}` : failed ? 'Odczyt chwilowo niedostępny' : loaded ? 'Brak opublikowanego raportu' : 'Ładowanie raportu…';
+  $('[data-as-of]').textContent = r ? `${historical() ? 'Raport z' : 'Stan na'} ${fullTime(r.as_of)}` : failed ? 'Odczyt chwilowo niedostępny' : loaded ? 'Brak opublikowanego raportu' : 'Ładowanie raportu…';
+  $('[data-latest-report]').hidden = !historical();
+  root.dataset.reportId = r?.report_id ?? '';
+  root.dataset.reportDate = r?.as_of ?? '';
   $('.r-metric .r-eyebrow').textContent = `Indeks RTA · ${regional ? regions[state.area] : 'raport dobowy'}`;
   $('[data-region]').value = state.area;
-  $('[data-scope-label]').textContent = regional ? `Wybrany region: ${regions[state.area]}` : 'Polska i wschodnia flanka NATO';
   $('[data-confidence]').textContent = regional ? 'Nieustalona dla regionu' : r?.rtb.confidence.percent == null ? 'Nieokreślona' : `${r.rtb.confidence.percent}%`;
   $('.r-confidence').title = 'Pewność opisuje zakres obserwacji, ukończony przegląd i dostępność historii. Nie jest prawdopodobieństwem eskalacji.';
   let status = $('[data-score-status]');
@@ -72,7 +81,7 @@ function renderMetric() {
   official.replaceChildren(); official.hidden = !visibleWarnings(r?.rtb).length;
   for (const w of visibleWarnings(r?.rtb)) {
     const article = el('article'); article.dataset.shelter = String(w.level === 'L3_shelter');
-    article.append(el('strong', '', w.level === 'L3_shelter' ? 'Oficjalne zalecenie ochronne' : 'Oficjalny komunikat'), el('p', '', w.instruction_pl),
+    article.append(el('strong', '', historical() ? 'Komunikat zapisany w tym raporcie' : w.level === 'L3_shelter' ? 'Oficjalne zalecenie ochronne' : 'Oficjalny komunikat'), el('p', '', w.instruction_pl),
       el('p', 'r-small', `${w.authority} · ${w.area} · od ${fullTime(w.effective_at)}${w.valid_until ? ` do ${fullTime(w.valid_until)}` : ''}`));
     if (w.status === 'unknown') article.append(el('p', 'r-small', 'Ostatnia znana instrukcja. Sprawdź jej aktualność u wydającej ją instytucji.'));
     official.append(article);
@@ -100,23 +109,70 @@ function renderMetric() {
 }
 
 function drawTrend() {
-  const r = report(), target = $('.r-spark'), svg = select(target); svg.selectAll('*').remove();
-  const note = $('[data-history-note]'), footer = note.parentElement;
-  target.hidden = true; footer.hidden = true; note.textContent = '';
-  if (state.area !== 'macro') return;
-  const all = dailyHistory.slice(0, 14).reverse();
-  const compatible = all.map(row => ({ ...row, valid: r && comparable(row, r.provenance) && (r.provenance.methodology_version !== 'rtb-v0.4' || row.confidence_key === r.rtb.confidence.comparison_key) && row.score !== null }));
-  const values = compatible.filter(p => p.valid);
-  target.hidden = values.length < 2;
-  footer.hidden = values.length < 2;
-  if (values.length >= 2) note.textContent = 'Historia RTA · przerwy oznaczają brak porównywalnego wyniku';
-  if (values.length < 2 || target.clientWidth < 10) return;
-  const w = target.clientWidth, h = 40, bounds = extent(values, d => d.score);
-  const x = scaleLinear().domain([0, Math.max(1, compatible.length - 1)]).range([4, w - 4]);
-  const y = scaleLinear().domain([bounds[0] - 2, bounds[1] + 2]).range([h - 4, 4]);
-  svg.attr('viewBox', `0 0 ${w} ${h}`); svg.append('title').text(values.map(v => `${fullTime(v.as_of)}: ${v.score}`).join('; '));
-  svg.append('path').datum(compatible).attr('d', line().defined(d => d.valid).x((d, i) => x(i)).y(d => y(d.score))).attr('fill', 'none').attr('stroke', 'var(--r-trend)').attr('stroke-width', 2);
-  compatible.forEach((d, i) => { if (d.valid) svg.append('circle').attr('cx', x(i)).attr('cy', y(d.score)).attr('r', 2).attr('fill', 'var(--r-trend)'); });
+  const host = $('[data-index-history]'), target = $('.r-index-chart'), svg = select(target);
+  const status = $('[data-history-status]');
+  status.textContent = selection.pending ? 'Wczytywanie raportu…' : selection.failed ? 'Nie udało się otworzyć raportu. Spróbuj ponownie.' : reportHistory.failed ? 'Część historii jest chwilowo niedostępna.' : '';
+  status.hidden = !status.textContent;
+  $('.r-hero').setAttribute('aria-busy', String(Boolean(selection.pending)));
+  host.hidden = !latestEnvelope;
+  if (!latestEnvelope || state.page !== 'overview') return;
+  const r = report(), focused = document.activeElement?.closest('[data-history-report]')?.dataset.historyReport;
+  const days = historyDays(reportHistory.rows, latestEnvelope.report.as_of, reportHistory.cache, state.area);
+  const w = target.clientWidth, h = target.clientHeight;
+  if (w < 10 || h < 10) return;
+  const left = 40, right = 8, step = (w - left - right) / days.length;
+  const x = i => left + step * (i + .5), y = scaleLinear().domain([0, 100]).range([h - 12, 12]);
+  svg.selectAll('*').remove(); svg.attr('viewBox', `0 0 ${w} ${h}`);
+  svg.append('title').text(days.filter(d => d.row).map(d => `${shortDate(d.day)}: ${d.score === null ? 'brak wyniku' : scoreLabel(d.score)}`).join('; '));
+  const axis = $('.r-history-axis-labels'); axis.replaceChildren();
+  for (const tick of [0, 20, 40, 60, 80, 100]) {
+    svg.append('line').attr('class', 'r-history-grid').attr('x1', left).attr('x2', w - right).attr('y1', y(tick)).attr('y2', y(tick));
+    const label = el('span', '', String(tick)); label.style.top = `${y(tick)}px`; axis.append(label);
+  }
+  days.forEach((day, i) => {
+    if (i && canJoinDays(days[i - 1], day)) svg.append('path').attr('class', 'r-history-line').attr('d', `M${x(i - 1)},${y(days[i - 1].score)}L${x(i)},${y(day.score)}`);
+    if (day.score === null) return;
+    const active = day.row.report_id === r?.report_id;
+    if (active) {
+      svg.append('line').attr('class', 'r-history-guide').attr('x1', x(i)).attr('x2', x(i)).attr('y1', 0).attr('y2', h);
+      svg.append('circle').attr('class', 'r-history-halo').attr('cx', x(i)).attr('cy', y(day.score)).attr('r', 10);
+    }
+    svg.append('circle').attr('class', 'r-history-dot').attr('data-selected', active).attr('cx', x(i)).attr('cy', y(day.score)).attr('r', active ? 6 : 4);
+  });
+  const controls = $('.r-history-points'); controls.replaceChildren();
+  for (const [index, day] of days.entries()) {
+    const control = day.row ? button('', () => selection.choose(day.row.report_id), 'r-history-day') : el('span', 'r-history-gap');
+    control.style.left = `${left + index * step}px`; control.style.width = `${step}px`;
+    control.append(el('span', 'r-history-day-label', shortDate(day.day)));
+    if (day.row) {
+      const value = day.score === null ? 'Indeks niewyliczony' : `RTA ${scoreLabel(day.score)}`;
+      control.dataset.historyReport = day.row.report_id;
+      control.setAttribute('aria-label', `${fullTime(day.row.as_of)} · ${value}. Otwórz raport.`);
+      control.setAttribute('aria-pressed', String(day.row.report_id === r?.report_id));
+      control.append(el('span', 'r-history-value', `${shortDate(day.day)} · ${value}`));
+      control.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+        event.preventDefault();
+        const buttons = [...controls.querySelectorAll('button')], i = buttons.indexOf(control);
+        const next = event.key === 'Home' ? 0 : event.key === 'End' ? buttons.length - 1 : Math.max(0, Math.min(buttons.length - 1, i + (event.key === 'ArrowLeft' ? -1 : 1)));
+        buttons[next]?.focus();
+      });
+    } else control.setAttribute('aria-label', `${shortDate(day.day)}: brak raportu`);
+    controls.append(control);
+  }
+  $('[data-selected-day]').textContent = r ? new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', day: 'numeric', month: 'long' }).format(new Date(r.as_of)) : '';
+  if (focused) controls.querySelector(`[data-history-report="${focused}"]`)?.focus({ preventScroll: true });
+  const scroll = $('.r-history-scroll');
+  const positionKey = `${r?.report_id}:${scroll.clientWidth}`;
+  if (scroll.dataset.positioned !== positionKey) {
+    const i = days.findIndex(day => day.row?.report_id === r?.report_id);
+    if (i >= 0) {
+      const start = left + i * step, end = start + step;
+      if (start < scroll.scrollLeft + left) scroll.scrollLeft = Math.max(0, start - left);
+      else if (end > scroll.scrollLeft + scroll.clientWidth - right) scroll.scrollLeft = end - scroll.clientWidth + right;
+      scroll.dataset.positioned = positionKey;
+    }
+  }
 }
 
 function selectSignals(ids) {
@@ -281,7 +337,6 @@ async function loadHistory(more = false) {
     if (!Array.isArray(response.items)) throw new Error('invalid_history');
     history = more ? [...history, ...response.items.filter(r => !history.some(old => old.report_id === r.report_id))] : response.items;
     nextOffset = response.next_offset; historyAnchor = response.anchor;
-    if (kind === 'daily') { dailyHistory = history; drawTrend(); }
     renderReports();
   } catch { if (generation === historyGeneration) { $('[data-reports]').replaceChildren(el('p', 'r-empty', 'Archiwum jest chwilowo niedostępne. Odśwież widok, aby spróbować ponownie.')); } }
 }
@@ -296,6 +351,7 @@ function render() {
 }
 function navigate(page) {
   $('.r-hero').hidden = page !== 'overview';
+  $('[data-overview-area]').hidden = page !== 'overview';
   state.page = page; state.selected = null; state.related = [];
   for (const b of $$('[data-page]')) { if (b.dataset.page === page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   for (const view of $$('[data-view]')) view.hidden = view.dataset.view !== page;
@@ -330,6 +386,11 @@ $('[data-close-report]').addEventListener('click', () => {
 });
 $('[data-report-type]').addEventListener('change', e => { state.historyType = e.target.value; history = []; nextOffset = null; $('[data-report-preview]').hidden = true; loadHistory(); });
 $('[data-more-reports]').addEventListener('click', () => loadHistory(true));
+$('[data-latest-report]').addEventListener('click', async () => {
+  if (!latestEnvelope) return;
+  await selection.choose(latestEnvelope.report.report_id);
+  if (!historical()) { $('[data-page-title]').tabIndex = -1; $('[data-page-title]').focus({ preventScroll: true }); }
+});
 
 const periods = [['day', 'Dzisiaj'], ['week', 'Ten tydzień'], ['month', 'Ten miesiąc'], ['quarter', 'Ten kwartał'], ['year', 'Ten rok'], ['current7', 'Ostatnie 7 dni'], ['previous7', 'Poprzednie 7 dni'], ['undated', 'Bez daty']];
 function setOptions(select, values, selected) {
@@ -350,7 +411,8 @@ function renderFilters() {
     const topic = view === 'map' ? state.mapTopic : state.category, period = state[view + 'Period'];
     const values = [['macro', 'Flanka wschodnia'], ['PL', 'Cała Polska'], ...Object.entries(regions).map(([id, name]) => [id, `${name} (${report() ? filterSignals(records(), { asOf: report().as_of, area: id, period, topic, source: view === 'journal' ? state.source : 'all', includeNational: false }).length : 0})`])];
     setOptions($(`[data-${view}-area]`), values, state[view + 'Area']);
-    setOptions($(`[data-${view}-period]`), view === 'journal' ? [['all', 'Całe archiwum'], ...periods] : periods, period);
+    const labels = historical() ? periods.map(([key, name]) => [key, ({ day: 'Wybrany dzień', week: 'Tydzień raportu', month: 'Miesiąc raportu', quarter: 'Kwartał raportu', year: 'Rok raportu' })[key] ?? name]) : periods;
+    setOptions($(`[data-${view}-period]`), view === 'journal' ? [['all', 'Całe archiwum'], ...labels] : labels, period);
   }
   setOptions($('[data-map-topic]'), [['all', 'Wszystkie tematy'], ...Object.entries(topics).map(([key, value]) => [key, value.label])], state.mapTopic);
   $('[data-category]').value = state.category;
@@ -404,22 +466,34 @@ function ensureArchive() {
   if (start < archive.earliestLoaded || archive.failed) archive.loadThrough(start);
 }
 
+function activateReport(value) {
+  archive?.dispose(); envelope = value;
+  state.selected = null; state.related = []; state.expanded.clear();
+  archive = value ? new SignalArchive(value, path => reportHistory.read(path), () => { if (archive?.envelope === value) render(); }) : null;
+  render(); ensureArchive();
+}
+
 async function refresh() {
   if (busy) return; busy = true;
   try {
     const next = checkEnvelope(await api('/api/latest'));
-    const changed = !loaded || next?.report.report_id !== envelope?.report.report_id;
-    envelope = next; loaded = true; failed = false;
+    if (!next && latestEnvelope) throw new Error('latest_missing');
+    // Polls update the available latest report without interrupting a user's
+    // historical selection or an in-flight choice of date.
+    const followLatest = !historical() && !selection.pending;
+    const changed = !loaded || next?.report.report_id !== latestEnvelope?.report.report_id;
+    latestEnvelope = next; reportHistory.remember(next); loaded = true; failed = false;
     if (changed) {
-      archive?.dispose();
-      archive = next ? new SignalArchive(next, api, () => { if (archive?.envelope === next) render(); }) : null;
-      render(); ensureArchive(); await loadHistory(); if (state.historyType !== 'daily') { const h = await api('/api/reports?type=daily'); dailyHistory = h.items; drawTrend(); } }
+      if (followLatest || !envelope) activateReport(next);
+      else renderMetric();
+      if (next) reportHistory.load(next, drawTrend);
+      await loadHistory(); }
     else freshness();
   } catch { failed = true; loaded = true; if (!envelope) renderMetric(); else freshness(); }
   finally { busy = false; }
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
-new ResizeObserver(drawTrend).observe($('.r-analysis'));
+new ResizeObserver(drawTrend).observe($('.r-index-panel'));
 render(); renderReports();
 api('/api/config').then(value => { if (value.refresh_seconds >= 10 && value.stale_after_hours >= 1) config = value; }).catch(() => {});
 await refresh();

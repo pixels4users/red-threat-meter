@@ -14,9 +14,9 @@
 <div class="r-side-footer">Obraz sytuacji<br/>z otwartych źródeł</div>
 </aside>
 <main class="r-main">
-<header class="r-top"><h1 data-page-title="">Przegląd</h1><div class="r-top-meta"><span data-as-of="">Ładowanie raportu…</span></div></header>
+<header class="r-top"><div class="r-heading-group"><h1 data-page-title="">Przegląd</h1><div class="r-field r-field-unlabeled" data-overview-area><select class="r-select" data-region aria-label="Obszar"><option value="macro">Cały obszar</option></select></div></div><div class="r-top-meta"><span data-as-of="">Ładowanie raportu…</span><button class="r-link" data-latest-report type="button" hidden>Wróć do najnowszego</button></div></header>
 <section aria-label="Indeks RTA i komentarz analityczny" class="r-hero">
-<div class="r-area-switch" data-overview-area><div class="r-field r-field-unlabeled"><select class="r-select" data-region aria-label="Obszar"><option value="macro">Cały obszar</option></select></div><span class="r-small" data-scope-label>Polska i wschodnia flanka NATO</span></div>
+<div class="r-index-panel">
 <div class="r-metric">
 <div class="r-eyebrow">Indeks RTA</div>
 <div class="r-kpi-line"><strong class="r-kpi">—</strong><span class="r-unit">/100</span><span class="r-trend" data-trend="" hidden=""><i aria-hidden="true" data-lucide="trending-up"></i><span data-delta=""></span><span class="r-period">pkt / poprzedni raport</span></span></div>
@@ -24,8 +24,14 @@
 <div class="r-confidence"><span>Pewność danych: <strong data-confidence="">Nieokreślona</strong></span></div>
 <details class="r-index-details"><summary>Skąd ten wynik?</summary><div class="r-contributions"><span>Działania <b data-component="hostile_activity">—</b></span><span>Przygotowania <b data-component="preparation">—</b></span></div><p class="r-small" data-regional-note></p></details>
 </div>
-<div class="r-analysis"><div class="r-eyebrow">Komentarz analityczny</div><div class="r-commentary-rows" aria-live="polite" data-commentary></div><svg aria-label="Historia indeksu RTA" class="r-spark" hidden="" role="img"></svg><div class="r-analysis-foot" hidden><span data-history-note=""></span></div></div>
+<div class="r-index-history" data-index-history hidden>
+<div class="r-history-heading"><span>Ostatnie 14 dni</span><span data-selected-day></span></div>
+<div class="r-history-frame"><div class="r-history-scroll"><div class="r-history-plot"><svg aria-label="Historia indeksu RTA, skala od 0 do 100" class="r-index-chart" role="img"></svg><div class="r-history-points" role="group" aria-label="Wybierz dzień raportu"></div></div></div><div class="r-history-axis-labels" aria-hidden="true"></div></div>
+</div>
+</div>
+<div class="r-analysis"><div class="r-eyebrow">Komentarz analityczny</div><div class="r-commentary-rows" aria-live="polite" data-commentary></div></div>
 </section>
+<p class="r-history-status r-small" data-history-status role="status" hidden></p>
 <section aria-label="Przegląd" class="r-view" data-view="overview">
 <section class="r-topic-section" aria-label="Sygnały według tematu"><div class="r-section-heading"><h2>Sygnały <span class="r-small">· ostatnie 7 dni</span></h2><span class="r-small" data-count-period></span></div><div class="r-topic-strip" data-topic-counts></div><p class="r-small" data-count-note></p></section>
 <div class="r-overview"><section class="r-map-region"><div class="r-section-heading"><h2>Sytuacja w regionie</h2><button class="r-link cursor-interaction" data-go="map" type="button">Otwórz mapę<i aria-hidden="true" data-lucide="arrow-up-right"></i></button></div><div data-map-slot="overview"></div></section><aside class="r-context"><div data-timeline=""></div><div data-detail="overview" hidden=""></div></aside></div>
