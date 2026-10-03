@@ -1,0 +1,14 @@
+/* RTA Design System: a neutral content surface, independent of page layout.
+ * Import after theme.css. Use --surface-background in descendants that need
+ * an opaque mask (for example a fixed chart axis) instead of a canvas color.
+ */
+.rtb-app .r-card {
+  --surface-background: var(--color-card);
+  min-width: 0;
+  padding: var(--card-padding);
+  color: var(--color-text);
+  background: var(--surface-background);
+  border: 0;
+  border-radius: var(--card-radius);
+  box-shadow: none;
+}

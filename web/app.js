@@ -72,10 +72,13 @@ function renderMetric() {
   $('[data-region]').value = state.area;
   $('[data-confidence]').textContent = regional ? 'Nieustalona dla regionu' : r?.rtb.confidence.percent == null ? 'Nieokreślona' : `${r.rtb.confidence.percent}%`;
   $('.r-confidence').title = 'Pewność opisuje zakres obserwacji, ukończony przegląd i dostępność historii. Nie jest prawdopodobieństwem eskalacji.';
-  let status = $('[data-score-status]');
-  if (!status) { status = el('p', 'r-small'); status.dataset.scoreStatus = ''; $('.r-metric').append(status); }
+  const status = $('[data-score-status]');
   status.textContent = r && score === null ? 'Za mało danych do wyliczenia indeksu' : !regional && r?.rtb.review_required ? 'Wzrost indeksu wymaga pogłębionej oceny sytuacji' : score === 0 ? 'Brak naliczonych sygnałów. Zero nie potwierdza bezpieczeństwa.' : r?.rtb.status === 'provisional' ? 'Ocena oparta na częściowych obserwacjach' : '';
   if (score > 60 && metric.red_priority?.eligible === false) status.textContent += ' Brakuje niezależnych potwierdzeń bezpośrednich zdarzeń, by nadać najwyższy priorytet.';
+  // Routine coverage detail belongs in the disclosure. Keep zero, missing
+  // scores and review warnings visible without requiring that interaction.
+  if (status.textContent && (score === null || score === 0 || r?.rtb.review_required || score > 60)) $('.r-index-details').before(status);
+  else $('.r-index-details').append(status);
   for (const b of $$('[data-component]')) b.textContent = score === null ? '—' : `${scoreLabel(metric.components[b.dataset.component])} pkt`;
   $('[data-regional-note]').textContent = regional ? 'Wynik obejmuje zdarzenia lokalne i wpływ z sąsiednich regionów. Pewność regionalna nie została jeszcze oszacowana.' : 'Indeks uwzględnia ocenę zdarzeń i upływ czasu; nie jest sumą sygnałów na mapie.';
   official.replaceChildren(); official.hidden = !visibleWarnings(r?.rtb).length;

@@ -15,6 +15,15 @@ zaakceptowany układ: **B — Chronologia**.
 7. Indeks występuje tylko w Przeglądzie i przewija się z treścią. W B oś czasu poprzedza mapę, również na telefonie.
 8. Rozwijany zakres obserwacji umieszczamy po treści widoku, przed stopką;
    w Przeglądzie po osi czasu i mapie. Skrót pewności pozostaje przy RTB.
+9. Indeks, historia i komentarz tworzą jedną wspólną `.r-card`. Używaj
+   `ui/components/card.css` i tokenów `--card-*` / `--color-card` z `theme.css`.
+   Nie kopiuj jej tła, paddingu, promienia ani cienia do reguł widoku.
+   Karta nie narzuca Grid/Flexbox ani szerokości kolumn. Pozostałe sekcje
+   zachowują dotychczasowy układ bez dodatkowych kart.
+10. Opis poziomu, pewność i rozwinięcie „Skąd ten wynik?” grupujemy obok
+    liczby, na telefonie poniżej. Wkłady i opis częściowych obserwacji są
+    w rozwinięciu. Brak wyniku, objaśnienie zera i istotne ostrzeżenia
+    pozostają widoczne. Rozwinięcie przesuwa treść, nie zasłania wykresu.
 
 ## Kolor
 
@@ -56,6 +65,8 @@ zaakceptowany układ: **B — Chronologia**.
   Liczniki sygnałów stosują odrębne, prostsze reguły opisane poniżej.
 - Historyczne wartości mogą pozostać widoczne jako osobne punkty także przy
   braku porównywalności. Nie łącz ich wtedy linią ani nie zastępuj braków zerami.
+- Nieprzezroczyste fragmenty wizualizacji na karcie używają odziedziczonego
+  `--surface-background`; nie zakładają białego tła strony.
 - Wybór dnia stosuje się do indeksu, pewności, komentarza, mapy, osi i liczników.
   Korzystaj z treści zapisanej wtedy, bez późniejszych rewizji i dopisywania porad.
 - Wykres ma stały zakres 14 dni kalendarzowych i skalę 0–100. Ponowne wydania

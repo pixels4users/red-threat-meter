@@ -125,6 +125,8 @@ Warstwy wynikają z kontrastu powierzchni; cienie nie dekorują ekranu.
 - `design.md` — kierunek, decyzje, komponenty i historia zmian.
 - `guidelines.md` — reguły użycia i odbioru UI.
 - `theme.css` — jedyne źródło wspólnych tokenów.
+- `ui/components/card.css` — wspólna karta `.r-card`; importowana przez
+  frontend. API i przykład użycia: `ui/components/README.md`.
 - `web/` — działający interfejs B; importuje tokeny z `theme.css`, czyta `/api/`.
 - `schemas/dashboard/report.schema.json` — kontrakt danych, niezależny od układu.
 - `ui/dashboard-fragment.html` — wspólny szablon, układy i interakcje A/B;
@@ -190,6 +192,20 @@ Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
   1/4 na komentarz (minimum 280 px). Przy szerokości do 1120 px komentarz
   przechodzi pod wykres, a na telefonie jego części ustawiają się pionowo.
   Siatka osi czasu i mapy pozostaje bez zmian.
+- Cała grupa indeks + historia + komentarz używa wspólnej `.r-card`.
+  Karta jest neutralną powierzchnią bez cienia i dodatkowej ramki; jej tło,
+  promień 8 px oraz odstępy pochodzą z tokenów. Odstęp wewnętrzny: 32 px,
+  do 900 px szerokości 24 px, do 620 px 16 px. Komponent nie narzuca kolumn.
+  Nie dodajemy kart do liczników, osi ani mapy. To decyzja użytkownika
+  z 03.10.2026, po pierwszym podglądzie historii.
+- Poziom zagrożenia, pewność i „Skąd ten wynik?” są po prawej stronie liczby.
+  Na telefonie przechodzą pod nią. Wkłady Działania / Przygotowania,
+  objaśnienie indeksu i opis częściowych obserwacji są wewnątrz rozwinięcia.
+  Objaśnienie zera, brak wyniku oraz potrzeba pogłębionego przeglądu nadal
+  pozostają widoczne bez otwierania szczegółów.
+- Wspólna karta jest zdefiniowana wyłącznie w `ui/components/card.css`,
+  a używający jej widok ustala tylko układ. Wykres odczytuje odziedziczone
+  `--surface-background`, aby jego stała oś i obrysy punktów miały tło karty.
 - Wykres obejmuje 14 dni kalendarzowych Europe/Warsaw, kończących się datą
   najnowszego raportu. Każdy dzień wskazuje ostatni dobowy raport z tego dnia;
   korekty tego samego momentu rozstrzyga czas publikacji. Dawnych wydań nie usuwamy.
@@ -301,3 +317,23 @@ Enter oraz widoczność wybranego dnia po zmianie szerokości. Strona nie ma
 poziomego przepełnienia; na telefonie przewija się wyłącznie historia.
 Przywrócono automatyczny wybór wyglądu. Konsola bez ostrzeżeń i błędów.
 Nie opublikowano prototypu ani nie zmieniono danych, silnika i harmonogramu.
+
+### Wspólna karta i opis obok wyniku — druga iteracja
+
+Karta jest komponentem `ui/components/card.css`, importowanym przez frontend,
+z tokenami w `theme.css` i przykładem użycia w `ui/components/README.md`.
+Reguły widoku ustalają wyłącznie układ. Na dużym ekranie zachowano proporcję
+840 / 280 px dla dwóch kolumn przy szerokości 1440 px. Opis indeksu przechodzi
+pod liczbę również wtedy, gdy sam panel ma mniej niż 440 px szerokości.
+
+Sprawdzono szerokości 1440, 736, 621 i 320 px, oba motywy, rozwijanie klawiszem
+Enter i kliknięciem oraz odstęp między rozwinięciem a wykresem. Bez poziomego
+przepełnienia strony. Zero w łódzkim i historyczny niewyliczony wynik mają
+nadal widoczne wyjaśnienie przy zamkniętych szczegółach. Częściowe obserwacje
+dla dodatniego indeksu są opisane w rozwinięciu; procent pewności jest widoczny.
+Kontrast tekstów podstawowych, pomocniczych i trzech kolorów poziomu indeksu
+na tle karty wynosi co najmniej 5,37:1 w jasnym i 7,22:1 w ciemnym motywie.
+To sprawdzenie wymienionych par, nie pełny audyt dostępności.
+
+Przeszło 31 istniejących testów JS/PostgreSQL oraz build. Wersja nadal jest
+lokalnym prototypem bez publikacji; automatyczny wygląd został przywrócony.
