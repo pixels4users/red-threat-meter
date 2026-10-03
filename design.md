@@ -145,7 +145,9 @@ Użytkownik zaakceptował `ui/experiments/rta-overview-prototype.html`.
 To rozwinięcie B — Chronologia, z zachowaniem osi po lewej i mapy po prawej.
 Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
 
-- Przełącznik obszaru nad wynikiem, wszystkie województwa i lokalne zapamiętanie.
+- Jeden dropdown „Obszar” nad wynikiem: domyślnie „Cały obszar”, następnie
+  wszystkie województwa. Bez osobnego przycisku resetującego i pustej opcji
+  „Wybierz województwo”. Zachowujemy lokalne zapamiętanie wyboru.
   Wynik regionalny pochodzi z raportu; brak oceny pozostaje brakiem.
   Pewność krajowa jest podpisana jako dotycząca całego obszaru, bez kopiowania
   jej do województw. Przy regionie: „Nieustalona dla regionu”.
@@ -168,6 +170,8 @@ Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
 - Mapa Operacyjna: Obszar / Okres / Temat, mapa, lista. W filtrach są też
   województwa z zerem. Liczba lokalna jest oddzielona od komunikatów krajowych.
   Dziennik dodaje filtr źródła oraz dostęp do sygnałów bez daty.
+- Znaczenie flagi krajowej wyjaśnia legenda mapy. Nie powtarzamy tego
+  objaśnienia w szczegółach sygnału — doprecyzowanie użytkownika z 03.10.
 - Indeks pozostaje tylko w Przeglądzie. Górna sekcja przewija się z treścią,
   aby dłuższy komentarz nie zasłaniał mapy ani osi. Dolna nawigacja mobilna
   nadal pozostaje przy dolnej krawędzi ekranu.

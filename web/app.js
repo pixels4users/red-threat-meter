@@ -59,7 +59,7 @@ function renderMetric() {
   for (const e of $$('[data-dialog-score]')) e.textContent = scoreLabel(score);
   $('[data-as-of]').textContent = r ? `Stan na ${fullTime(r.as_of)}` : failed ? 'Odczyt chwilowo niedostępny' : loaded ? 'Brak opublikowanego raportu' : 'Ładowanie raportu…';
   $('.r-metric .r-eyebrow').textContent = `Indeks RTA · ${regional ? regions[state.area] : 'raport dobowy'}`;
-  $('[data-region]').value = state.area; $('[data-macro]').setAttribute('aria-pressed', String(!regional));
+  $('[data-region]').value = state.area;
   $('[data-scope-label]').textContent = regional ? `Wybrany region: ${regions[state.area]}` : 'Polska i wschodnia flanka NATO';
   $('[data-confidence]').textContent = regional ? 'Nieustalona dla regionu' : r?.rtb.confidence.percent == null ? 'Nieokreślona' : `${r.rtb.confidence.percent}%`;
   $('.r-confidence').title = 'Pewność opisuje zakres obserwacji, ukończony przegląd i dostępność historii. Nie jest prawdopodobieństwem eskalacji.';
@@ -143,10 +143,8 @@ function renderDetails() {
     set('[data-detail-tag] span:last-child', presentation(event).topics.map(t => topics[t].label).join(' · '));
     const precision = { unknown: 'dokładność nieustalona', country: 'zasięg krajowy', region: 'region', city: 'miasto', approximate: 'położenie przybliżone', exact: 'miejsce wskazane w źródle' };
     set('[data-detail-location]', `${event.location.label ?? 'Miejsce nieustalone'} · ${precision[event.location.precision]}`);
-    const national = panel.querySelector('[data-national-note]'); national.hidden = presentation(event).scope !== 'national';
-    national.textContent = 'Flaga w stolicy reprezentuje cały kraj. Nie oznacza miejsca incydentu.';
     let cityNote = panel.querySelector('[data-city-note]');
-    if (!cityNote) { cityNote = el('p', 'r-small'); cityNote.dataset.cityNote = ''; national.after(cityNote); }
+    if (!cityNote) { cityNote = el('p', 'r-small'); cityNote.dataset.cityNote = ''; panel.querySelector('[data-detail-summary]').after(cityNote); }
     const anchor = presentation(event).map_anchor; cityNote.hidden = !anchor; cityNote.replaceChildren();
     if (anchor) {
       cityNote.append(document.createTextNode(`Punkt wskazuje miasto ${anchor.label}, nie dokładne miejsce zdarzenia. `));
@@ -347,7 +345,7 @@ function periodCaption(period) {
   return range.dateStart ? `${shortDate(range.dateStart)} – ${fullTime(report().as_of)}` : 'Całe dostępne archiwum';
 }
 function renderFilters() {
-  setOptions($('[data-region]'), [['macro', 'Wybierz województwo'], ...Object.entries(regions)], state.area);
+  setOptions($('[data-region]'), [['macro', 'Cały obszar'], ...Object.entries(regions)], state.area);
   for (const view of ['map', 'journal']) {
     const topic = view === 'map' ? state.mapTopic : state.category, period = state[view + 'Period'];
     const values = [['macro', 'Flanka wschodnia'], ['PL', 'Cała Polska'], ...Object.entries(regions).map(([id, name]) => [id, `${name} (${report() ? filterSignals(records(), { asOf: report().as_of, area: id, period, topic, source: view === 'journal' ? state.source : 'all', includeNational: false }).length : 0})`])];
@@ -389,7 +387,6 @@ function selectArea(area) {
   try { localStorage.setItem('rta-region', area); } catch {}
   render(); ensureArchive();
 }
-$('[data-macro]').addEventListener('click', () => selectArea('macro'));
 $('[data-region]').addEventListener('change', e => selectArea(e.target.value));
 for (const view of ['map', 'journal']) for (const field of ['area', 'period', ...(view === 'map' ? ['topic'] : [])]) {
   $(`[data-${view}-${field}]`).addEventListener('change', e => {
