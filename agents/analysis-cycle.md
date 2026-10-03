@@ -17,6 +17,10 @@ użytkownika. Drugi przegląd tego samego agenta nie jest niezależnym źródłe
   współrzędnych, sprawcy ani „normalnego poziomu”. Brak wiedzy nie oznacza spokoju.
 - Pracuj w istniejącym katalogu z bazą i archiwum. Nowy worktree nie ma tych
   danych ani sekretów. Jednocześnie może działać tylko jeden cykl analityczny.
+- Dla sprawdzenia połączenia, pobierania i publikacji używaj pojedynczych
+  poleceń z pełnymi ścieżkami z `docs/automation-runbook.md`. Są objęte
+  wcześniej zatwierdzonymi regułami wykonania; nie zastępuj testu połączenia
+  dowolnym `python -c` ani nie zmieniaj uprawnień w trakcie cyklu.
 
 ## 1. Przygotowanie materiałów
 

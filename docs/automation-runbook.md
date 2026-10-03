@@ -1,10 +1,19 @@
 # Codzienny cykl Codexa
 
-Stan: 01.10.2026. Zadanie **RTB — codzienna analiza i raport** jest aktywnym
+Stan: 03.10.2026. Zadanie **RTB — codzienna analiza i raport** jest aktywnym
 harmonogramem w tym wątku Codexa. Start: codziennie o **09:00 czasu lokalnego
 Europe/Warsaw**. Identyfikator: `rtb-codzienna-analiza-i-raport`. Pierwszy
-zaplanowany przebieg po konfiguracji przypada 02.10; jego wykonanie wymaga
-osobnego potwierdzenia. Ręczny odbiór pełnego cyklu zakończono 01.10 o 12:12.
+zaplanowany przebieg 02.10 zatrzymała blokada sieci; ręczne wznowienie
+zakończyło się publikacją. Odbiór wykonania bez interwencji pozostaje otwarty.
+
+03.10 po naprawie reguł wykonano ręczny pełny cykl
+`2026-10-03T080200Z-4df15c35`: RTA 2,2597/100, pewność 22%, 10 odroczeń,
+szacowany koszt X 0,10 USD. Publikację potwierdzono w Supabase, publicznym
+API i przeglądarce; odtworzenie z archiwum kodu zwróciło identyczny wynik.
+Dowód: `data/analysis/cycles/2026-10-03T080200Z-4df15c35/verification.json`
+(prywatny, poza Git). Ten przebieg używał zatwierdzonego dostępu sieciowego;
+reguły z pliku wymagają jeszcze restartu Codexa i odbioru kolejnego
+uruchomienia harmonogramu.
 
 ## Warunki pracy
 
@@ -20,6 +29,47 @@ bazy live. Zadanie korzysta z uprawnień Codexa; blokada sieci lub zapisu jest
 błędem wykonania do zgłoszenia, nie powodem do samodzielnego poszerzania
 uprawnień. Dzisiejsza kontrola ręczna nie potwierdza przyszłego wykonania
 bez nadzoru.
+
+### Dostęp sieciowy do ustalonych poleceń
+
+03.10 porównano ten sam odczyt w ograniczonym środowisku i po zatwierdzeniu
+dostępu: DNS działał tylko w drugim przypadku, a istniejące dane logowania
+Supabase były poprawne. To ograniczenie wykonania Codexa, nie awaria DNS domeny.
+
+Na prośbę użytkownika o naprawę zapisano pięć wąskich reguł w
+`~/.codex/rules/rtb-network.rules`; ich wersja do przeglądu jest w
+[docs/examples/rtb-network.rules](examples/rtb-network.rules).
+Reguły dopuszczają uruchomienie poza sandboxem wyłącznie wskazanego interpretera
+i skryptu/podpolecenia. Nie nadają ogólnego zezwolenia na Python ani powłokę.
+Ręczne dodanie reguł wymaga ponownego uruchomienia Codexa
+([dokumentacja reguł](https://learn.chatgpt.com/docs/agent-configuration/rules)).
+Sam zapis pliku i poprawny test dopasowania nie potwierdzają ich załadowania.
+
+W harmonogramie używaj poniższych poleceń **pojedynczo, z pełnymi ścieżkami**,
+bez opakowania w dodatkowy skrypt powłoki, `cd`, zmienne lub `python -c`:
+
+```sh
+'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/check_network.py'
+'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/early_warning.py' collect
+'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/collect_x.py' collect
+'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/analysis_cycle.py' prepare
+'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/analysis_cycle.py' publish --cycle CYKL --type daily
+```
+
+Pierwsze polecenie jest tylko odczytem: sprawdza DNS, najnowszy raport Supabase
+i publiczny odczyt strony. Nie odpytuje płatnego X ani nie zmienia danych.
+Nie zastępuj go osobnym testem DNS w `python -c`: takie polecenie nie jest
+objęte regułami. Po publikacji uruchom je z `--expected-report-id RAPORT`.
+Kontrola weryfikuje oryginalny hash raportu Supabase, schemat odczytu strony
+oraz zgodność całej zawartości; uwzględnia równoważny zapis liczb `0.0` i `0`
+po serializacji JSON w JavaScript.
+
+Wynik nieudanego testu rozpatruj według usługi. Błąd DNS wszystkich adresów
+lub niedostępność Supabase zatrzymuje zależne kroki. Sama awaria odczytu
+strony nie oznacza awarii Supabase ani pozwolenia na zmianę hostingu.
+Reguł nie instaluj ani nie rozszerzaj podczas cyklu. Zgłoś blokadę zamiast
+przestawiać globalne uprawnienia. Kontrole, audyty i obliczenia offline
+pozostają w zwykłym środowisku projektu.
 
 ## Kolejność wykonania
 

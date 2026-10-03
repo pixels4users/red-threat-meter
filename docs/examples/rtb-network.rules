@@ -1,0 +1,44 @@
+# Scoped network execution for the existing RedThreatAlert daily workflow.
+# Absolute interpreter/script paths intentionally exclude other projects.
+# Install only after approval; manual installation requires a Codex restart.
+# No blanket permission for Python, shells, curl, package managers or git.
+
+prefix_rule(
+    pattern = ["/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python", "/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/check_network.py"],
+    decision = "allow",
+    justification = "Authorized RedThreatAlert collection, publication or read-only connectivity check; existing data and spending limits remain mandatory.",
+    match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/check_network.py'"],
+    not_match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' -c 'print(1)'"],
+)
+
+prefix_rule(
+    pattern = ["/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python", "/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/early_warning.py", "collect"],
+    decision = "allow",
+    justification = "Authorized RedThreatAlert collection, publication or read-only connectivity check; existing data and spending limits remain mandatory.",
+    match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/early_warning.py' collect"],
+    not_match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' -c 'print(1)'"],
+)
+
+prefix_rule(
+    pattern = ["/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python", "/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/collect_x.py", "collect"],
+    decision = "allow",
+    justification = "Authorized RedThreatAlert collection, publication or read-only connectivity check; existing data and spending limits remain mandatory.",
+    match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/collect_x.py' collect"],
+    not_match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' -c 'print(1)'"],
+)
+
+prefix_rule(
+    pattern = ["/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python", "/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/analysis_cycle.py", "prepare"],
+    decision = "allow",
+    justification = "Authorized RedThreatAlert collection, publication or read-only connectivity check; existing data and spending limits remain mandatory.",
+    match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/analysis_cycle.py' prepare"],
+    not_match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' -c 'print(1)'"],
+)
+
+prefix_rule(
+    pattern = ["/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python", "/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/analysis_cycle.py", "publish"],
+    decision = "allow",
+    justification = "Authorized RedThreatAlert collection, publication or read-only connectivity check; existing data and spending limits remain mandatory.",
+    match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/analysis_cycle.py' publish"],
+    not_match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' -c 'print(1)'"],
+)
