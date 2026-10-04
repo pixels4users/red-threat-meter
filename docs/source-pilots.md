@@ -104,3 +104,17 @@ przegląd → zdarzenie lub kontekst → raport → Supabase → strona**. Nowe
 źródło nie wymaga nowej metodologii, dopóki używa tych samych reguł oceny.
 Zmiana wag, atrybucji albo znaczenia punktacji wymaga osobnej wersji i testów.
 Nie zaplanowano dodatkowej automatyzacji pilotażu.
+
+## Ocena przydatności po przeglądzie
+
+03.10.2026 przejrzano wszystkie 41 rekordów i porównano je z kopią bazy.
+Sjöfartsverket wnosi trzy przydatne komunikaty kontekstowe z 11 ostrzeżeń.
+Z 30 pozycji Meduzy wybrano dziewięć do dalszej pracy: cztery doprowadziły
+do sprawdzonych, ograniczonych ustaleń; pięć wymaga dalszej weryfikacji.
+Nie oznacza to dziewięciu nowych incydentów. Dokładna kwota rosyjskiego
+projektu budżetu była już w OSW, a część doniesień opisuje starsze zdarzenia.
+
+Rekomendacja: najpierw adapter Sjöfartsverket, po kolejnych próbach i teście
+na kopii bazy; Meduza po poprawie przekazywania treści RSS i priorytetów.
+Oba źródła nadal mają status `isolated_pilot`. Wyniki, dowody, ograniczenia
+i kolejność prac opisuje [ocena wartości pilotażu](source-pilots-review-2026-10-03.md).
