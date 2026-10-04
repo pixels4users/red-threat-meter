@@ -137,6 +137,7 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 
 ## Dokumentacja i dalszy zakres
 
+- [Git — gałęzie i katalogi pracy](docs/git-workflow.md) — aktualny kod na `main`, jedna gałąź UI i odtwarzanie archiwum.
 - [Dashboard — obsługa](docs/dashboard-runbook.md) — publikacja, historia, korekty, uruchomienie i testy.
 - [Dashboard online i domena](docs/hosting-runbook.md) — wdrożenie Sites i przygotowane rekordy home.pl.
 - [Pilotaż nowych źródeł](docs/source-pilots.md) — ograniczone próby Sjöfartsverket i Meduzy poza punktacją i publikacją.
