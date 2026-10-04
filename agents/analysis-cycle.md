@@ -118,7 +118,9 @@ Jeśli są podstawy, przygotuj `context.json` według
 `schemas/dashboard/commentary-context.schema.json`: 1–3 ustalenia z dosłownie
 istniejącymi evidence_refs. Role situation, action, impact oraz recommendation są opisowe;
 nie wymagaj kompletu ani określonej kolejności. Użyj wyłącznie ustaleń, które
-rzeczywiście przejrzałeś, i instrukcji `prompts/analysis-findings.md`.
+rzeczywiście przejrzałeś, i instrukcji `prompts/analysis-findings.md`. Przed pisaniem uzupełnij obowiązkowe
+`context.selection` dla wszystkich zdarzeń w katalogu, z wyborem tematu i osobną
+oceną wpływu na Polskę.
 RTB i metodologia muszą odpowiadać draft.json. Sam indeks nie uzasadnia
 bezpieczeństwa, rutynowości, intencji ani skutków gospodarczych.
 
@@ -126,7 +128,7 @@ Według `prompts/dashboard-commentary-system.md` zapisz `candidate.json`
 (`schemas/dashboard/commentary-candidate.schema.json`): 1–3 krótkie zdania
 po polsku o sprawdzonych wydarzeniach, bez meta-komentarzy. Trend i skutki dla
 Polski dodawaj tylko przy osobnych podstawach; ich brak nie blokuje komentarza.
-Do nowych kandydatów dodaj `sections` zgodnie z promptem v3.
+Do nowych kandydatów dodaj `sections` zgodnie z promptem v4.
 Każde zdanie ma jeden numer i jedną rolę. Brak wpływu lub zalecenia oznacza
 pominięcie pola, nie wymyślanie treści. Ustalenie `recommendation` musi wskazać
 aktualną instrukcję odpowiednich służb oraz jej obszar i termin; samo działanie
@@ -197,3 +199,20 @@ RSO ze Świnoujścia nie jest przez to informacją ogólnopolską.
 Gdy nie ma podstaw, wybierz `unknown` i pustą listę regionów. Nie wyznaczaj
 współrzędnych z nazwy regionu. Metadane obejmuje istniejący krytyczny audyt
 `category_and_scope`; korekty tworzą nową rewizję, a historia pozostaje bez zmian.
+
+## Korekta istniejących sygnałów
+
+Na bezpośrednie polecenie użytkownika można wykonać `prepare --offline --review-incident IDENTYFIKATOR` (argument powtarzalny). To nowy cykl na zachowanych
+materiałach, bez pobrania i odświeżania dat źródeł. Dotychczas nierozstrzygnięci
+kandydaci pozostają do jawnej oceny. Poprawka wymaga check, audytu, apply i nowego
+wyniku; stare rewizje i raporty pozostają nienaruszone. Rewizja `out_of_scope`
+usuwa wpis z bieżących sygnałów, nie z prywatnego archiwum. `excluded_incidents`
+w eksporcie zapobiega przywracaniu go przez starsze wydania w historii interfejsu.
+Nowe oceny muszą mieć `security_relevance`, a nowe komentarze — pełny audyt v2.
+
+Przy rozstrzygniętych pomiarach GNSS pakiet może zawierać `context_summary`
+z wartościami i hashem pełnego rekordu w `prepared.inputs.materials`. To kontekst
+dotychczasowej oceny, nie materiał do ponownego zatwierdzenia. Nowy pomiar zawsze
+ma pełne dane. Korekta starego wymaga wskazania jego incydentu przez
+`--review-incident`; walidator nie przyjmie nowej oceny samego skrótu.
+Tytuł kandydata identyczny z tytułem materiału jest przechowywany tylko w materiale.

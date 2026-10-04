@@ -19,7 +19,7 @@ from .review import validate_schema
 
 LOGGER = logging.getLogger(__name__)
 SYSTEM_PROMPT_PATH = ROOT / "prompts/dashboard-commentary-system.md"
-PROMPT_VERSION = "dashboard-commentary-v3"
+PROMPT_VERSION = "dashboard-commentary-v4"
 META = re.compile(
     r"\b(?:jako\s+(?:ai|model|asystent)|w\s+modelowym\s+scenariuszu|"
     r"as\s+an?\s+(?:ai|language\s+model)|nie\s+moge|nie\s+jestem\s+w\s+stanie|"

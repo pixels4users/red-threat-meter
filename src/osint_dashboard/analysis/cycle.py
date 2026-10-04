@@ -57,16 +57,25 @@ def require_state(store, expected):
         raise AnalysisError("cycle_state_changed_prepare_again")
 
 
-def prepare(data_dir: Path, *, offline=False, fixture=None, progress=lambda message: None):
+def prepare(data_dir: Path, *, offline=False, fixture=None, review_incidents=(), progress=lambda message: None):
     config = read_json(ROOT / "config/analysis.json")
     validate_schema("analysis/config", config)
     if fixture and data_dir.resolve() == (ROOT / "data").resolve():
         raise AnalysisError("fixture_requires_isolated_directory")
+    if review_incidents and not offline:
+        raise AnalysisError('correction_requires_offline')
     result = run(data_dir, offline=offline, fixture=fixture, collect_only=True, progress=progress)
     inputs = read_json(Path(result["review_queue"]).with_name("review-input.json"))
     if inputs["scoring"]["version"] != config["methodology_version"]:
         raise AnalysisError("analysis_methodology_mismatch")
     targets = [c["candidate_id"] for c in inputs["candidates"] if c["candidate_id"] not in inputs["resolutions"]]
+    if review_incidents:
+        events = {event['incident_id']: event for event in inputs['incidents']}
+        if not set(review_incidents) <= events.keys():
+            raise AnalysisError('correction_unknown_incident')
+        # Explicit corrections reuse saved evidence; unresolved candidates stay
+        # in the packet and must still receive an honest decision.
+        targets = sorted(set(targets) | {cid for eid in review_incidents for cid in events[eid]['candidate_ids']})
     if len(targets) > config["max_candidates_per_packet"]:
         raise AnalysisError("packet_candidate_limit")
     with locked(data_dir), Store(data_dir) as store:
@@ -77,6 +86,8 @@ def prepare(data_dir: Path, *, offline=False, fixture=None, progress=lambda mess
         folder = cycle_folder(data_dir, inputs["run_id"])
         prepared = {"version": "codex-cycle-v1", "inputs": inputs, "packet": packet,
                     "code_hash": code_hash(), "analysis_config_hash": digest(config), "state_sha256": input_state(inputs)}
+        if review_incidents:
+            prepared['correction_incident_ids'] = sorted(set(review_incidents))
         write_once(folder / "prepared.json", prepared)
         write_once(folder / "manifest.json", {"prepared_sha256": digest(prepared)})
         write_once(folder / "packet.json", packet)

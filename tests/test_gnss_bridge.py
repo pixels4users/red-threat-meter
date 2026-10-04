@@ -5,7 +5,7 @@ import pytest
 from jsonschema import ValidationError
 
 from osint_dashboard import gnss_bridge as bridge
-from osint_dashboard.common import ROOT, read_json, write_json
+from osint_dashboard.common import ROOT, digest, read_json, write_json
 from osint_dashboard.early_warning import collectors, pipeline as ew, store as storage, translations
 from osint_dashboard.analysis import cycle
 from osint_dashboard.pipeline import replay
@@ -68,7 +68,8 @@ def proposal(material, candidate):
                 'date_evidence_ids': ['timing'], 'country': None,
                 'attribution': {'actor': 'unknown', 'status': 'unverified', 'reason': 'Pomiar nie określa źródła sygnału.'},
                 'location': {'label': 'Prostokąt badawczy', 'geometry': None, 'precision': 'region', 'evidence_ids': ['location']},
-                'criteria': [], 'campaign_id': None, 'evidence': evidence}}
+                'criteria': [], 'campaign_id': None, 'evidence': evidence,
+                'security_relevance': {'classification': 'operational_context', 'reason': 'Syntetyczny pomiar nawigacji bez punktacji i atrybucji.', 'evidence_ids': ['occurrence']}}}
 
 
 def test_numeric_evidence_review_confidence_publication_and_replay(prepared_gnss, monkeypatch):
@@ -86,6 +87,14 @@ def test_numeric_evidence_review_confidence_publication_and_replay(prepared_gnss
     m = prepared['packet']['materials'][0]
     c = prepared['packet']['candidates'][0]
     d = proposal(m, c)
+    from osint_dashboard.analysis.reviewer import context_material, convert_proposal, AnalysisError
+    compact = context_material(m)
+    assert 'source_record' not in compact and compact['review_scope'] == 'context_summary'
+    assert compact['numeric_context']['values'] == bridge.numeric_values(m['source_record'])
+    assert compact['numeric_context']['source_record_sha256'] == digest(m['source_record'])
+    compact_packet = deepcopy(prepared['packet']); compact_packet['materials'] = [compact]
+    with pytest.raises(AnalysisError, match='requires_full_material'):
+        convert_proposal({'decisions': [d]}, compact_packet, {'type': 'agent', 'name': 'fixture'})
     from osint_dashboard.scoring_v04 import score_v04
     before, _ = score_v04(prepared['inputs'])
     assert next(x for x in before['confidence']['domains'] if x['id'] == 'gnss')['percent'] == 0

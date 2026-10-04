@@ -99,9 +99,10 @@ def build_report(snapshot: dict) -> str:
     sources = {m["material_id"]: m for m in snapshot["materials"]}
     contribution = {c["incident_id"]: c["points"] for c in rtb["contributions"]}
     exclusions = {e["incident_id"]: REASONS.get(e["reason"], e["reason"]) for e in rtb["exclusions"]}
-    if not snapshot["incidents"]:
+    visible = [event for event in snapshot['incidents'] if event.get('security_relevance', {}).get('classification') != 'out_of_scope']
+    if not visible:
         lines += ["Brak zdarzeń z zarejestrowanym przeglądem. Zebrane publikacje nie są automatycznie traktowane jako potwierdzone incydenty.", ""]
-    for event in snapshot["incidents"]:
+    for event in visible:
         lines += [f"### {safe(event['title'])}", "", safe(event["summary"]), "",
                   f"Data zdarzenia: {event['occurred_on'] or 'nieustalona'}. Status: `{event['status']}`. "
                   f"Atrybucja: `{event['attribution']['actor']}` / `{event['attribution']['status']}`.",
@@ -133,4 +134,5 @@ def geojson(snapshot: dict) -> dict:
                           "properties": {"title": e["title"], "category": e["category"], "status": e["status"],
                                          "occurred_on": e["occurred_on"], "precision": e["location"]["precision"],
                                          "revision_id": e["revision_id"],
-                                         "strategic_area_ids": e.get("strategic_context", {}).get("area_ids", [])}} for e in snapshot["incidents"]]}
+                                         "strategic_area_ids": e.get("strategic_context", {}).get("area_ids", [])}} for e in snapshot["incidents"]
+                         if e.get('security_relevance', {}).get('classification') != 'out_of_scope']}

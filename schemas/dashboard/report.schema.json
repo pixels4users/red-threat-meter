@@ -993,7 +993,10 @@
               "const": "agent"
             },
             "method": {
-              "const": "codex-editorial-v1"
+              "enum": [
+                "codex-editorial-v1",
+                "codex-editorial-v2"
+              ]
             },
             "sections_sha256": {
               "type": "string",
@@ -1045,6 +1048,35 @@
         "maxLength": 2500
       },
       "maxItems": 10000
+    },
+    "excluded_incidents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^evt_[a-f0-9]+$"
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "revision",
+          "recorded_at"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 200,
+      "uniqueItems": true
     }
   },
   "required": [

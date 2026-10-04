@@ -10,7 +10,7 @@ from ..dashboard_commentary import MARKUP, META, _fold
 from ..review import validate_schema
 
 VERSION = "dashboard-v1"
-EXPORTER = "dashboard-export-v5"
+EXPORTER = "dashboard-export-v6"
 
 GAPS = {
     'time_precision_limited': 'Część zdarzeń ma przybliżony czas; uwzględniamy najniższy uzasadniony wkład.',
@@ -133,7 +133,7 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
     materials = {m["material_id"]: m for m in snapshot["materials"]}
     points = {c["incident_id"]: c["points"] for c in snapshot["rtb"]["contributions"]}
     exclusions = {c["incident_id"]: c["reason"] for c in snapshot["rtb"]["exclusions"]}
-    incidents, features = [], []
+    incidents, features, excluded = [], [], []
     # Keep one version of an incident per release; multiple articles are evidence,
     # never extra incident rows. The scoring engine owns campaign deduplication.
     seen = set()
@@ -141,6 +141,11 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
         if event["incident_id"] in seen or instant(event["recorded_at"]) > instant(snapshot["as_of"]):
             continue
         seen.add(event["incident_id"])
+        if event.get('security_relevance', {}).get('classification') == 'out_of_scope':
+            if points.get(event['incident_id'], 0):
+                raise ValueError('Cannot hide a scoring incident')
+            excluded.append({'id': event['incident_id'], 'revision': event['revision'], 'recorded_at': event['recorded_at']})
+            continue
         refs = []
         for mid in dict.fromkeys(e["material_id"] for e in event["evidence"]):
             m = materials[mid]
@@ -192,6 +197,8 @@ def build_report(snapshot: dict, source_config: dict, *, report_type: str = "dai
                               "Obserwacja obejmuje skonfigurowane źródła, nie wszystkie zdarzenia w regionie."]}
     if commentary_record is not None:
         result["commentary"] = public_commentary(commentary_record, digest(snapshot), snapshot["run_id"], snapshot["rtb"]["score"])
+    if excluded:
+        result['excluded_incidents'] = excluded
     if snapshot['methodology_version'] in ('rtb-v0.3', 'rtb-v0.4'):
         result['rtb']['red_priority'] = deepcopy(snapshot['rtb']['red_priority'])
         result['rtb']['regions'] = {k: {field: deepcopy(v[field]) for field in ('score','components','direct_points','propagated_points','red_priority')}
@@ -233,6 +240,10 @@ def validate_report(report: dict) -> None:
     ids = [i["id"] for i in report["incidents"]]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate incidents")
+    excluded_ids = [item['id'] for item in report.get('excluded_incidents', [])]
+    if (len(excluded_ids) != len(set(excluded_ids)) or set(excluded_ids) & set(ids) or
+            any(instant(item['recorded_at']) > instant(report['as_of']) for item in report.get('excluded_incidents', []))):
+        raise ValueError('Invalid incident withdrawal')
     source_ids = [s["id"] for s in report["sources"]]
     if len(source_ids) != len(set(source_ids)):
         raise ValueError("Duplicate source states")

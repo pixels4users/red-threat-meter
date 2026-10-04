@@ -175,3 +175,23 @@ odczytu. Cofnięcie do poprzedniej strony po publikacji v5 wymaga zachowania
 nowego walidatora adaptera — nie należy cofać go do schematu odrzucającego v5.
 Źródła pilotażowe pozostają poza produkcyjnym rejestrem i bazą do zakończenia
 oceny. Nie zmieniamy przy tym wag ani metodologii `rtb-v0.4`.
+
+## Selekcja i wycofanie wpisu — 04.10.2026
+
+Eksporter `dashboard-export-v6` zachowuje `dashboard-v1` i metodologię rtb-v0.4.
+Nowy prywatny przegląd `security_relevance` oddziela istotne zdarzenia i kontekst
+operacyjny od materiałów bez takiego znaczenia. Korekta `out_of_scope` jest nową
+rewizją; nie usuwa dowodów. Publiczne `excluded_incidents` zawiera tylko id,
+revision i recorded_at. Nie zawiera tekstu odrzuconej wiadomości. Frontend stosuje
+wycofanie również po wczytaniu starszych raportów, wyłącznie od daty korekty.
+Nowsza, jawnie zaakceptowana rewizja może ponownie zakwalifikować zdarzenie.
+
+Nowe komentarze wymagają prywatnego `context.selection`: oceny każdego tematu,
+wyboru przewodniego zdarzenia i uzasadnionego rozstrzygnięcia wpływu na Polskę.
+`codex-editorial-v2` dodaje cztery kontrole selekcji do dotychczasowego audytu;
+przegląd i jego powody pozostają poza publicznym kontraktem. Potwierdzony wpływ
+musi trafić do `sections.impact`. Brak podstaw nie wymusza treści ani nie blokuje
+wyniku. Dawne rekordy `codex-editorial-v1` pozostają czytelne i nie są przepisywane.
+
+Czytnik v6 należy wdrożyć przed pierwszym raportem zawierającym nowe pola.
+Nie należy cofać walidatora hostingu do wersji odrzucającej v2/wycofania.

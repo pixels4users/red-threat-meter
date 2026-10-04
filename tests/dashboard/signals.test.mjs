@@ -48,6 +48,16 @@ test('reports, revisions, reprints and episodes count once; future knowledge is 
   assert.equal(filterSignals(merged,{asOf,period:'previous7',topic:'cyber'}).length,1);
 });
 const loadedHistory = { earliestLoaded: end - 2 * WEEK };
+test('withdrawn incidental news cannot return from history; past views remain unchanged', () => {
+  const festival = event('festival', iso(end-86400000));
+  const old = report(iso(end-86400000), [festival]);
+  const correction = report(asOf, [], { excluded_incidents: [{id:'festival',revision:2,recorded_at:asOf}] });
+  assert.equal(mergeSignals([old, correction], asOf).length, 0);
+  assert.equal(mergeSignals([correction, old], asOf).length, 0);
+  assert.equal(mergeSignals([old, correction], old.as_of).length, 1);
+  const restored = report(iso(end+1000), [{...festival,revision:3,recorded_at:iso(end+1000)}]);
+  assert.equal(mergeSignals([old, correction, restored], restored.as_of).length, 1);
+});
 test('counts compare recorded signals despite source changes, partial feeds, review backlog and report gaps', () => {
   const history = [report(iso(end - 2 * WEEK), [], {
     provenance: { source_config_hash: 'old', exporter_version: 'old' },

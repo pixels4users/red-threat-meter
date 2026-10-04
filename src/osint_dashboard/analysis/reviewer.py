@@ -22,11 +22,31 @@ def public_material(material: dict) -> dict:
     return result
 
 
+def context_material(material: dict) -> dict:
+    """A resolved GNSS series needs context, not another copy of every cell.
+
+    Full bytes remain in prepared.inputs.materials. A new review must target
+    this candidate explicitly so packet_for includes the complete record.
+    """
+    result = public_material(material)
+    record = material.get('source_record', {})
+    if material['source_id'] == 'gpsjam_reviewed' and record.get('adapter') == 'gnss-review-1':
+        from ..gnss_bridge import numeric_values
+        result.pop('source_record')
+        result['review_scope'] = 'context_summary'
+        result['numeric_context'] = {'values': numeric_values(record),
+                                     'observation_id': record['observation']['observation_id'],
+                                     'dependency_groups': record['observation']['dependency_groups'],
+                                     'source_record_sha256': digest(record)}
+    return result
+
+
 def packet_for(store, inputs, targets):
     current = {m["material_id"]: m for m in inputs["materials"] if m["material_id"] in inputs["latest_material_ids"]}
     candidates = {c["candidate_id"]: c for c in inputs["candidates"]}
     events = inputs["incidents"]
     needed = {candidates[cid]["material_id"] for cid in targets}
+    target_materials = needed.copy()
     needed.update(e["material_id"] for event in events for e in event["evidence"] if e["material_id"] in current)
     # Retain every usable evidence candidate and current incident binding.
     # Resolved candidates without a packet material cannot be used by a proposal.
@@ -35,8 +55,13 @@ def packet_for(store, inputs, targets):
                if cid in bound or c["material_id"] in needed]
     return {"as_of": inputs["as_of"], "mode": inputs["mode"],
             "scoring": inputs["scoring"], "target_candidate_ids": targets,
-            "candidates": [{key: c[key] for key in ("candidate_id", "material_id", "document_id", "title", "source_id", "flags")} for c in visible],
-            "materials": [public_material(current[mid]) for mid in sorted(needed)],
+            # An identical title is already in the material. Keep differing
+            # titles and titles of unavailable materials; no source text or
+            # evidence binding is discarded to meet the packet budget.
+            "candidates": [{key: c[key] for key in ("candidate_id", "material_id", "document_id", "title", "source_id", "flags")
+                            if key != 'title' or c['title'] != current.get(c['material_id'], {}).get('title') or c['material_id'] not in needed}
+                           for c in visible],
+            "materials": [(public_material if mid in target_materials else context_material)(current[mid]) for mid in sorted(needed)],
             "existing_incidents": [{k: v for k, v in event.items() if k != "reviewer"} for event in events]}
 
 
@@ -53,6 +78,8 @@ def convert_proposal(proposal: dict, packet: dict, reviewer: dict) -> tuple[dict
             raise AnalysisError("proposal_candidate_scope")
         if any(candidates[cid]["material_id"] not in materials for cid in ids):
             raise AnalysisError("proposal_unseen_material")
+        if any(materials[candidates[cid]['material_id']].get('review_scope') == 'context_summary' for cid in ids):
+            raise AnalysisError('proposal_requires_full_material_prepare_target')
         coverage.update(targets.intersection(ids))
         private.append({"decision_id": digest(item), "proposal": item, "review_decision": None})
         if item["kind"] != "incident":
@@ -66,6 +93,8 @@ def convert_proposal(proposal: dict, packet: dict, reviewer: dict) -> tuple[dict
         if item["incident"] is None:
             raise AnalysisError("proposal_missing_incident")
         event = deepcopy(item["incident"])
+        if not event.get('security_relevance'):
+            raise AnalysisError('proposal_security_relevance_required')
         if event["event_key"] in event_keys:
             raise AnalysisError("proposal_duplicate_event")
         event_keys.add(event["event_key"])

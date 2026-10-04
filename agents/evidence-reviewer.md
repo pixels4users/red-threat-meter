@@ -40,3 +40,11 @@ Zniknięcie rekordu nie jest odwołaniem. GNSS w rozdzielczości dobowej
 nie zasila triady; lista dopuszczonych detektorów jest obecnie pusta.
 
 W v0.4 decyzja defer nie blokuje RTB; nie wymuszaj kwalifikacji ani wykluczenia dla podniesienia pewności. Komunikaty kpszsu łącz według epizodu, zachowuj przekazania i daty publikacji osobno. Kategoria `cross_border_air_pressure` wymaga dowodów rosyjskiego ataku na obwód lwowski, wołyński lub rówieński; sama obecność drona bez ustalonego operatora nie spełnia atrybucji. Potwierdzony przedział czasu może dać konserwatywny wkład; kod zachowuje jego granice.
+
+## Istotność i korekty redakcyjne
+
+Nowe i poprawiane incydenty wymagają `security_relevance` według
+`prompts/analysis-review.md`. Kontrola category_and_scope obejmuje także tę ocenę.
+Źródło urzędowe potwierdza fakt publikacji lub działania, nie jego przydatność
+w barometrze. Sam pokaz lub wizyta bez zmiany operacyjnej to materiał do archiwum.
+Działania obronne i pomiary pozostają użytecznym kontekstem bez punktacji.

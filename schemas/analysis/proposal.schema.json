@@ -1171,6 +1171,40 @@
                       "region_ids",
                       "evidence_ids"
                     ]
+                  },
+                  "security_relevance": {
+                    "type": "object",
+                    "properties": {
+                      "classification": {
+                        "enum": [
+                          "direct",
+                          "operational_context",
+                          "out_of_scope"
+                        ]
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 15,
+                        "maxLength": 1200
+                      },
+                      "evidence_ids": {
+                        "type": "array",
+                        "items": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 200
+                        },
+                        "minItems": 1,
+                        "maxItems": 200,
+                        "uniqueItems": true
+                      }
+                    },
+                    "required": [
+                      "classification",
+                      "reason",
+                      "evidence_ids"
+                    ],
+                    "additionalProperties": false
                   }
                 },
                 "required": [

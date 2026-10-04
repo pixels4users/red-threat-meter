@@ -62,9 +62,12 @@ export function filterSignals(records, { asOf, area = 'macro', topic = 'all', pe
     .sort((a, b) => (signalTime(b).value ?? '').localeCompare(signalTime(a).value ?? '') || a.id.localeCompare(b.id));
 }
 export function mergeSignals(reports, asOf) {
-  const cutoff = Date.parse(asOf), byId = new Map();
+  const cutoff = Date.parse(asOf), byId = new Map(), excluded = new Map();
   for (const report of [...reports].sort((a, b) => Date.parse(a.as_of) - Date.parse(b.as_of))) {
     if (Date.parse(report.as_of) > cutoff) continue;
+    for (const item of report.excluded_incidents ?? []) {
+      if (Date.parse(item.recorded_at) <= cutoff) excluded.set(item.id, Math.max(excluded.get(item.id) ?? 0, item.revision));
+    }
     for (const event of report.incidents) {
       if (Date.parse(event.recorded_at) > cutoff) continue;
       const old = byId.get(event.id);
@@ -74,6 +77,7 @@ export function mergeSignals(reports, asOf) {
       byId.set(event.id, current);
     }
   }
+  for (const [id, revision] of excluded) if ((byId.get(id)?.revision ?? 0) <= revision) byId.delete(id);
   const episodes = new Map();
   for (const event of byId.values()) {
     const key = presentation(event).episode_id, old = episodes.get(key);

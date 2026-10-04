@@ -32,6 +32,14 @@ def validate_evidence(incident: dict, materials: dict[str, dict]) -> None:
     by_id = {e["id"]: e for e in incident["evidence"]}
     if len(by_id) != len(incident["evidence"]):
         raise ValueError("Evidence IDs must be unique")
+    relevance = incident.get('security_relevance')
+    if relevance:
+        if any(ref not in by_id or by_id[ref]['stance'] != 'supports' for ref in relevance['evidence_ids']):
+            raise ValueError('Security relevance requires supporting evidence')
+        if relevance['classification'] == 'out_of_scope' and (
+                incident['category'] != 'context' or incident['criteria'] or
+                incident.get('assessment_v03') or incident.get('assessment_v04') or incident.get('official_warning')):
+            raise ValueError('An out-of-scope correction cannot hide scoring or official warnings')
     for evidence in incident["evidence"]:
         material = materials.get(evidence["material_id"])
         if material is None:

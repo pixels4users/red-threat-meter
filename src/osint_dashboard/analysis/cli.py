@@ -26,6 +26,7 @@ def main(argv=None):
     parser.add_argument("--context", type=Path)
     parser.add_argument("--candidate", type=Path)
     parser.add_argument("--reviewer-name", default="Codex")
+    parser.add_argument('--review-incident', action='append', default=[], help='Explicit offline correction of an existing incident')
     parser.add_argument("--type", choices=("daily", "weekly"), default="daily")
     parser.add_argument("--local-store", type=Path)
     args = parser.parse_args(argv)
@@ -34,6 +35,7 @@ def main(argv=None):
             parser.error("--cycle is required")
         if args.command == "prepare":
             result = cycle.prepare(args.data_dir, offline=args.offline, fixture=args.fixture,
+                                   review_incidents=args.review_incident,
                                    progress=lambda message: print(message, file=sys.stderr, flush=True))
         elif args.command == "check":
             if not args.proposal:

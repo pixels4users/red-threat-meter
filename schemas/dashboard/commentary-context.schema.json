@@ -108,6 +108,116 @@
           }
         }
       }
+    },
+    "selection": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "const": "editorial-selection-v1"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "incident_id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "decision": {
+                "enum": [
+                  "lead",
+                  "support",
+                  "omit"
+                ]
+              },
+              "relevance": {
+                "enum": [
+                  "direct",
+                  "operational_context",
+                  "out_of_scope"
+                ]
+              },
+              "timeliness": {
+                "enum": [
+                  "new",
+                  "continuing",
+                  "historical",
+                  "expired"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 15,
+                "maxLength": 1200
+              },
+              "evidence_refs": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "minItems": 1,
+                "maxItems": 30,
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "incident_id",
+              "decision",
+              "relevance",
+              "timeliness",
+              "reason",
+              "evidence_refs"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 200,
+          "uniqueItems": true
+        },
+        "poland_impact": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "enum": [
+                "supported",
+                "not_established"
+              ]
+            },
+            "finding_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "minItems": 0,
+              "maxItems": 3,
+              "uniqueItems": true
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 15,
+              "maxLength": 1200
+            }
+          },
+          "required": [
+            "status",
+            "finding_ids",
+            "reason"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "version",
+        "items",
+        "poland_impact"
+      ],
+      "additionalProperties": false
     }
   }
 }

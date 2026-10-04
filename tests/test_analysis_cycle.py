@@ -36,6 +36,7 @@ def proposal_for(data, cid):
         if c["source_id"] == "rcb":
             d = decision_for(materials[c["material_id"]], c)
             event = d["incident"]
+            event["security_relevance"] = {"classification": "direct", "reason": "Syntetyczne naruszenie przestrzeni w izolowanym teście.", "evidence_ids": ["occurrence"]}
             location = copy.deepcopy(event["evidence"][0])
             location.update(id="place", claim="location")
             event["evidence"].append(location)
@@ -70,6 +71,8 @@ def test_packet_preserves_evidence_and_bindings_without_unusable_resolved_candid
     assert {m["material_id"] for m in packet["materials"]} == {
         target["material_id"], current["material_id"]}
     assert packet["existing_incidents"][0]["evidence"] == inputs["incidents"][0]["evidence"]
+    assert 'title' not in next(c for c in packet['candidates'] if c['candidate_id'] == target['candidate_id'])
+    assert next(m for m in packet['materials'] if m['material_id'] == target['material_id'])['title'] == target['title']
     assert inputs == original
 
     # Even a binding without current material must remain visible to the
@@ -78,6 +81,38 @@ def test_packet_preserves_evidence_and_bindings_without_unusable_resolved_candid
     inputs["incidents"][0]["candidate_ids"].append(missing["candidate_id"])
     packet = packet_for(None, inputs, [target["candidate_id"]])
     assert missing["candidate_id"] in {c["candidate_id"] for c in packet["candidates"]}
+
+
+def test_explicit_offline_correction_keeps_history_and_withdraws_unscored_context(prepared, fixture_file):
+    data, cid = prepared
+    proposal = proposal_for(data, cid)
+    event = proposal['decisions'][0]['incident']
+    event['category'], event['criteria'] = 'context', []
+    event['security_relevance']['classification'] = 'operational_context'
+    checked = cycle.check(data, cid, proposal, 'Fixture')
+    cycle.apply(data, cid, checked['proposal_sha256'], audit_for(checked))
+    cycle.calculate(data, cid)
+    old = read_json(cycle.cycle_folder(data, cid) / 'draft.json')
+    previous = old['snapshot']['incidents'][0]
+    with pytest.raises(AnalysisError, match='correction_requires_offline'):
+        cycle.prepare(data, review_incidents=[previous['incident_id']])
+    next_cycle = cycle.prepare(data, offline=True, fixture=fixture_file, review_incidents=[previous['incident_id']])['cycle_id']
+    revised = copy.deepcopy(proposal['decisions'][0])
+    revised['previous_revision'] = 1
+    revised['incident']['security_relevance']['classification'] = 'out_of_scope'
+    revised['incident']['security_relevance']['reason'] = 'Syntetyczna korekta: pokaz bez udokumentowanej zmiany operacyjnej.'
+    checked = cycle.check(data, next_cycle, {'decisions': [revised]}, 'Fixture')
+    cycle.apply(data, next_cycle, checked['proposal_sha256'], audit_for(checked))
+    cycle.calculate(data, next_cycle)
+    draft = read_json(cycle.cycle_folder(data, next_cycle) / 'draft.json')
+    report = build_report(draft['snapshot'], draft['inputs']['source_config'])
+    assert report['incidents'] == [] and report['geojson']['features'] == []
+    assert report['excluded_incidents'][0]['id'] == previous['incident_id']
+    assert report['excluded_incidents'][0]['revision'] == 2
+    assert evidence_catalog(draft['snapshot'], draft['inputs']) == {'rtb:score': evidence_catalog(draft['snapshot'], draft['inputs'])['rtb:score']}
+    assert read_json(cycle.cycle_folder(data, cid) / 'draft.json') == old
+    with Store(data) as store:
+        assert store.counts()['incident_revisions'] == 2
 
 
 def audit_for(result):
@@ -96,6 +131,18 @@ def reviewed(prepared):
     return checked, audit, applied
 
 
+def selection_for(context, catalog):
+    # Test-only fixture; production assessments are made explicitly by a reviewer.
+    refs = {v['incident_id']: k for k, v in catalog.items() if 'incident_id' in v}
+    impact_ids = [f['id'] for f in context['findings'] if f['status'] == 'accepted' and f['role'] == 'impact']
+    return {'version': 'editorial-selection-v1', 'items': [
+        {'incident_id': eid, 'decision': 'lead' if i == 0 else 'omit', 'relevance': 'direct',
+         'timeliness': 'new', 'reason': 'Syntetyczny wybór tematu w odseparowanym teście.', 'evidence_refs': [ref]}
+        for i, (eid, ref) in enumerate(refs.items())],
+        'poland_impact': {'status': 'supported' if impact_ids else 'not_established', 'finding_ids': impact_ids,
+                          'reason': 'Syntetyczna ocena wpływu w odseparowanym teście.'}}
+
+
 def commentary_for(data, cid):
     folder, _ = cycle.load_cycle(data, cid)
     draft = read_json(folder / "draft.json")
@@ -109,10 +156,13 @@ def commentary_for(data, cid):
                "rtb": {"score": 15, "delta_points": None, "methodology_version": "rtb-v0.2"},
                "findings": [{"id": f"f{i}", "role": role, "status": "accepted", "text_pl": text,
                              "evidence_refs": [evidence_ref]} for i, (role, text) in enumerate(zip(("situation", "action", "impact"), sentences))]}
-    candidate = {"snapshot_id": cid, "language": "pl", "sentences": sentences}
+    context["findings"] = [context["findings"][0], context["findings"][2]]
+    sentences = [sentences[0], sentences[2]]
+    context["selection"] = selection_for(context, evidence_catalog(draft["snapshot"], draft["inputs"]))
+    candidate = {"snapshot_id": cid, "language": "pl", "sentences": sentences, "sections": {"situation": 0, "impact": 1}}
     checked = cycle.editorial_input(data, cid, context, candidate)
     audit = {"subject_sha256": checked["subject_sha256"], "verdict": "accept",
-             "checks": {key: True for key in ("supported_by_evidence", "no_false_reassurance", "no_inferred_actor_or_intent", "polish_civilian_prose", "current_and_in_scope")},
+             "checks": {key: True for key in ("supported_by_evidence", "no_false_reassurance", "no_inferred_actor_or_intent", "polish_civilian_prose", "current_and_in_scope", "security_relevance", "important_findings_covered", "poland_impact_considered", "continuity_checked")},
              "reason": "Syntetyczny werdykt redakcyjny, używany wyłącznie w odseparowanym teście."}
     return context, candidate, audit
 
@@ -148,12 +198,14 @@ def test_short_commentary_without_trend_or_impact_survives_full_cycle(prepared, 
     cycle.calculate(data, cid)
     context, candidate, _ = commentary_for(data, cid)
     candidate["sentences"] = candidate["sentences"][:count]
+    candidate.pop("sections", None)
     context["findings"] = context["findings"][:count]
     for finding in context["findings"]:
         finding["role"] = "action"
+    context["selection"]["poland_impact"] = {"status": "not_established", "finding_ids": [], "reason": "W teście brak ustalenia wpływu; pozostaje opis zdarzenia."}
     checked = cycle.editorial_input(data, cid, context, candidate)
     audit = {"subject_sha256": checked["subject_sha256"], "verdict": "accept",
-             "checks": {key: True for key in ("supported_by_evidence", "no_false_reassurance", "no_inferred_actor_or_intent", "polish_civilian_prose", "current_and_in_scope")},
+             "checks": {key: True for key in ("supported_by_evidence", "no_false_reassurance", "no_inferred_actor_or_intent", "polish_civilian_prose", "current_and_in_scope", "security_relevance", "important_findings_covered", "poland_impact_considered", "continuity_checked")},
              "reason": "Syntetyczny przegląd krótkiego komentarza, bez oceny trendu i wpływu na ludność."}
     finished = cycle.finish(data, cid, context=context, candidate=candidate, audit=audit)
     folder = Path(finished["snapshot_dir"])
@@ -401,7 +453,7 @@ def test_reviewed_sections_are_exported_with_hash_and_tampering_is_rejected(prep
     data, cid = prepared
     reviewed(prepared); cycle.calculate(data, cid)
     context, candidate, audit = commentary_for(data, cid)
-    candidate['sentences'] = [candidate['sentences'][0], candidate['sentences'][2]]
+    candidate['sentences'] = [candidate['sentences'][0], candidate['sentences'][1]]
     candidate['sections'] = {'situation': 0, 'impact': 1}
     checked = cycle.editorial_input(data, cid, context, candidate)
     audit['subject_sha256'] = checked['subject_sha256']

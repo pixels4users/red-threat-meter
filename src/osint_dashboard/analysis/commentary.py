@@ -7,6 +7,43 @@ from ..dashboard_commentary import build_generation_request, candidate_digest, p
 from ..review import validate_schema
 from .reviewer import AnalysisError, public_material
 
+EDITORIAL_CHECKS = {'security_relevance', 'important_findings_covered', 'poland_impact_considered', 'continuity_checked'}
+
+
+def check_selection(context, catalog):
+    """Review the available topics, not just the sentences already selected."""
+    selection = context.get('selection')
+    if not selection:
+        raise AnalysisError('commentary_selection_required')
+    available = {value['incident_id'] for value in catalog.values() if 'incident_id' in value}
+    items = {item['incident_id']: item for item in selection['items']}
+    if len(items) != len(selection['items']) or set(items) != available:
+        raise AnalysisError('commentary_selection_incomplete')
+    selected = set()
+    leads = 0
+    for eid, item in items.items():
+        refs = item['evidence_refs']
+        if any(ref not in catalog or catalog[ref].get('incident_id') != eid for ref in refs):
+            raise AnalysisError('commentary_selection_evidence_mismatch')
+        if any(value and item['relevance'] != value['classification'] for value in (catalog[ref].get('security_relevance') for ref in refs)):
+            raise AnalysisError('commentary_relevance_mismatch')
+        if item['decision'] == 'omit':
+            continue
+        if (item['relevance'] == 'out_of_scope' or item['timeliness'] in ('expired', 'historical') or
+                any(catalog[ref].get('expired_warning') for ref in refs)):
+            raise AnalysisError('commentary_topic_not_current_or_relevant')
+        selected.add(eid)
+        leads += item['decision'] == 'lead'
+    accepted = [f for f in context['findings'] if f['status'] == 'accepted']
+    represented = {catalog[ref]['incident_id'] for f in accepted for ref in f['evidence_refs'] if 'incident_id' in catalog[ref]}
+    if leads != 1 or represented != selected:
+        raise AnalysisError('commentary_selection_findings_mismatch')
+    impact = selection['poland_impact']
+    impact_ids = {f['id'] for f in accepted if f['role'] == 'impact'}
+    if (set(impact['finding_ids']) != impact_ids or
+            (impact['status'] == 'supported') != bool(impact_ids)):
+        raise AnalysisError('commentary_impact_assessment_mismatch')
+
 
 def evidence_catalog(snapshot: dict, inputs: dict) -> dict:
     """Private references for prose; only current, dated, confirmed observations."""
@@ -22,6 +59,8 @@ def evidence_catalog(snapshot: dict, inputs: dict) -> dict:
     start = instant(snapshot["window"]["start"]).astimezone(zone).date().isoformat()
     end = instant(snapshot["as_of"]).astimezone(zone).date().isoformat()
     for event in snapshot["incidents"]:
+        if event.get('security_relevance', {}).get('classification') == 'out_of_scope':
+            continue
         if event["status"] not in ("confirmed_primary", "corroborated") or not event["occurred_on"]:
             continue
         if not start <= event["occurred_on"] <= end:
@@ -38,9 +77,13 @@ def evidence_catalog(snapshot: dict, inputs: dict) -> dict:
             catalog[event["revision_id"] + ":" + evidence["id"]] = {
                 "incident_id": event["incident_id"], "occurred_on": event["occurred_on"],
                 "title": event["title"], "summary": event["summary"],
+                "category": event['category'], "security_relevance": event.get('security_relevance'),
                 "attribution": event["attribution"], "evidence": evidence,
                 "material": public_material(materials[evidence["material_id"]])}
             warning = event.get('official_warning')
+            if warning and (warning['status'] != 'active' or
+                            (warning['valid_until'] and instant(warning['valid_until']) < instant(snapshot['as_of']))):
+                catalog[event['revision_id'] + ':' + evidence['id']]['expired_warning'] = True
             if (warning and warning['status'] == 'active' and evidence['id'] in warning['evidence_ids']
                     and instant(warning['effective_at']) <= instant(snapshot['as_of'])
                     and (not warning['valid_until'] or instant(snapshot['as_of']) <= instant(warning['valid_until']))):
@@ -65,6 +108,7 @@ def check_context(snapshot, inputs, context):
             raise AnalysisError('commentary_recommendation_without_current_instruction')
     if build_generation_request(context) is None:
         raise AnalysisError("commentary_incomplete_findings")
+    check_selection(context, catalog)
     return catalog
 
 
@@ -74,12 +118,16 @@ def check_sections(context, candidate):
     for role in candidate.get('sections', {}):
         if role in ('impact', 'recommendation') and role not in roles:
             raise AnalysisError('commentary_section_without_finding')
+    if context.get('selection', {}).get('poland_impact', {}).get('status') == 'supported' and 'impact' not in candidate.get('sections', {}):
+        raise AnalysisError('commentary_supported_impact_omitted')
 
 
 def make_record(snapshot, inputs, context, candidate, audit, reviewer_name):
     check_context(snapshot, inputs, context)
     check_sections(context, candidate)
     validate_schema("analysis/editorial-audit", audit)
+    if not EDITORIAL_CHECKS <= audit['checks'].keys():
+        raise AnalysisError('editorial_selection_checks_required')
     subject = {"context": context, "candidate": candidate}
     if audit["subject_sha256"] != digest(subject):
         raise AnalysisError("editorial_audit_text_changed")
@@ -90,18 +138,20 @@ def make_record(snapshot, inputs, context, candidate, audit, reviewer_name):
                               approved_sha256=candidate_digest(candidate))
     if text["text"] is None:
         raise AnalysisError("commentary_not_publishable")
-    return {"version": "codex-editorial-v1", "snapshot_sha256": digest(snapshot),
+    return {"version": "codex-editorial-v2", "snapshot_sha256": digest(snapshot),
             "context": context, "candidate": candidate, "audit": audit,
             "reviewer": {"type": "agent", "name": reviewer_name}, "reviewed_at": now()}
 
 
 def public_commentary(record: dict, snapshot_hash: str, run_id: str, score) -> dict:
     """Validate a server-written receipt; it is provenance, not proof of truth."""
-    if (record.get("version") != "codex-editorial-v1" or record.get("snapshot_sha256") != snapshot_hash or
+    if (record.get("version") not in ("codex-editorial-v1", "codex-editorial-v2") or record.get("snapshot_sha256") != snapshot_hash or
             record.get("reviewer", {}).get("type") != "agent" or not record.get("reviewer", {}).get("name")):
         raise AnalysisError("invalid_editorial_record")
     validate_schema("dashboard/commentary-context", record["context"])
     validate_schema("analysis/editorial-audit", record["audit"])
+    if record['version'] == 'codex-editorial-v2' and (not record['context'].get('selection') or not EDITORIAL_CHECKS <= record['audit']['checks'].keys()):
+        raise AnalysisError('invalid_editorial_selection_record')
     if (record["context"]["snapshot_id"] != run_id or record["context"]["rtb"]["score"] != score or
             build_generation_request(record["context"]) is None):
         raise AnalysisError("invalid_editorial_context")
@@ -117,7 +167,7 @@ def public_commentary(record: dict, snapshot_hash: str, run_id: str, score) -> d
     check_sections(record['context'], record['candidate'])
     receipt = {"record_sha256": digest(record), "snapshot_sha256": snapshot_hash,
                                 "text_sha256": digest(result["text"]), "reviewer_type": "agent",
-                                "method": "codex-editorial-v1"}
+                                "method": record['version']}
     if 'sections' in result:
         receipt['sections_sha256'] = digest(result['sections'])
     return {**result, 'review': receipt}

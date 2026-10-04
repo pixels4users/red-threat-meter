@@ -65,3 +65,23 @@ Kategoria context, country=null, attribution.actor=unknown, criteria=[]; bez
 assessment i official_warning. Geometry=null; bbox nie wyznacza państwa ani
 punktu. Data obserwacji może pochodzić z pola day. Traktuj 15% komórek jako
 udzial komórek z określoną wartością GPSJAM, nie 15% lotów ani ryzyko wojny.
+
+## Istotność dla bezpieczeństwa
+
+Każda nowa lub poprawiana decyzja incident wymaga `security_relevance`:
+`classification` = `direct`, `operational_context` albo `out_of_scope`, konkretnego
+`reason` oraz `evidence_ids` wspierających ocenę. `direct` dotyczy zagrożenia,
+potwierdzonych skutków lub istotnych ograniczeń. `operational_context` obejmuje
+udokumentowane zmiany zdolności/gotowości, działania ochronne i pomiary GNSS.
+Nie oznacza punktów ani zagrożenia ze strony sojusznika.
+
+Pokazy sprzętu, festiwale, ceremonie, patronaty i wizyty bez udokumentowanej zmiany
+operacyjnej wykluczaj jako materiały (`exclude`). Jeżeli taki wpis trafił już do
+sygnałów, zachowaj jego tożsamość i dowody w nowej rewizji kontekstowej oznaczonej
+`out_of_scope`; nie usuwaj historii. Taka rewizja nie może ukrywać punktacji lub
+ostrzeżenia. Nie stosuj wykluczenia na podstawie pojedynczego słowa w artykule.
+
+Datowany bilans ataku zachowuje własną datę z cytatu `timing`. Nie rozmywaj go
+w bezdatowej serii alarmów; alarmy i trasy nie dowodzą trafień. Jeżeli nie można
+powiązać wiadomości z tym atakiem, pozostają osobnymi ustaleniami lub kontekstem,
+a nie dowodami nowych trafień czy czasu zakończenia ataku.

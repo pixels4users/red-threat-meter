@@ -158,6 +158,7 @@ def test_western_ukraine_criteria_survive_full_agent_review_cycle(tmp_path, fixt
                 'location': {'label': 'Obwód lwowski', 'geometry': None, 'precision': 'region', 'evidence_ids': ['location']},
                 'criteria': [{'key': key, 'evidence_ids': ['criterion']} for key in ('air_attack', 'western_ukraine')],
                 'campaign_id': None, 'evidence': evidence,
+                'security_relevance': {'classification': 'direct', 'reason': 'Syntetyczny atak na zachodzie Ukrainy, w zakresie testu.', 'evidence_ids': ['occurrence']},
                 'assessment_v04': {'version': 'rtb-v0.4', 'profile': 'tactical',
                     'time': {'earliest': stamp, 'latest': stamp, 'evidence_ids': ['timing']},
                     'episode_key': 'synthetic-western-ukraine', 'components': [], 'direct_kinetic': False,

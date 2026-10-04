@@ -29,6 +29,18 @@
         },
         "current_and_in_scope": {
           "type": "boolean"
+        },
+        "security_relevance": {
+          "type": "boolean"
+        },
+        "important_findings_covered": {
+          "type": "boolean"
+        },
+        "poland_impact_considered": {
+          "type": "boolean"
+        },
+        "continuity_checked": {
+          "type": "boolean"
         }
       },
       "required": [
