@@ -10,7 +10,7 @@ from jsonschema import ValidationError
 from osint_dashboard.analysis import cycle
 from osint_dashboard.analysis.cli import main
 from osint_dashboard.analysis.commentary import evidence_catalog
-from osint_dashboard.analysis.reviewer import AnalysisError
+from osint_dashboard.analysis.reviewer import AnalysisError, packet_for
 from osint_dashboard.common import digest, now, read_json
 from osint_dashboard.dashboard.contract import build_report, load_commentary_record, load_snapshot, validate_report
 from osint_dashboard.dashboard.publication import LocalPublications, SupabasePublications
@@ -48,6 +48,36 @@ def proposal_for(data, cid):
                               "reason": "Syntetyczny kontekst służący izolowanemu testowi.",
                               "previous_revision": 0, "incident": None})
     return {"decisions": sorted(decisions, key=lambda d: d["kind"] != "incident")}
+
+
+def test_packet_preserves_evidence_and_bindings_without_unusable_resolved_candidates(prepared):
+    data, cid = prepared
+    _, frozen = cycle.load_cycle(data, cid)
+    inputs = copy.deepcopy(frozen["inputs"])
+    target = inputs["candidates"][0]
+    current = inputs["candidates"][1]
+    inputs["incidents"] = [{"event_key": "synthetic-existing-event",
+                            "candidate_ids": [current["candidate_id"]],
+                            "evidence": [{"material_id": current["material_id"]}],
+                            "reviewer": {"type": "agent", "name": "fixture"}}]
+    same_material = {**target, "candidate_id": "cand_same_material"}
+    inputs["candidates"].append(same_material)
+    original = copy.deepcopy(inputs)
+    packet = packet_for(None, inputs, [target["candidate_id"]])
+    assert {c["candidate_id"] for c in packet["candidates"]} == {
+        target["candidate_id"], current["candidate_id"], same_material["candidate_id"]}
+    assert packet["target_candidate_ids"] == [target["candidate_id"]]
+    assert {m["material_id"] for m in packet["materials"]} == {
+        target["material_id"], current["material_id"]}
+    assert packet["existing_incidents"][0]["evidence"] == inputs["incidents"][0]["evidence"]
+    assert inputs == original
+
+    # Even a binding without current material must remain visible to the
+    # revision checks, so packet compaction cannot allow severing evidence.
+    missing = inputs["candidates"][2]
+    inputs["incidents"][0]["candidate_ids"].append(missing["candidate_id"])
+    packet = packet_for(None, inputs, [target["candidate_id"]])
+    assert missing["candidate_id"] in {c["candidate_id"] for c in packet["candidates"]}
 
 
 def audit_for(result):

@@ -28,9 +28,14 @@ def packet_for(store, inputs, targets):
     events = inputs["incidents"]
     needed = {candidates[cid]["material_id"] for cid in targets}
     needed.update(e["material_id"] for event in events for e in event["evidence"] if e["material_id"] in current)
+    # Retain every usable evidence candidate and current incident binding.
+    # Resolved candidates without a packet material cannot be used by a proposal.
+    bound = {cid for event in events for cid in event["candidate_ids"]}
+    visible = [c for cid, c in candidates.items()
+               if cid in bound or c["material_id"] in needed]
     return {"as_of": inputs["as_of"], "mode": inputs["mode"],
             "scoring": inputs["scoring"], "target_candidate_ids": targets,
-            "candidates": [{key: c[key] for key in ("candidate_id", "material_id", "document_id", "title", "source_id", "flags")} for c in candidates.values()],
+            "candidates": [{key: c[key] for key in ("candidate_id", "material_id", "document_id", "title", "source_id", "flags")} for c in visible],
             "materials": [public_material(current[mid]) for mid in sorted(needed)],
             "existing_incidents": [{k: v for k, v in event.items() if k != "reviewer"} for event in events]}
 
