@@ -1,0 +1,8 @@
+# Local Codex configuration for this trusted project: .codex/config.toml.
+# Keep the real data directory writable even when a scheduled turn retains
+# the visualization directory as its original workspace.
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+writable_roots = ["/Users/milosz/Documents/Codex/OSINT Dashboard"]
+network_access = false

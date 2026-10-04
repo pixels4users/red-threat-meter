@@ -1,6 +1,6 @@
 # Codzienny cykl Codexa
 
-Stan: 03.10.2026. Zadanie **RTB — codzienna analiza i raport** jest aktywnym
+Stan: 04.10.2026. Zadanie **RTB — codzienna analiza i raport** jest aktywnym
 harmonogramem w tym wątku Codexa. Start: codziennie o **09:00 czasu lokalnego
 Europe/Warsaw**. Identyfikator: `rtb-codzienna-analiza-i-raport`. Pierwszy
 zaplanowany przebieg 02.10 zatrzymała blokada sieci; ręczne wznowienie
@@ -71,6 +71,44 @@ Reguł nie instaluj ani nie rozszerzaj podczas cyklu. Zgłoś blokadę zamiast
 przestawiać globalne uprawnienia. Kontrole, audyty i obliczenia offline
 pozostają w zwykłym środowisku projektu.
 
+### Stały dostęp do zapisu i kontrola przed pobraniem
+
+04.10 harmonogram zatrzymał się na `data/.pipeline.lock`: jego lista katalogów
+do zapisu obejmowała dawny katalog wizualizacji tego wątku, ale nie projekt.
+DNS i odczyt Supabase działały. To blokada sandboxa, nie uszkodzenie bazy
+ani brak tokenu.
+
+Na prośbę użytkownika dodano lokalną `.codex/config.toml` w projekcie oraz
+w pierwotnym katalogu tego samego wątku:
+`~/.codex/visualizations/2026/09/22/01a0c92c-80ab-7692-8b52-c09cc44cedab`.
+Obie konfiguracje jawnie dodają katalog OSINT Dashboard do `writable_roots`,
+zachowując `workspace-write` i wyłączoną sieć w sandboxie. W konfiguracji
+użytkownika oznaczono jako zaufany wyłącznie ten dodatkowy katalog wątku;
+przed zmianą zachowano prywatną kopię konfiguracji. Wersja bez sekretów:
+[rtb-project-config.toml](examples/rtb-project-config.toml).
+Nie nadawano dostępu do całego dysku ani ogólnego zezwolenia na Python.
+
+Nowa kontrola, wykonywana **w zwykłym sandboxie, bez eskalacji**, przed
+kopią i pobieraniem:
+
+```sh
+'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/check_project_access.py'
+```
+
+Wymaga `ready=true`. Sprawdza rzeczywiste utworzenie, atomową zmianę nazwy,
+odczyt i usunięcie plików w katalogach wyjściowych, blokady obu pipeline'ów
+oraz SQLite WAL w usuwanej bazie testowej. Nie zmienia rekordów live,
+nie ładuje sekretów i nie wysyła żądań. Blokada innego procesu również
+zwraca błąd. Ta kontrola nie rezerwuje blokady na cały czas analizy.
+Nie powtarzaj jej poza sandboxem, aby uzyskać pozorny wynik pozytywny.
+
+W testach odtworzono poranną odmowę i potwierdzono poprawny zapis po dodaniu
+projektu. Świeży proces Codexa wczytuje obie konfiguracje; kontrola przez
+`command/exec` z zapisanymi ustawieniami domyślnymi przechodzi. Wymuszenie
+starej, niepełnej polityki nadal powoduje odmowę — istniejący harmonogram
+wymaga osobnego odbioru. Dowody prywatne: `data/diagnostics/write-access-repair-*.json`.
+Wykonano też spójną kopię bazy `osint-2026-10-04T074133+0000.sqlite3`.
+
 ## Kolejność wykonania
 
 1. Przeczytaj `AGENTS.md` i [instrukcję agenta](../agents/analysis-cycle.md).
@@ -78,7 +116,10 @@ pozostają w zwykłym środowisku projektu.
    Jeśli istnieje poprawny raport dobowy z dzisiaj i `verified_readback=true`,
    zakończ bez ponownego pobrania. Sam plik projektu raportu nie wystarcza.
    Nie uruchamiaj drugiego cyklu podczas trwającego przeglądu.
-2. Zachowaj spójną kopię bazy: `.venv/bin/python scripts/backup.py`.
+2. Uruchom `scripts/check_project_access.py` i wymagaj `ready=true`.
+   Przy odmowie zapisu zatrzymaj pobieranie i zgłoś konkretną ścieżkę;
+   nie zmieniaj uprawnień w cyklu. Następnie zachowaj spójną kopię bazy:
+   `.venv/bin/python scripts/backup.py`.
    Sprawdź kopię kodu `data/analysis/code/<code_hash>/code-manifest.json`.
    Wszystkie hashe muszą się zgadzać. Brakującą wersję zachowaj przed
    pobraniem, wraz z konfiguracją, schematami, instrukcjami, zależnościami

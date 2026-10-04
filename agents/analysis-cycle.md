@@ -17,6 +17,10 @@ użytkownika. Drugi przegląd tego samego agenta nie jest niezależnym źródłe
   współrzędnych, sprawcy ani „normalnego poziomu”. Brak wiedzy nie oznacza spokoju.
 - Pracuj w istniejącym katalogu z bazą i archiwum. Nowy worktree nie ma tych
   danych ani sekretów. Jednocześnie może działać tylko jeden cykl analityczny.
+- Przed kopią bazy i pobieraniem wykonaj `scripts/check_project_access.py`
+  przez lokalny interpreter w zwykłym sandboxie. Wymagaj `ready=true`.
+  Nie eskaluj tej kontroli: ma wykryć brak zapisu w środowisku cyklu,
+  zanim zostaną pobrane płatne materiały.
 - Dla sprawdzenia połączenia, pobierania i publikacji używaj pojedynczych
   poleceń z pełnymi ścieżkami z `docs/automation-runbook.md`. Są objęte
   wcześniej zatwierdzonymi regułami wykonania; nie zastępuj testu połączenia
