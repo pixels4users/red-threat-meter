@@ -1,3 +1,4 @@
+import { createSignalItem, prepareSignalDetail } from '../ui/components/signal-item.js';
 import { reportRoute } from './report-presentation.js';
 import { initializeReports } from './reports-view.js';
 import { commentaryRows } from './commentary.js';
@@ -63,14 +64,8 @@ for (const panel of $$('[data-detail]')) panel.append($('template[data-template=
 const overviewDetail = $('[data-detail=overview]'); overviewDetail.id = 'overview-signal-detail';
 const mapDetail = $('[data-detail=map]'); mapDetail.id = 'map-signal-detail';
 const journalDetail = $('[data-detail=journal]'); journalDetail.id = 'journal-signal-detail';
-// Journal disclosures keep their title in the row and put prose beside facts.
-const journalCopy = el('div', 'r-journal-detail-copy'), journalFacts = el('div', 'r-journal-detail-facts');
-journalDetail.querySelector('[data-detail-title]').hidden = true;
-journalDetail.querySelector('[data-detail-tag]').hidden = true;
-journalDetail.querySelector('[data-close-detail]').remove();
-journalCopy.append(journalDetail.querySelector('[data-detail-summary]'));
-journalFacts.append(journalDetail.querySelector('dl'));
-journalDetail.querySelector('.r-detail').append(journalCopy, journalFacts);
+const inlineDetails = [overviewDetail, mapDetail, journalDetail];
+for (const panel of inlineDetails) prepareSignalDetail(panel, { compact: panel !== journalDetail });
 const topicPreview = el('section', 'r-topic-preview'); topicPreview.id = 'topic-preview'; topicPreview.hidden = true;
 $('[data-topic-counts]').after(topicPreview);
 for (const [key, value] of Object.entries(topics)) { const option = el('option', '', value.label); option.value = key; $('[data-category]').append(option); }
@@ -219,22 +214,24 @@ function drawTrend() {
   }
 }
 
-function selectSignals(ids) {
-  if (ids.length === 1 && ids[0] === state.selected && document.activeElement?.matches('.r-signal-button, .r-map-signal-button, .r-journal-entry-button')) { closeDetails(); return; }
-  if (!document.activeElement?.closest('[data-detail]')) detailOpener = document.activeElement;
+function selectSignals(ids, opener = null) {
+  if (ids.length === 1 && ids[0] === state.selected && opener) { detailOpener = opener; closeDetails(); return; }
+  if (opener || !document.activeElement?.closest('[data-detail]')) detailOpener = opener ?? document.activeElement;
   state.selected = ids[0]; state.related = ids;
   renderDetails();
   if (state.page === 'map' && !mapDialog.open) maps.reveal(state.selected, 'operational');
   maps.draw(); icons();
   const panel = $(`[data-detail="${mapDialog.open ? 'expanded' : state.page}"]`);
-  if (state.page === 'journal' && !mapDialog.open) {
-    const b = $('[data-journal] [aria-expanded=true]');
-    b?.focus({ preventScroll: true });
-    b?.closest('.r-journal-entry').scrollIntoView({ block: 'nearest', behavior: 'instant' });
-    return;
+  if (!mapDialog.open) {
+    const trigger = $(`[data-view="${state.page}"] .r-signal-toggle[aria-expanded=true]`);
+    if (trigger) {
+      trigger.focus({ preventScroll: true });
+      trigger.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+      return;
+    }
   }
   const heading = panel?.querySelector('h3');
-  if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); if (!mapDialog.open) panel.scrollIntoView({ block: 'nearest', behavior: 'instant' }); }
+  if (heading && !heading.hidden) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); if (!mapDialog.open) panel.scrollIntoView({ block: 'nearest', behavior: 'instant' }); }
 }
 function clearSelection() { state.selected = null; state.related = []; }
 function closeDetails() {
@@ -273,7 +270,7 @@ function renderDetails() {
     const areaNote = areaLocationNote(event);
     if (areaNote) { cityNote.hidden = false; cityNote.textContent = areaNote; }
     const sources = panel.querySelector('[data-detail-source]'); sources.replaceChildren();
-    if (panel === journalDetail) {
+    if (inlineDetails.includes(panel)) {
       const publishers = new Map();
       for (const source of event.sources) {
         const href = safeLink(source.url); if (!href) continue;
@@ -281,9 +278,9 @@ function renderDetails() {
         publishers.get(source.publisher).add(href);
       }
       for (const [publisher, urls] of publishers) {
-        const group = el('div', 'r-journal-source-group');
+        const group = el('div', 'r-signal-source-group');
         if (urls.size > 1) group.append(el('span', '', publisher));
-        const links = el('div', 'r-journal-source-links'); let index = 0;
+        const links = el('div', 'r-signal-source-links'); let index = 0;
         for (const href of urls) {
           const a = el('a', 'r-source-link', urls.size > 1 ? `Materiał ${++index}` : publisher);
           a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
@@ -298,39 +295,29 @@ function renderDetails() {
     }
     let date = panel.querySelector('[data-event-date]'); if (!date) { date = el('p', 'r-small'); date.dataset.eventDate = ''; panel.querySelector('dl').after(date); }
     date.textContent = `Data zdarzenia: ${event.occurred_on ?? 'nieustalona'}.`;
-    if (panel === journalDetail) {
-      journalCopy.append(date);
+    if (inlineDetails.includes(panel)) {
+      panel.querySelector('.r-signal-detail-copy').append(date);
       cityNote.hidden = true; // Geography qualifiers stay with the map; location precision remains in the facts.
       date.textContent = signalTime(event).basis === 'measurement' ? `Dzień pomiaru: ${event.occurred_on} (UTC).` : date.textContent;
     }
     const choices = panel.querySelector('[data-cluster-choices]'); choices.replaceChildren(); choices.hidden = state.related.length < 2;
     for (const id of state.related) { const other = records().find(e => e.id === id); if (!other) continue; const b = button(other.title, () => selectSignals([id, ...state.related.filter(x => x !== id)])); b.setAttribute('aria-pressed', String(event.id === id)); choices.append(b); }
   }
-  for (const b of $$('[data-timeline] .r-signal-button')) {
-    const selected = b.dataset.signalId === event?.id;
-    b.setAttribute('aria-expanded', String(selected));
-    b.setAttribute('aria-controls', overviewDetail.id);
-    if (!selected) continue;
-    const items = b.closest('.r-time-items');
-    if (items?.hidden) {
-      items.hidden = false;
-      const toggle = items.previousElementSibling;
-      state.expanded.add(toggle.dataset.group); toggle.setAttribute('aria-expanded', 'true');
-      toggle.querySelector('.r-time-action').textContent = 'Zwiń';
+  for (const [selector, detail] of [['[data-timeline]', overviewDetail], ['[data-map-list]', mapDetail], ['[data-journal]', journalDetail]]) {
+    for (const b of $$(`${selector} .r-signal-toggle`)) {
+      const selected = b.dataset.signalId === event?.id;
+      b.setAttribute('aria-expanded', String(selected));
+      b.closest('.r-signal-disclosure').dataset.selected = String(selected);
+      if (!selected) continue;
+      const items = b.closest('.r-time-items');
+      if (items?.hidden) {
+        items.hidden = false;
+        const toggle = items.previousElementSibling;
+        state.expanded.add(toggle.dataset.group); toggle.setAttribute('aria-expanded', 'true');
+        toggle.querySelector('.r-time-action').textContent = 'Zwiń';
+      }
+      b.after(detail); detail.setAttribute('aria-labelledby', b.id);
     }
-    b.after(overviewDetail);
-  }
-  for (const b of $$('[data-map-list] .r-map-signal-button')) {
-    const selected = b.dataset.signalId === event?.id;
-    b.setAttribute('aria-expanded', String(selected)); b.setAttribute('aria-controls', mapDetail.id);
-    b.closest('.r-map-signal').dataset.selected = String(selected);
-    if (selected) b.after(mapDetail);
-  }
-  for (const b of $$('[data-journal] .r-journal-entry-button')) {
-    const selected = b.dataset.signalId === event?.id;
-    b.setAttribute('aria-expanded', String(selected));
-    b.closest('.r-journal-entry').dataset.selected = String(selected);
-    if (selected) { b.after(journalDetail); journalDetail.setAttribute('aria-labelledby', b.id); }
   }
   const activeDetail = state.page === 'journal' ? journalDetail : state.page === 'map' ? mapDetail : overviewDetail;
   const previousEvent = state.page === 'journal' ? previousJournal : state.page === 'map' ? previousMap : previous;
@@ -364,7 +351,7 @@ function renderTimeline() {
     const dot = el('span', 'r-time-node'); dot.append(el('i')); row.append(dot);
     if (!events.length) row.append(el('span', 'r-time-empty', 'Brak wpisów'));
     else {
-      if (state.scale === 'day' && events.length === 1) { const item = el('div', 'r-signal-item'); item.append(signalButton(events[0])); row.append(item); rail.append(row); continue; }
+      if (state.scale === 'day' && events.length === 1) { row.append(timelineSignal(events[0])); rail.append(row); continue; }
       const group = `${state.scale}:${key}`, expanded = state.expanded.has(group), content = el('div');
       const counts = Object.entries(topics).map(([id, c]) => ({ label: c.label, count: events.filter(e => presentation(e).topics.includes(id)).length })).filter(c => c.count).sort((a, b) => b.count - a.count);
       const title = state.scale === 'day' && events.length === 1 ? events[0].title : signalCount(events.length);
@@ -377,7 +364,7 @@ function renderTimeline() {
       open.append(el('span', 'r-time-title', title), el('span', 'r-time-subtitle', state.scale === 'month' ? 'Dominujące: ' + counts.filter(c => c.count === counts[0]?.count).map(c => c.label).join(', ') : counts.map(c => `${c.count}× ${c.label}`).join(' · ')), el('span', 'r-time-action', expanded ? 'Zwiń' : 'Rozwiń'));
       const badges = el('span', 'r-badges'); for (const label of [...new Set(events.map(regionLabel))]) badges.append(el('span', 'r-region-badge', label)); open.append(badges);
       const items = el('div', 'r-time-items'); items.id = `group-${group}`; items.hidden = !expanded;
-      for (const event of events) { const item = el('div', 'r-signal-item'); item.append(signalButton(event)); items.append(item); }
+      for (const event of events) items.append(timelineSignal(event));
       content.append(open, items); row.append(content);
     }
     rail.append(row);
@@ -387,11 +374,14 @@ function renderTimeline() {
   if (undated) host.append(el('p', 'r-small', `${signalCount(undated)} bez ustalonej daty znajdziesz w dzienniku.`));
 }
 
-function signalButton(event) {
-  const b = button('', () => selectSignals([event.id]), 'r-signal-button'); b.dataset.signalId = event.id;
-  b.append(el('span', 'r-time-title', event.title), el('span', 'r-region-badge', regionLabel(event)),
-    el('span', 'r-small', `${presentation(event).topics.map(t => topics[t].label).join(' · ')} · ${[...new Set(event.sources.map(s => s.publisher))].join(' · ')}`));
-  return b;
+function timelineSignal(event) {
+  return createSignalItem({
+    id: `overview-entry-${event.id}`, signalId: event.id, controls: overviewDetail.id,
+    title: event.title, compact: true,
+    after: [el('span', 'r-region-badge', regionLabel(event)),
+      el('span', 'r-signal-meta', `${presentation(event).topics.map(t => topics[t].label).join(' · ')} · ${[...new Set(event.sources.map(s => s.publisher))].join(' · ')}`)],
+    onToggle: trigger => selectSignals([event.id], trigger),
+  }).row;
 }
 function areaSummary(filtered, area) {
   if (!regions[area]) return signalCount(filtered.length);
@@ -414,23 +404,18 @@ function renderJournal() {
     section.setAttribute('aria-labelledby', title.id); section.dataset.day = group.day || 'undated';
     heading.append(title, el('span', '', signalCount(group.events.length))); section.append(heading);
     for (const event of group.events) {
-      const row = el('article', 'r-journal-entry'), b = button('', () => selectSignals([event.id]), 'r-journal-entry-button');
-      b.id = `journal-entry-${event.id}`; b.dataset.signalId = event.id;
-      b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', journalDetail.id);
-      const time = el('time', 'r-journal-clock', journalClock(event)), t = signalTime(event);
+      const time = el('time', '', journalClock(event)), t = signalTime(event);
       if (t.value) time.dateTime = t.precision === 'day' ? t.day : t.value;
       time.title = signalTimeText(event); time.setAttribute('aria-label', t.value ? signalTimeText(event) : 'Data nieustalona');
-      const p = presentation(event), icon = el('i'), chevron = el('i');
-      icon.dataset.lucide = topics[p.topics[0]]?.icon ?? 'newspaper'; icon.setAttribute('aria-hidden', 'true');
-      chevron.dataset.lucide = 'chevron-down'; chevron.className = 'r-journal-chevron'; chevron.setAttribute('aria-hidden', 'true');
-      const content = el('span', 'r-journal-entry-content');
-      content.append(el('span', 'r-journal-entry-title', event.title));
-      const meta = el('span', 'r-journal-entry-meta');
+      const p = presentation(event), meta = el('span', 'r-signal-meta');
       for (const value of [p.topics.map(t => topics[t].label).join(', '), kinds[p.kind], regionLabel(event), [...new Set(event.sources.map(s => s.publisher))].join(', ')].filter(Boolean)) meta.append(el('span', '', value));
-      content.append(meta);
-      const caution = journalCaution(event);
-      if (caution) content.append(el('span', 'r-journal-caution', caution));
-      b.append(time, icon, content, chevron); row.append(b); section.append(row);
+      const after = [meta], caution = journalCaution(event);
+      if (caution) after.push(el('span', 'r-signal-caution', caution));
+      section.append(createSignalItem({
+        id: `journal-entry-${event.id}`, signalId: event.id, controls: journalDetail.id,
+        title: event.title, icon: topics[p.topics[0]]?.icon ?? 'newspaper', clock: time, after,
+        onToggle: trigger => selectSignals([event.id], trigger),
+      }).row);
     }
     host.append(section);
   }
@@ -444,18 +429,19 @@ function renderOperational() {
   const host = $('[data-map-list]');
   $('[data-map-list-body]').append(mapDetail); host.replaceChildren();
   for (const event of filtered) {
-    const row = el('article', 'r-map-signal'), b = button('', () => selectSignals([event.id]), 'r-map-signal-button');
-    b.dataset.signalId = event.id;
-    const p = presentation(event), date = signalTime(event), icon = el('i'), content = el('span', 'r-map-signal-content');
-    icon.dataset.lucide = topics[p.topics[0]]?.icon ?? 'newspaper'; icon.setAttribute('aria-hidden', 'true');
-    const meta = el('span', 'r-map-signal-meta', `${date.value ? shortDate(date.day ?? dateKey(date.value)) : 'Bez daty'} · ${kinds[p.kind]}`);
+    const p = presentation(event), date = signalTime(event);
+    const meta = el('span', 'r-signal-meta', `${date.value ? shortDate(date.day ?? dateKey(date.value)) : 'Bez daty'} · ${kinds[p.kind]}`);
     meta.title = signalTimeText(event);
-    const location = el('span', 'r-map-signal-location', regionLabel(event));
+    const location = el('span', 'r-signal-meta', regionLabel(event));
     const areas = eventAreas(event);
     if (areas.length) location.textContent = areas.map(a => a.feature.properties.label).join(', ') + (areas.some(a => a.context) ? ' · orientacyjnie' : '');
     if (!mapped.has(event.id)) location.textContent += ' · bez zaznaczenia';
-    content.append(meta, el('span', 'r-map-signal-title', event.title), location);
-    b.append(icon, content); row.append(b); host.append(row);
+    const { row } = createSignalItem({
+      id: `map-entry-${event.id}`, signalId: event.id, controls: mapDetail.id,
+      title: event.title, icon: topics[p.topics[0]]?.icon ?? 'newspaper', compact: true,
+      before: [meta], after: [location], onToggle: trigger => selectSignals([event.id], trigger),
+    });
+    row.classList.add('r-map-signal'); host.append(row);
   }
   if (!filtered.length) host.append(el('p', 'r-empty', archive?.loading ? 'Wczytywanie sygnałów…' : 'Brak sygnałów dla wybranych filtrów.'));
 }

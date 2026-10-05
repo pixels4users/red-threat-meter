@@ -597,3 +597,15 @@ Decyzja użytkownika: publikujemy stronę raportu, wersję do druku i istniejąc
 eksporty TXT/JSON/GeoJSON. Wspólny selektor formatu pozostaje; gotowy PDF
 nie jest dostępny i czytnik nie odpytuje jego metadanych. Powyższe opisy
 lokalnej integracji PDF zachowują kontekst prototypu, nie status produkcji.
+
+## Ujednolicenie rozwijanych sygnałów — 05.10.2026
+
+Zaakceptowano wzorzec Dziennika dla wszystkich trzech list. Wspólna fabryka
+`ui/components/signal-item.js` i arkusz CSS zawierają nagłówek z chevronem,
+stan rozwinięcia oraz układ szczegółów. Wariant zwarty obsługuje Oś czasu
+i listę przy mapie. Usunięto lokalne style oraz × i powtórzony tytuł
+z rozwinięć. Dane, filtrowanie i układ głównych sekcji pozostają bez zmian.
+
+Sprawdzenie: 51 testów frontendu bez błędów; build produkcyjny poprawny.
+W przeglądarce: trzy listy, Enter/Spacja/Escape, fokus na nagłówku, wybór
+z obszaru mapy, szerokości 1350/390/320 px bez przewijania w bok.

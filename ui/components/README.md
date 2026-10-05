@@ -62,3 +62,16 @@ Pierwsze użycie: `web/index.html`, Przegląd — wspólna karta indeksu, histor
 i komentarza. Liczniki, oś czasu i mapa pozostają poza nią. Pozostałe widoki
 nie otrzymują kart przy okazji tej zmiany. Historyczny prototyp A/B ma własny
 szablon i nie jest katalogiem obecnych komponentów produkcyjnego frontendu.
+
+## Rozwijany sygnał — `createSignalItem`
+
+`signal-item.js` i `signal-item.css` obsługują Oś czasu, listę przy Mapie
+i Dziennik. Jedna implementacja przycisku, chevronu i dostępności; wariant
+`compact` zmienia gęstość układu, nie zachowanie. Tytuł pozostaje w nagłówku.
+Kliknięcie, Enter i Spacja przełączają `aria-expanded`; Escape zamyka
+szczegóły i zwraca fokus do nagłówka. Linki do źródeł są poza przyciskiem.
+`prepareSignalDetail` przygotowuje wspólny układ treści i metadanych bez ×
+i powtórzonego tytułu. Wywołujący wiąże panel przez `aria-controls` oraz
+`aria-labelledby`, przenosi go pod wybrany wpis i przechowuje stan wyboru.
+Przycisk zamknięcia pozostaje tylko w oddzielnym panelu pełnoekranowej mapy.
+Style instancji nie nadpisują chevronu, stanu rozwinięcia ani interakcji.

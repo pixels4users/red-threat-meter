@@ -234,3 +234,12 @@ Decyzja użytkownika: publikujemy stronę raportu, wersję do druku i istniejąc
 eksporty TXT/JSON/GeoJSON. Wspólny selektor formatu pozostaje; gotowy PDF
 nie jest dostępny i czytnik nie odpytuje jego metadanych. Powyższe opisy
 lokalnej integracji PDF zachowują kontekst prototypu, nie status produkcji.
+
+## Wspólny rozwijany sygnał (05.10.2026)
+
+- Oś czasu, lista przy mapie i Dziennik używają `ui/components/signal-item`.
+  Zwarty układ jest wariantem tego samego komponentu.
+- Chevron jest widoczny przed rozwinięciem i obraca się po otwarciu.
+  Nagłówek otwiera i zamyka; fokus pozostaje na nim. Nie dodawaj × ani
+  drugiego tytułu do szczegółów we wpisie. Osobny panel pełnoekranowej mapy
+  zachowuje możliwość zamknięcia.
