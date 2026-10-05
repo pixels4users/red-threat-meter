@@ -5,6 +5,15 @@ const node = (tag, cls, text) => {
   if (text !== undefined) e.textContent = text;
   return e;
 };
+// Decorative taxonomy icon stays attached to its visible category label.
+export function createCategoryLabel({ icon, label, count }) {
+  const labelNode = node('span', 'r-category-label');
+  const glyph = node('i', ''); glyph.dataset.lucide = icon;
+  glyph.setAttribute('aria-hidden', 'true');
+  labelNode.append(glyph, node('span', '', count === undefined ? label : `${count}× ${label}`));
+  return labelNode;
+}
+
 export function createSignalItem({ id, signalId, controls, title, icon, clock,
   before = [], after = [], compact = false, onToggle }) {
   const row = node('article', 'r-signal-disclosure' + (compact ? ' r-signal-disclosure--compact' : ''));

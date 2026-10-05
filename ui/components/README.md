@@ -84,3 +84,12 @@ Dziennika; nie stosujemy `aria-expanded` ani przycisku zamknięcia.
 Hover i focus unoszą ikonę, przesuwają strzałkę i zmieniają neutralne tło.
 `prefers-reduced-motion` usuwa animację. Zero pozostaje widoczne.
 Kolejność i ikony pochodzą ze wspólnego rejestru kategorii.
+
+## Etykieta kategorii — `createCategoryLabel`
+
+Wspólna etykieta z `signal-item.js`: ikona 16 px, odstęp 4 px i nazwa
+kategorii, opcjonalnie z liczbą (`2× Lotnictwo`). Ikona pochodzi ze wspólnego
+rejestru kategorii, dziedziczy kolor tekstu i jest dekoracyjna (`aria-hidden`).
+Nazwa pozostaje widoczna; cała etykieta zawija się jako jeden element.
+Oś czasu używa jej przy pojedynczych sygnałach, zestawieniach godzinowych
+i dobowych oraz dominujących kategoriach w widoku miesiąca.

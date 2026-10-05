@@ -1,4 +1,4 @@
-import { createSignalItem, prepareSignalDetail } from '../ui/components/signal-item.js';
+import { createSignalItem, prepareSignalDetail, createCategoryLabel } from '../ui/components/signal-item.js';
 import { reportRoute } from './report-presentation.js';
 import { initializeReports } from './reports-view.js';
 import { commentaryRows } from './commentary.js';
@@ -353,7 +353,7 @@ function renderTimeline() {
     else {
       if (state.scale === 'day' && events.length === 1) { row.append(timelineSignal(events[0])); rail.append(row); continue; }
       const group = `${state.scale}:${key}`, expanded = state.expanded.has(group), content = el('div');
-      const counts = Object.entries(topics).map(([id, c]) => ({ label: c.label, count: events.filter(e => presentation(e).topics.includes(id)).length })).filter(c => c.count).sort((a, b) => b.count - a.count);
+      const counts = Object.entries(topics).map(([id, c]) => ({ id, label: c.label, count: events.filter(e => presentation(e).topics.includes(id)).length })).filter(c => c.count).sort((a, b) => b.count - a.count);
       const title = state.scale === 'day' && events.length === 1 ? events[0].title : signalCount(events.length);
       const open = button('', () => {
         if (state.expanded.has(group)) { state.expanded.delete(group); if (events.some(e => e.id === state.selected)) clearSelection(); }
@@ -361,7 +361,13 @@ function renderTimeline() {
         renderTimeline(); renderDetails(); maps.draw(); host.querySelector(`[data-group="${group}"]`)?.focus();
       }, 'r-time-button');
       open.dataset.group = group; open.setAttribute('aria-expanded', String(expanded)); open.setAttribute('aria-controls', `group-${group}`);
-      open.append(el('span', 'r-time-title', title), el('span', 'r-time-subtitle', state.scale === 'month' ? 'Dominujące: ' + counts.filter(c => c.count === counts[0]?.count).map(c => c.label).join(', ') : counts.map(c => `${c.count}× ${c.label}`).join(' · ')), el('span', 'r-time-action', expanded ? 'Zwiń' : 'Rozwiń'));
+      const subtitle = el('span', 'r-time-subtitle'), dominant = state.scale === 'month';
+      if (dominant) subtitle.append('Dominujące: ');
+      (dominant ? counts.filter(c => c.count === counts[0]?.count) : counts).forEach((category, index) => {
+        if (index) subtitle.append(' · ');
+        subtitle.append(createCategoryLabel({ ...topics[category.id], count: dominant ? undefined : category.count }));
+      });
+      open.append(el('span', 'r-time-title', title), subtitle, el('span', 'r-time-action', expanded ? 'Zwiń' : 'Rozwiń'));
       const badges = el('span', 'r-badges'); for (const label of [...new Set(events.map(regionLabel))]) badges.append(el('span', 'r-region-badge', label)); open.append(badges);
       const items = el('div', 'r-time-items'); items.id = `group-${group}`; items.hidden = !expanded;
       for (const event of events) items.append(timelineSignal(event));
@@ -375,11 +381,16 @@ function renderTimeline() {
 }
 
 function timelineSignal(event) {
+  const meta = el('span', 'r-signal-meta');
+  for (const topic of presentation(event).topics) {
+    const category = el('span'); category.append(createCategoryLabel(topics[topic])); meta.append(category);
+  }
+  const publishers = [...new Set(event.sources.map(s => s.publisher))].filter(Boolean);
+  if (publishers.length) meta.append(el('span', '', publishers.join(' · ')));
   return createSignalItem({
     id: `overview-entry-${event.id}`, signalId: event.id, controls: overviewDetail.id,
     title: event.title, compact: true,
-    after: [el('span', 'r-region-badge', regionLabel(event)),
-      el('span', 'r-signal-meta', `${presentation(event).topics.map(t => topics[t].label).join(' · ')} · ${[...new Set(event.sources.map(s => s.publisher))].join(' · ')}`)],
+    after: [el('span', 'r-region-badge', regionLabel(event)), meta],
     onToggle: trigger => selectSignals([event.id], trigger),
   }).row;
 }

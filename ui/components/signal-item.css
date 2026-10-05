@@ -54,3 +54,6 @@
 @media(prefers-reduced-motion:reduce) {
   .rtb-app .r-signal-toggle,.rtb-app .r-signal-chevron { transition:none; }
 }
+
+.rtb-app .r-category-label { display:inline-flex; align-items:center; gap:var(--space-2xs); vertical-align:middle; white-space:nowrap; }
+.rtb-app .r-category-label > svg { width:16px; height:16px; flex:none; }
