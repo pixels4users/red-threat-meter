@@ -1,11 +1,15 @@
+import { reportRoute } from './report-presentation.js';
+import { initializeReports } from './reports-view.js';
 import { commentaryRows } from './commentary.js';
 import { createIcons, Radar, Menu, X, LayoutDashboard, Map as MapIcon, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee } from 'lucide';
 import { select, scaleLinear } from 'd3';
 import { historyDays, canJoinDays, ReportHistory, SnapshotSelection } from './index-history.js';
-import { categories, statuses, sourceStatuses, scoreLabel, threatLevel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, checkEnvelope, safeLink, reportText } from './data.js';
+import { categories, statuses, sourceStatuses, scoreLabel, threatLevel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, checkEnvelope, safeLink } from './data.js';
 import { signalTime } from './signal-time.js';
+import { journalDays, journalClock, journalCaution } from './journal.js';
 import { signalTimeText } from './data.js';
-import { initializeMaps, mapPoints } from './map.js';
+import { initializeMaps } from './map.js';
+import { eventAreas, mappedSignalIds, areaLocationNote } from './map-geography.js';
 import { topics, regions, kinds, presentation, regionLabel, filterSignals, topicCounts, periodRange, mapReport, SignalArchive, WEEK } from './signals.js';
 
 const root = document.querySelector('#rtb-dashboard');
@@ -14,10 +18,10 @@ const icons = () => createIcons({ icons: { Radar, Menu, X, LayoutDashboard, Map:
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const button = (text, action, cls = 'r-button') => { const b = el('button', cls, text); b.type = 'button'; b.addEventListener('click', action); return b; };
 const pages = { overview: 'Przegląd', map: 'Mapa Operacyjna', journal: 'Dziennik Sygnałów', reports: 'Raporty' };
-const state = { page: 'overview', selected: null, related: [], scale: 'day', expanded: new Set(), category: 'all', source: 'all', historyType: 'daily', area: 'macro', mapArea: 'macro', mapPeriod: 'day', mapTopic: 'all', journalArea: 'macro', journalPeriod: 'all' };
+const state = { page: 'overview', selected: null, related: [], scale: 'day', expanded: new Set(), previewTopic: null, category: 'all', source: 'all', area: 'macro', mapArea: 'macro', mapPeriod: 'day', mapTopic: 'all', journalArea: 'macro', journalPeriod: 'all' };
 try { const saved = localStorage.getItem('rta-region'); if (Object.hasOwn(regions, saved)) state.area = state.mapArea = state.journalArea = saved; } catch {}
 let archive = null, detailOpener = null, expandedFrom = 'overview';
-let envelope = null, latestEnvelope = null, loaded = false, failed = false, busy = false, history = [], nextOffset = null, historyAnchor = null, historyGeneration = 0;
+let envelope = null, latestEnvelope = null, loaded = false, failed = false, busy = false, reportView;
 const reportHistory = new ReportHistory(api);
 const historical = () => Boolean(envelope && latestEnvelope && envelope.report.report_id !== latestEnvelope.report.report_id);
 const selection = new SnapshotSelection(id => reportHistory.get(id), value => {
@@ -33,11 +37,42 @@ const journalRecords = () => report() ? filterSignals(records(), { asOf: report(
 const shownMap = slot => { const view = slot === 'expanded' ? expandedFrom : slot; return mapReport(report(), view === 'overview' ? (report() ? filterSignals(records(), { asOf: report().as_of, area: state.area, period: state.scale }) : []) : mapRecords()); };
 $('.r-main').id = 'main';
 $('.r-overview').prepend($('.r-context'));
-root.style.setProperty('--r-kpi-size', '104px');
+root.dataset.page = 'overview';
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const journalMobile = matchMedia('(max-width: 620px)');
+let journalFiltersOpen = false;
+function showJournalFilters() {
+  const show = !journalMobile.matches || journalFiltersOpen;
+  $('#journal-filters').hidden = !show;
+  $('[data-journal-filter-toggle]').setAttribute('aria-expanded', String(show));
+}
+$('[data-journal-filter-toggle]').addEventListener('click', () => { journalFiltersOpen = !journalFiltersOpen; showJournalFilters(); });
+journalMobile.addEventListener('change', showJournalFilters); showJournalFilters();
+const historyToggle = $('[data-history-toggle]'), historyFrame = $('.r-history-frame');
+historyFrame.hidden = matchMedia('(max-width: 760px)').matches;
+historyToggle.setAttribute('aria-expanded', String(!historyFrame.hidden));
+historyToggle.addEventListener('click', () => {
+  historyFrame.hidden = !historyFrame.hidden;
+  historyToggle.setAttribute('aria-expanded', String(!historyFrame.hidden));
+  drawTrend();
+});
 const notice = el('p', 'r-data-notice'); notice.setAttribute('role', 'status'); $('.r-hero').after(notice);
 const official = el('section', 'r-official-warnings'); official.setAttribute('aria-label', 'Oficjalne ostrzeżenia'); $('.r-hero').before(official);
 const coverage = el('details', 'r-coverage'); $('.r-bottom-line').before(coverage);
 for (const panel of $$('[data-detail]')) panel.append($('template[data-template=detail]').content.cloneNode(true));
+const overviewDetail = $('[data-detail=overview]'); overviewDetail.id = 'overview-signal-detail';
+const mapDetail = $('[data-detail=map]'); mapDetail.id = 'map-signal-detail';
+const journalDetail = $('[data-detail=journal]'); journalDetail.id = 'journal-signal-detail';
+// Journal disclosures keep their title in the row and put prose beside facts.
+const journalCopy = el('div', 'r-journal-detail-copy'), journalFacts = el('div', 'r-journal-detail-facts');
+journalDetail.querySelector('[data-detail-title]').hidden = true;
+journalDetail.querySelector('[data-detail-tag]').hidden = true;
+journalDetail.querySelector('[data-close-detail]').remove();
+journalCopy.append(journalDetail.querySelector('[data-detail-summary]'));
+journalFacts.append(journalDetail.querySelector('dl'));
+journalDetail.querySelector('.r-detail').append(journalCopy, journalFacts);
+const topicPreview = el('section', 'r-topic-preview'); topicPreview.id = 'topic-preview'; topicPreview.hidden = true;
+$('[data-topic-counts]').after(topicPreview);
 for (const [key, value] of Object.entries(topics)) { const option = el('option', '', value.label); option.value = key; $('[data-category]').append(option); }
 
 async function api(path) {
@@ -111,6 +146,7 @@ function renderMetric() {
   freshness(); drawTrend();
 }
 
+let chartSignature = '';
 function drawTrend() {
   const host = $('[data-index-history]'), target = $('.r-index-chart'), svg = select(target);
   const status = $('[data-history-status]');
@@ -121,14 +157,19 @@ function drawTrend() {
   if (!latestEnvelope || state.page !== 'overview') return;
   const r = report(), focused = document.activeElement?.closest('[data-history-report]')?.dataset.historyReport;
   const days = historyDays(reportHistory.rows, latestEnvelope.report.as_of, reportHistory.cache, state.area);
+  $('[data-selected-day]').textContent = r ? new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', day: 'numeric', month: 'long' }).format(new Date(r.as_of)) : '';
   const w = target.clientWidth, h = target.clientHeight;
   if (w < 10 || h < 10) return;
+  const signature = JSON.stringify([r?.report_id, state.area, w, h, $('.r-history-scroll').clientWidth, days]);
+  // Archive updates must not keep restarting the selected point's pulse.
+  if (signature === chartSignature) return;
+  chartSignature = signature;
   const left = 40, right = 8, step = (w - left - right) / days.length;
   const x = i => left + step * (i + .5), y = scaleLinear().domain([0, 100]).range([h - 12, 12]);
   svg.selectAll('*').remove(); svg.attr('viewBox', `0 0 ${w} ${h}`);
   svg.append('title').text(days.filter(d => d.row).map(d => `${shortDate(d.day)}: ${d.score === null ? 'brak wyniku' : scoreLabel(d.score)}`).join('; '));
   const axis = $('.r-history-axis-labels'); axis.replaceChildren();
-  for (const tick of [0, 20, 40, 60, 80, 100]) {
+  for (const tick of [0, 50, 100]) {
     svg.append('line').attr('class', 'r-history-grid').attr('x1', left).attr('x2', w - right).attr('y1', y(tick)).attr('y2', y(tick));
     const label = el('span', '', String(tick)); label.style.top = `${y(tick)}px`; axis.append(label);
   }
@@ -138,9 +179,10 @@ function drawTrend() {
     const active = day.row.report_id === r?.report_id;
     if (active) {
       svg.append('line').attr('class', 'r-history-guide').attr('x1', x(i)).attr('x2', x(i)).attr('y1', 0).attr('y2', h);
-      svg.append('circle').attr('class', 'r-history-halo').attr('cx', x(i)).attr('cy', y(day.score)).attr('r', 10);
+      svg.append('circle').attr('class', 'r-history-pulse').attr('data-tone', day.tone).attr('cx', x(i)).attr('cy', y(day.score)).attr('r', 9);
+      svg.append('circle').attr('class', 'r-history-halo').attr('data-tone', day.tone).attr('cx', x(i)).attr('cy', y(day.score)).attr('r', 8);
     }
-    svg.append('circle').attr('class', 'r-history-dot').attr('data-selected', active).attr('cx', x(i)).attr('cy', y(day.score)).attr('r', active ? 6 : 4);
+    svg.append('circle').attr('class', 'r-history-dot').attr('data-tone', day.tone).attr('data-selected', active).attr('cx', x(i)).attr('cy', y(day.score)).attr('r', active ? 4 : 3.5);
   });
   const controls = $('.r-history-points'); controls.replaceChildren();
   for (const [index, day] of days.entries()) {
@@ -163,7 +205,6 @@ function drawTrend() {
     } else control.setAttribute('aria-label', `${shortDate(day.day)}: brak raportu`);
     controls.append(control);
   }
-  $('[data-selected-day]').textContent = r ? new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', day: 'numeric', month: 'long' }).format(new Date(r.as_of)) : '';
   if (focused) controls.querySelector(`[data-history-report="${focused}"]`)?.focus({ preventScroll: true });
   const scroll = $('.r-history-scroll');
   const positionKey = `${r?.report_id}:${scroll.clientWidth}`;
@@ -179,17 +220,36 @@ function drawTrend() {
 }
 
 function selectSignals(ids) {
-  detailOpener = document.activeElement; state.selected = ids[0]; state.related = ids;
-  renderDetails(); maps.draw(); icons();
+  if (ids.length === 1 && ids[0] === state.selected && document.activeElement?.matches('.r-signal-button, .r-map-signal-button, .r-journal-entry-button')) { closeDetails(); return; }
+  if (!document.activeElement?.closest('[data-detail]')) detailOpener = document.activeElement;
+  state.selected = ids[0]; state.related = ids;
+  renderDetails();
+  if (state.page === 'map' && !mapDialog.open) maps.reveal(state.selected, 'operational');
+  maps.draw(); icons();
   const panel = $(`[data-detail="${mapDialog.open ? 'expanded' : state.page}"]`);
+  if (state.page === 'journal' && !mapDialog.open) {
+    const b = $('[data-journal] [aria-expanded=true]');
+    b?.focus({ preventScroll: true });
+    b?.closest('.r-journal-entry').scrollIntoView({ block: 'nearest', behavior: 'instant' });
+    return;
+  }
   const heading = panel?.querySelector('h3');
   if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); if (!mapDialog.open) panel.scrollIntoView({ block: 'nearest', behavior: 'instant' }); }
 }
 function clearSelection() { state.selected = null; state.related = []; }
-function closeDetails() { clearSelection(); renderDetails(); maps.draw(); if (detailOpener?.isConnected) detailOpener.focus({ preventScroll: true }); }
+function closeDetails() {
+  const signal = state.selected, marker = detailOpener?.dataset.pointIds, area = detailOpener?.dataset.areaId;
+  clearSelection(); renderDetails(); maps.draw();
+  const fallback = marker ? $$('[data-point-ids]').find(b => b.dataset.pointIds === marker && b.getClientRects().length) : area ? $$('[data-area-id]').find(b => b.dataset.areaId === area && b.getClientRects().length) : $$('button[data-signal-id]').find(b => b.dataset.signalId === signal && b.getClientRects().length);
+  (detailOpener?.isConnected ? detailOpener : fallback)?.focus({ preventScroll: state.page !== 'journal' });
+}
 function renderDetails() {
   const event = records().find(e => e.id === state.selected);
-  $('[data-timeline]').hidden = Boolean(event);
+  const previous = overviewDetail.dataset.eventId, previousMap = mapDetail.dataset.eventId, previousJournal = journalDetail.dataset.eventId;
+  overviewDetail.dataset.eventId = event?.id ?? '';
+  mapDetail.dataset.eventId = event?.id ?? '';
+  journalDetail.dataset.eventId = event?.id ?? '';
+  $('[data-timeline]').hidden = false;
   $('[data-operational]').dataset.selected = String(Boolean(event));
   $('.r-expanded-grid').dataset.selected = String(Boolean(event));
   for (const panel of $$('[data-detail]')) {
@@ -210,26 +270,89 @@ function renderDetails() {
       const href = safeLink(anchor.reference_url);
       if (href) { const a = el('a', 'r-source-link', 'Źródło położenia miasta'); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; cityNote.append(a); }
     }
+    const areaNote = areaLocationNote(event);
+    if (areaNote) { cityNote.hidden = false; cityNote.textContent = areaNote; }
     const sources = panel.querySelector('[data-detail-source]'); sources.replaceChildren();
-    for (const source of event.sources) {
+    if (panel === journalDetail) {
+      const publishers = new Map();
+      for (const source of event.sources) {
+        const href = safeLink(source.url); if (!href) continue;
+        if (!publishers.has(source.publisher)) publishers.set(source.publisher, new Set());
+        publishers.get(source.publisher).add(href);
+      }
+      for (const [publisher, urls] of publishers) {
+        const group = el('div', 'r-journal-source-group');
+        if (urls.size > 1) group.append(el('span', '', publisher));
+        const links = el('div', 'r-journal-source-links'); let index = 0;
+        for (const href of urls) {
+          const a = el('a', 'r-source-link', urls.size > 1 ? `Materiał ${++index}` : publisher);
+          a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+          if (urls.size > 1) a.setAttribute('aria-label', `${publisher} — materiał ${index}`);
+          links.append(a);
+        }
+        group.append(links); sources.append(group);
+      }
+    } else for (const source of event.sources) {
       const href = safeLink(source.url); if (!href) continue;
       const a = el('a', 'r-source-link', source.publisher); a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer'; sources.append(a);
     }
     let date = panel.querySelector('[data-event-date]'); if (!date) { date = el('p', 'r-small'); date.dataset.eventDate = ''; panel.querySelector('dl').after(date); }
     date.textContent = `Data zdarzenia: ${event.occurred_on ?? 'nieustalona'}.`;
+    if (panel === journalDetail) {
+      journalCopy.append(date);
+      cityNote.hidden = true; // Geography qualifiers stay with the map; location precision remains in the facts.
+      date.textContent = signalTime(event).basis === 'measurement' ? `Dzień pomiaru: ${event.occurred_on} (UTC).` : date.textContent;
+    }
     const choices = panel.querySelector('[data-cluster-choices]'); choices.replaceChildren(); choices.hidden = state.related.length < 2;
     for (const id of state.related) { const other = records().find(e => e.id === id); if (!other) continue; const b = button(other.title, () => selectSignals([id, ...state.related.filter(x => x !== id)])); b.setAttribute('aria-pressed', String(event.id === id)); choices.append(b); }
+  }
+  for (const b of $$('[data-timeline] .r-signal-button')) {
+    const selected = b.dataset.signalId === event?.id;
+    b.setAttribute('aria-expanded', String(selected));
+    b.setAttribute('aria-controls', overviewDetail.id);
+    if (!selected) continue;
+    const items = b.closest('.r-time-items');
+    if (items?.hidden) {
+      items.hidden = false;
+      const toggle = items.previousElementSibling;
+      state.expanded.add(toggle.dataset.group); toggle.setAttribute('aria-expanded', 'true');
+      toggle.querySelector('.r-time-action').textContent = 'Zwiń';
+    }
+    b.after(overviewDetail);
+  }
+  for (const b of $$('[data-map-list] .r-map-signal-button')) {
+    const selected = b.dataset.signalId === event?.id;
+    b.setAttribute('aria-expanded', String(selected)); b.setAttribute('aria-controls', mapDetail.id);
+    b.closest('.r-map-signal').dataset.selected = String(selected);
+    if (selected) b.after(mapDetail);
+  }
+  for (const b of $$('[data-journal] .r-journal-entry-button')) {
+    const selected = b.dataset.signalId === event?.id;
+    b.setAttribute('aria-expanded', String(selected));
+    b.closest('.r-journal-entry').dataset.selected = String(selected);
+    if (selected) { b.after(journalDetail); journalDetail.setAttribute('aria-labelledby', b.id); }
+  }
+  const activeDetail = state.page === 'journal' ? journalDetail : state.page === 'map' ? mapDetail : overviewDetail;
+  const previousEvent = state.page === 'journal' ? previousJournal : state.page === 'map' ? previousMap : previous;
+  if (event && previousEvent !== event.id && ['map', 'overview', 'journal'].includes(state.page) && !mapDialog.open && !reducedMotion.matches) {
+    activeDetail.getAnimations().forEach(a => a.cancel());
+    const frames = state.page !== 'overview'
+      ? [{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'translateY(0)' }]
+      : [{ height: '0px', opacity: 0 }, { height: `${activeDetail.offsetHeight}px`, opacity: 1 }];
+    activeDetail.animate(frames, { duration: 280, easing: 'cubic-bezier(.22,.61,.36,1)' });
   }
 }
 
 function renderTimeline() {
+  // The one details panel moves with its row, but survives archive rerenders.
+  $('.r-context').append(overviewDetail);
   const host = $('[data-timeline]'), r = report(); host.replaceChildren();
   const head = el('div', 'r-section-heading r-timeline-heading'); head.append(el('h2', '', 'Oś czasu')); host.append(head);
   const toggles = el('div', 'r-time-scale'); toggles.setAttribute('aria-label', 'Skala osi czasu');
   for (const [scale, label] of [['day', 'Dzień'], ['week', 'Tydzień'], ['month', 'Miesiąc']]) {
     const b = button(label, () => { state.scale = scale; clearSelection(); renderTimeline(); renderDetails(); maps.draw(); ensureArchive(); host.querySelector(`[data-scale=${scale}]`)?.focus(); }, ''); b.dataset.scale = scale; b.setAttribute('aria-pressed', String(state.scale === scale)); toggles.append(b);
   }
-  host.append(toggles);
+  head.append(toggles);
   if (!r) { host.append(el('p', 'r-empty', 'Oś czasu pojawi się po opublikowaniu raportu.')); return; }
   const data = timelineGroups(scoped(), r.as_of, state.scale);
   host.append(el('p', 'r-timeline-period', `${shortDate(data.start)} – ${shortDate(data.today)} · ${signalCount(data.eligible.length)}`));
@@ -241,16 +364,20 @@ function renderTimeline() {
     const dot = el('span', 'r-time-node'); dot.append(el('i')); row.append(dot);
     if (!events.length) row.append(el('span', 'r-time-empty', 'Brak wpisów'));
     else {
-      if (state.scale === 'day' && events.length === 1) { const b = signalButton(events[0]); row.append(b); rail.append(row); continue; }
+      if (state.scale === 'day' && events.length === 1) { const item = el('div', 'r-signal-item'); item.append(signalButton(events[0])); row.append(item); rail.append(row); continue; }
       const group = `${state.scale}:${key}`, expanded = state.expanded.has(group), content = el('div');
       const counts = Object.entries(topics).map(([id, c]) => ({ label: c.label, count: events.filter(e => presentation(e).topics.includes(id)).length })).filter(c => c.count).sort((a, b) => b.count - a.count);
       const title = state.scale === 'day' && events.length === 1 ? events[0].title : signalCount(events.length);
-      const open = button('', () => { if (expanded) state.expanded.delete(group); else state.expanded.add(group); renderTimeline(); host.querySelector(`[data-group="${group}"]`)?.focus(); }, 'r-time-button');
+      const open = button('', () => {
+        if (state.expanded.has(group)) { state.expanded.delete(group); if (events.some(e => e.id === state.selected)) clearSelection(); }
+        else state.expanded.add(group);
+        renderTimeline(); renderDetails(); maps.draw(); host.querySelector(`[data-group="${group}"]`)?.focus();
+      }, 'r-time-button');
       open.dataset.group = group; open.setAttribute('aria-expanded', String(expanded)); open.setAttribute('aria-controls', `group-${group}`);
       open.append(el('span', 'r-time-title', title), el('span', 'r-time-subtitle', state.scale === 'month' ? 'Dominujące: ' + counts.filter(c => c.count === counts[0]?.count).map(c => c.label).join(', ') : counts.map(c => `${c.count}× ${c.label}`).join(' · ')), el('span', 'r-time-action', expanded ? 'Zwiń' : 'Rozwiń'));
       const badges = el('span', 'r-badges'); for (const label of [...new Set(events.map(regionLabel))]) badges.append(el('span', 'r-region-badge', label)); open.append(badges);
       const items = el('div', 'r-time-items'); items.id = `group-${group}`; items.hidden = !expanded;
-      for (const event of events) items.append(signalButton(event));
+      for (const event of events) { const item = el('div', 'r-signal-item'); item.append(signalButton(event)); items.append(item); }
       content.append(open, items); row.append(content);
     }
     rail.append(row);
@@ -266,100 +393,92 @@ function signalButton(event) {
     el('span', 'r-small', `${presentation(event).topics.map(t => topics[t].label).join(' · ')} · ${[...new Set(event.sources.map(s => s.publisher))].join(' · ')}`));
   return b;
 }
-function renderList(host, filtered) {
-  host.replaceChildren();
-  for (const event of filtered) {
-    const row = el('article', 'r-journal-row'), text = el('div'); row.dataset.signalId = event.id;
-    const date = signalTime(event), time = el('time', '', date.value ? shortDate(date.day ?? dateKey(date.value)) : 'Bez daty');
-    time.title = signalTimeText(event); row.append(time);
-    text.append(button(event.title, () => selectSignals([event.id]), 'r-journal-title'));
-    const meta = el('p', 'r-journal-meta'); meta.append(el('span', 'r-region-badge', regionLabel(event)), el('span', '', presentation(event).topics.map(t => topics[t].label).join(' · ')), el('span', '', kinds[presentation(event).kind]));
-    if (!mapPoints(mapReport(report(), [event])).length) meta.append(el('span', '', 'Bez punktu na mapie'));
-    text.append(meta);
-    const source = el('div', 'r-journal-source', [...new Set(event.sources.map(s => s.publisher))].join(' · ')); source.append(el('p', 'r-small', statuses[event.status])); row.append(text, source); host.append(row);
-  }
-  if (!filtered.length) host.append(el('p', 'r-empty', archive?.loading ? 'Wczytywanie sygnałów…' : 'Brak sygnałów dla wybranych filtrów.'));
-}
 function areaSummary(filtered, area) {
   if (!regions[area]) return signalCount(filtered.length);
   const national = filtered.filter(e => presentation(e).scope === 'national' && e.country === 'PL').length;
   return `Lokalne: ${filtered.length - national} · ogólnopolskie: ${national}`;
 }
 function renderJournal() {
-  const filtered = journalRecords();
+  const filtered = journalRecords(), host = $('[data-journal]');
   $('[data-journal-count]').textContent = areaSummary(filtered, state.journalArea);
-  $('[data-journal-period-note]').textContent = periodCaption(state.journalPeriod) + ' · publikacje i dni pomiarów';
-  renderList($('[data-journal]'), filtered);
+  $('[data-journal-period-note]').textContent = periodCaption(state.journalPeriod) + ' · publikacje i pomiary';
+  const active = [['[data-journal-area]', 'macro'], ['[data-journal-period]', 'all'], ['[data-category]', 'all'], ['[data-source]', 'all']]
+    .filter(([selector, value]) => $(selector).value !== value).map(([selector]) => $(selector).selectedOptions[0]?.textContent).filter(Boolean);
+  $('[data-journal-filter-count]').textContent = active.length ? `· ${active.length}` : '';
+  $('[data-journal-active-filters]').hidden = !active.length;
+  $('[data-journal-active-filters]').textContent = active.join(' · ');
+  $('[data-view=journal]').append(journalDetail); host.replaceChildren();
+  for (const group of journalDays(filtered)) {
+    const section = el('section', 'r-journal-day'), heading = el('div', 'r-journal-day-heading');
+    const title = el('h2', '', group.label); title.id = `journal-day-${group.day || 'undated'}`;
+    section.setAttribute('aria-labelledby', title.id); section.dataset.day = group.day || 'undated';
+    heading.append(title, el('span', '', signalCount(group.events.length))); section.append(heading);
+    for (const event of group.events) {
+      const row = el('article', 'r-journal-entry'), b = button('', () => selectSignals([event.id]), 'r-journal-entry-button');
+      b.id = `journal-entry-${event.id}`; b.dataset.signalId = event.id;
+      b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-controls', journalDetail.id);
+      const time = el('time', 'r-journal-clock', journalClock(event)), t = signalTime(event);
+      if (t.value) time.dateTime = t.precision === 'day' ? t.day : t.value;
+      time.title = signalTimeText(event); time.setAttribute('aria-label', t.value ? signalTimeText(event) : 'Data nieustalona');
+      const p = presentation(event), icon = el('i'), chevron = el('i');
+      icon.dataset.lucide = topics[p.topics[0]]?.icon ?? 'newspaper'; icon.setAttribute('aria-hidden', 'true');
+      chevron.dataset.lucide = 'chevron-down'; chevron.className = 'r-journal-chevron'; chevron.setAttribute('aria-hidden', 'true');
+      const content = el('span', 'r-journal-entry-content');
+      content.append(el('span', 'r-journal-entry-title', event.title));
+      const meta = el('span', 'r-journal-entry-meta');
+      for (const value of [p.topics.map(t => topics[t].label).join(', '), kinds[p.kind], regionLabel(event), [...new Set(event.sources.map(s => s.publisher))].join(', ')].filter(Boolean)) meta.append(el('span', '', value));
+      content.append(meta);
+      const caution = journalCaution(event);
+      if (caution) content.append(el('span', 'r-journal-caution', caution));
+      b.append(time, icon, content, chevron); row.append(b); section.append(row);
+    }
+    host.append(section);
+  }
+  if (!filtered.length) host.append(el('p', 'r-empty', archive?.loading ? 'Wczytywanie sygnałów…' : 'Brak sygnałów dla wybranych filtrów.'));
 }
 function renderOperational() {
-  const filtered = mapRecords(), mapped = mapPoints(mapReport(report(), filtered)).length;
-  $('[data-map-count]').textContent = `${areaSummary(filtered, state.mapArea)} · ${mapped} na mapie · ${filtered.length - mapped} bez wskazanego miejsca. ${periodCaption(state.mapPeriod)}`;
-  renderList($('[data-map-list]'), filtered);
+  const filtered = mapRecords(), mapped = mappedSignalIds(mapReport(report(), filtered));
+  $('[data-map-count]').textContent = areaSummary(filtered, state.mapArea);
+  $('[data-map-period-note]').textContent = periodCaption(state.mapPeriod);
+  $('[data-map-location-count]').textContent = `${mapped.size} na mapie · ${filtered.length - mapped.size} bez lokalizacji na mapie`;
+  const host = $('[data-map-list]');
+  $('[data-map-list-body]').append(mapDetail); host.replaceChildren();
+  for (const event of filtered) {
+    const row = el('article', 'r-map-signal'), b = button('', () => selectSignals([event.id]), 'r-map-signal-button');
+    b.dataset.signalId = event.id;
+    const p = presentation(event), date = signalTime(event), icon = el('i'), content = el('span', 'r-map-signal-content');
+    icon.dataset.lucide = topics[p.topics[0]]?.icon ?? 'newspaper'; icon.setAttribute('aria-hidden', 'true');
+    const meta = el('span', 'r-map-signal-meta', `${date.value ? shortDate(date.day ?? dateKey(date.value)) : 'Bez daty'} · ${kinds[p.kind]}`);
+    meta.title = signalTimeText(event);
+    const location = el('span', 'r-map-signal-location', regionLabel(event));
+    const areas = eventAreas(event);
+    if (areas.length) location.textContent = areas.map(a => a.feature.properties.label).join(', ') + (areas.some(a => a.context) ? ' · orientacyjnie' : '');
+    if (!mapped.has(event.id)) location.textContent += ' · bez zaznaczenia';
+    content.append(meta, el('span', 'r-map-signal-title', event.title), location);
+    b.append(icon, content); row.append(b); host.append(row);
+  }
+  if (!filtered.length) host.append(el('p', 'r-empty', archive?.loading ? 'Wczytywanie sygnałów…' : 'Brak sygnałów dla wybranych filtrów.'));
 }
 
-function download(name, text, type) {
-  const url = URL.createObjectURL(new Blob([text], { type })), a = el('a'); a.href = url; a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-let reportOpener;
-function showReportPreview(title, body, opener) {
-  const preview = $('[data-report-preview]'), heading = $('[data-report-title]');
-  reportOpener = opener;
-  heading.textContent = title; $('[data-report-body]').textContent = body; preview.hidden = false;
-  if (state.page === 'reports') {
-    heading.setAttribute('tabindex', '-1'); heading.focus({ preventScroll: true });
-    preview.scrollIntoView({ block: 'start', behavior: 'instant' });
-  }
-}
-async function readReport(id, action) {
-  const opener = document.activeElement;
-  try {
-    const item = checkEnvelope(await api(`/api/reports/${id}`)); if (!item) throw new Error('missing');
-    if (action === 'read') showReportPreview(`Raport · ${fullTime(item.report.as_of)}`, reportText(item.report), opener);
-    else if (action === 'text') download(`rtb-${item.report.as_of.slice(0, 10)}.txt`, reportText(item.report), 'text/plain;charset=utf-8');
-    else download(`${id}.${action}`, JSON.stringify(action === 'geojson' ? item.report.geojson : item.report, null, 2), 'application/json');
-  } catch { showReportPreview('Raport chwilowo niedostępny', 'Spróbuj otworzyć go ponownie.', opener); }
-}
-function renderReports() {
-  const host = $('[data-reports]'); host.replaceChildren();
-  for (const r of history) {
-    const row = el('article', 'r-report-row'), mark = el('span', 'r-report-icon'); const icon = el('i'); icon.dataset.lucide = 'files'; mark.append(icon);
-    const info = el('div'); info.append(el('h3', '', `${r.report_type === 'daily' ? 'Raport dobowy' : 'Raport tygodniowy'} · ${fullTime(r.as_of)}`), el('p', 'r-small', `RTA ${r.score === null ? 'niewyliczony' : scoreLabel(r.score) + '/100'} · ${r.methodology_version}${r.supersedes ? ' · korekta' : ''}`));
-    const actions = el('div', 'r-report-actions'); actions.append(button('Czytaj', () => readReport(r.report_id, 'read')), button('Pobierz', () => readReport(r.report_id, 'text')),
-      button('JSON', () => readReport(r.report_id, 'json'), 'r-link'), button('GeoJSON', () => readReport(r.report_id, 'geojson'), 'r-link'));
-    row.append(mark, info, actions); host.append(row);
-  }
-  if (!history.length) host.append(el('p', 'r-empty', 'Brak opublikowanych raportów tego rodzaju.'));
-  $('[data-more-reports]').hidden = nextOffset === null; icons();
-}
-async function loadHistory(more = false) {
-  const generation = ++historyGeneration, kind = state.historyType;
-  const q = new URLSearchParams({ type: kind });
-  if (more && nextOffset !== null) { q.set('offset', nextOffset); q.set('anchor', historyAnchor); }
-  try {
-    const response = await api(`/api/reports?${q}`); if (generation !== historyGeneration) return;
-    if (!Array.isArray(response.items)) throw new Error('invalid_history');
-    history = more ? [...history, ...response.items.filter(r => !history.some(old => old.report_id === r.report_id))] : response.items;
-    nextOffset = response.next_offset; historyAnchor = response.anchor;
-    renderReports();
-  } catch { if (generation === historyGeneration) { $('[data-reports]').replaceChildren(el('p', 'r-empty', 'Archiwum jest chwilowo niedostępne. Odśwież widok, aby spróbować ponownie.')); } }
-}
+reportView = initializeReports(root, api, () => state.page === 'reports');
 
 function render() {
   const available = new Set(records().map(i => i.id)); if (!available.has(state.selected)) clearSelection();
   const sources = new Map((report()?.sources ?? []).map(s => [s.id, s.name]));
   for (const e of records()) for (const s of e.sources) sources.set(s.source_id, s.publisher);
-  setOptions($('[data-source]'), [['all', 'Wszystkie źródła'], ...sources], state.source);
+  setOptions($('[data-source]'), [['all', 'Wszystkie'], ...sources], state.source);
   renderFilters(); renderMetric(); renderTopicCounts(); renderTimeline(); renderJournal(); renderOperational(); renderDetails();
   maps.draw(); icons();
 }
 function navigate(page) {
   $('.r-hero').hidden = page !== 'overview';
   $('[data-overview-area]').hidden = page !== 'overview';
-  state.page = page; state.selected = null; state.related = [];
+  if (state.page === 'reports' && page !== 'reports') reportView.leave();
+  state.page = page; root.dataset.page = page; state.selected = null; state.related = [];
   for (const b of $$('[data-page]')) { if (b.dataset.page === page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }
   for (const view of $$('[data-view]')) view.hidden = view.dataset.view !== page;
   $('[data-page-title]').textContent = pages[page]; render(); ensureArchive();
-  if (page === 'reports') loadHistory();
+  if (page === 'reports') reportView.open();
   window.scrollTo({ top: 0, behavior: 'instant' });
   $('[data-page-title]').setAttribute('tabindex', '-1');
   $('[data-page-title]').focus({ preventScroll: true });
@@ -383,12 +502,6 @@ for (const b of $$('[data-close-detail]')) b.addEventListener('click', closeDeta
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && state.selected && !mapDialog.open) closeDetails(); });
 $('[data-category]').addEventListener('change', e => { state.category = e.target.value; clearSelection(); render(); });
 $('[data-source]').addEventListener('change', e => { state.source = e.target.value; clearSelection(); render(); });
-$('[data-close-report]').addEventListener('click', () => {
-  $('[data-report-preview]').hidden = true;
-  (reportOpener?.isConnected ? reportOpener : $('[data-report-type]')).focus();
-});
-$('[data-report-type]').addEventListener('change', e => { state.historyType = e.target.value; history = []; nextOffset = null; $('[data-report-preview]').hidden = true; loadHistory(); });
-$('[data-more-reports]').addEventListener('click', () => loadHistory(true));
 $('[data-latest-report]').addEventListener('click', async () => {
   if (!latestEnvelope) return;
   await selection.choose(latestEnvelope.report.report_id);
@@ -417,27 +530,46 @@ function renderFilters() {
     const labels = historical() ? periods.map(([key, name]) => [key, ({ day: 'Wybrany dzień', week: 'Tydzień raportu', month: 'Miesiąc raportu', quarter: 'Kwartał raportu', year: 'Rok raportu' })[key] ?? name]) : periods;
     setOptions($(`[data-${view}-period]`), view === 'journal' ? [['all', 'Całe archiwum'], ...labels] : labels, period);
   }
-  setOptions($('[data-map-topic]'), [['all', 'Wszystkie tematy'], ...Object.entries(topics).map(([key, value]) => [key, value.label])], state.mapTopic);
+  setOptions($('[data-map-topic]'), [['all', 'Wszystkie'], ...Object.entries(topics).map(([key, value]) => [key, value.label])], state.mapTopic);
   $('[data-category]').value = state.category;
 }
 function renderTopicCounts() {
+  const focusedTopic = document.activeElement?.closest('[data-preview-topic]')?.dataset.previewTopic;
   const host = $('[data-topic-counts]'); host.replaceChildren();
   $('[data-count-period]').textContent = report() ? periodCaption('current7') : '';
   $('[data-count-note]').textContent = archive?.loading ? 'Wczytywanie historii…' : archive?.failed ? 'Nie udało się pobrać całej historii. Liczby mogą być niepełne.' : 'Liczba zapisanych sygnałów, nie liczba ataków.';
+  topicPreview.replaceChildren(); topicPreview.hidden = !state.previewTopic || !report();
   if (!report()) return;
   const counts = topicCounts(records(), [...(archive?.reports.values() ?? [report()])], report().as_of, state.area, { failed: archive?.failed, loading: archive?.loading, earliestLoaded: archive?.earliestLoaded });
   for (const item of counts) {
-    const b = button('', () => { state.journalArea = state.area; state.category = item.topic; state.source = 'all'; state.journalPeriod = 'current7'; navigate('journal'); }, 'r-topic-button');
-    const label = el('span', 'r-topic-label'), icon = el('i'); icon.dataset.lucide = topics[item.topic].icon; label.append(icon, el('span', '', topics[item.topic].label));
+    const b = button('', () => { state.previewTopic = state.previewTopic === item.topic ? null : item.topic; renderTopicCounts(); icons(); }, 'r-topic-button');
+    b.dataset.previewTopic = item.topic; b.setAttribute('aria-expanded', String(state.previewTopic === item.topic)); b.setAttribute('aria-controls', topicPreview.id);
+    const icon = el('i'); icon.dataset.lucide = topics[item.topic].icon;
+    const content = el('span', 'r-topic-content'), label = el('span', 'r-topic-label', topics[item.topic].label), numbers = el('span', 'r-topic-numbers');
     const delta = item.delta == null ? null : item.delta > 0 ? `↑ ${item.delta} więcej` : item.delta < 0 ? `↓ ${Math.abs(item.delta)} mniej` : '— bez zmian';
-    b.append(label, el('strong', 'r-topic-number', String(item.current.length)));
-    if (delta !== null) b.append(el('span', 'r-small', delta));
-    b.setAttribute('aria-label', `${topics[item.topic].label}: ${signalCount(item.current.length)}.${delta !== null ? ` ${delta}.` : ''} Zobacz w dzienniku.`);
+    numbers.append(el('strong', 'r-topic-number', String(item.current.length)));
+    if (delta !== null) numbers.append(el('span', 'r-small', delta));
+    content.append(label, numbers); const arrow = el('i', 'r-topic-arrow'); arrow.dataset.lucide = 'chevron-down'; b.append(icon, content, arrow);
+    b.setAttribute('aria-label', `${topics[item.topic].label}: ${signalCount(item.current.length)}.${delta !== null ? ` ${delta}.` : ''} Pokaż sygnały.`);
     if (item.delta !== null) b.title = `Poprzednie 7 dni: ${item.previous.length}. ${periodCaption('previous7')}`;
     host.append(b);
+    if (state.previewTopic === item.topic) {
+      const head = el('div', 'r-section-heading'); head.append(el('h3', '', `${topics[item.topic].label} · ${signalCount(item.current.length)}`));
+      const close = button('', () => { state.previewTopic = null; renderTopicCounts(); icons(); host.querySelector(`[data-preview-topic="${item.topic}"]`)?.focus(); }, 'r-icon-button');
+      close.setAttribute('aria-label', 'Zamknij podgląd sygnałów'); const x = el('i'); x.dataset.lucide = 'x'; close.append(x); head.append(close); topicPreview.append(head);
+      const list = el('ol', 'r-topic-list');
+      for (const event of item.current.slice(0, 3)) {
+        const row = el('li'), date = signalTime(event); row.append(el('time', '', date.value ? shortDate(date.day ?? dateKey(date.value)) : '—'));
+        const text = el('div'); text.append(el('p', '', event.title), el('span', 'r-small', `${regionLabel(event)} · ${[...new Set(event.sources.map(s => s.publisher))].join(' · ')}`)); row.append(text); list.append(row);
+      }
+      topicPreview.append(list);
+      if (!item.current.length) topicPreview.append(el('p', 'r-small', archive?.loading ? 'Wczytywanie sygnałów…' : 'Brak zapisanych sygnałów dla tego obszaru i okresu.'));
+      topicPreview.append(button('Zobacz wszystkie w dzienniku', () => { state.journalArea = state.area; state.category = item.topic; state.source = 'all'; state.journalPeriod = 'current7'; navigate('journal'); }, 'r-link'));
+    }
   }
   if (counts.some(item => item.delta !== null)) $('[data-count-note]').append(document.createTextNode(' Porównanie z poprzednimi 7 dniami.'));
   if (report().sources.some(s => s.status !== 'current')) $('[data-count-note]').append(document.createTextNode(' Dane częściowe.'));
+  if (focusedTopic) host.querySelector(`[data-preview-topic="${focusedTopic}"]`)?.focus({ preventScroll: true });
 }
 function renderCommentary() {
   const host = $('[data-commentary]'); host.replaceChildren();
@@ -491,14 +623,16 @@ async function refresh() {
       if (followLatest || !envelope) activateReport(next);
       else renderMetric();
       if (next) reportHistory.load(next, drawTrend);
-      await loadHistory(); }
+      reportView.refresh(); }
     else freshness();
   } catch { failed = true; loaded = true; if (!envelope) renderMetric(); else freshness(); }
   finally { busy = false; }
 }
-document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
-new ResizeObserver(drawTrend).observe($('.r-index-panel'));
-render(); renderReports();
+document.addEventListener('visibilitychange', () => { root.dataset.pageHidden = String(document.hidden); if (!document.hidden) refresh(); });
+new ResizeObserver(drawTrend).observe($('.r-hero'));
+render();
+window.addEventListener('hashchange', () => { if (reportRoute(location.hash) || location.hash === '#raporty') navigate('reports'); });
+if (reportRoute(location.hash) || location.hash === '#raporty') navigate('reports');
 api('/api/config').then(value => { if (value.refresh_seconds >= 10 && value.stale_after_hours >= 1) config = value; }).catch(() => {});
 await refresh();
 // These reads refresh the screen, not the analysis pipeline. No scheduled jobs.

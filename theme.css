@@ -1,4 +1,4 @@
-/* RTA Design System 0.4 — lokalny prototyp historii, układ B: Chronologia.
+/* RTA Design System 0.5 — Przegląd do odbioru lokalnego, układ B: Chronologia.
  * Rozwinięcie regionalne: te same neutralne role i skala 4 px.
  * Źródło tokenów dla podglądu i działającego frontendu.
  * Czerwień: wyłącznie znaczenie zagrożenia i znak marki, nigdy akcja.
@@ -87,7 +87,9 @@
   --z-modal: 40;
   --z-toast: 50;
   --z-tooltip: 60;
-  --motion-fast: 140ms;
+  --motion-fast: 160ms;
+  --motion-layout: 280ms;
+  --motion-ease: cubic-bezier(.22,.61,.36,1);
 
   /* Semantyczne aliasy adaptera istniejącego prototypu. */
   --r-bg: var(--color-canvas);
@@ -137,5 +139,41 @@
   .rtb-app { --page-gutter: var(--space-md); --section-gap: var(--space-xl); --card-padding: var(--space-md); --card-inset-padding: var(--space-md); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .rtb-app { --motion-fast: 0ms; }
+  .rtb-app { --motion-fast: 0ms; --motion-layout: 0ms; }
 }
+
+/* Shared palette of the refined data views. */
+.rtb-app:is([data-page="overview"], [data-page="map"], [data-page="journal"], [data-page="reports"]) {
+  --color-canvas: light-dark(#ffffff, #101111);
+  --color-sidebar: light-dark(#f7f7f5, #171918);
+  --color-surface: light-dark(#ffffff, #262927);
+  --color-card: light-dark(#f3f4f2, #1b1d1c);
+  --color-card-inset: var(--color-surface);
+  --color-surface-hover: light-dark(#e6eae3, #363e35);
+  --color-text: light-dark(#202421, #f2f3f1);
+  --color-text-secondary: light-dark(#5e655f, #b0b7b0);
+  --color-border: light-dark(#dce0d9, #424841);
+  --color-map-land: light-dark(#f4f6ef, #30372e);
+  --color-map-water: light-dark(#e1e8e4, #202c27);
+  --color-map-border: light-dark(#99a59a, #657462);
+  --color-map-country: light-dark(#e3e8dc, #3a4435);
+}
+.rtb-app[data-page="overview"] {
+  --r-kpi-size: 90px;
+  --text-kpi-mobile: 64px;
+  --history-chart-height: 104px;
+  --card-padding: var(--space-lg);
+}
+.rtb-app [data-tone] { --history-tone: var(--color-signal-neutral); }
+.rtb-app [data-tone="low"] { --history-tone: var(--color-index-low); }
+.rtb-app [data-tone="elevated"] { --history-tone: var(--color-index-elevated); }
+.rtb-app [data-tone="high"] { --history-tone: var(--color-threat); }
+@media(max-width:620px) {
+  .rtb-app[data-page="overview"] { --card-padding:var(--space-md); }
+}
+
+.rtb-app[data-page="map"] { --operational-map-height: clamp(440px, 64vh, 620px); }
+
+/* Report presentation v1: same semantic palette and tabular figures. */
+.rtb-app { --report-index-size:72px; --report-reading-width:900px; --report-print-width:210mm; }
+@media(max-width:620px) { .rtb-app { --report-index-size:56px; } }

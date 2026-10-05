@@ -1,9 +1,10 @@
 # RTB — Design System
 
-Wersja: **0.4 — historia indeksu i wspólna karta**, 03.10.2026. Żywy dokument: aktualizowany razem z interfejsem.
-Zakres: wdrożony frontend; prototyp z `codex/ux-index-history` został włączony
-do `codex/analysis-runtime` po akceptacji użytkownika.
-Publiczny dashboard korzysta z tego interfejsu od 03.10.2026, wersja Sites 18.
+Wersja: **0.5 — Przegląd, Mapa i Dziennik po odbiorze; Raporty do odbioru**, 04.10.2026. Żywy dokument aktualizowany razem z interfejsem.
+Przegląd i Mapa Operacyjna zaakceptowane przez użytkownika 04.10.2026. Po korekcie Dziennika
+użytkownik zlecił przejście do Raportów. Ten ekran jest teraz do odbioru lokalnego
+na `codex/ux-index-history`. Audyt całości z dostarczonymi skillami będzie osobnym krokiem. Nie opublikowano tej iteracji. Wcześniejsza
+wersja 0.4 została opublikowana 03.10.2026. Układ repozytorium: `docs/git-workflow.md`.
 Stan połączenia z chmurą: `supabase/README.md`. Silnik od 30.09.2026 wykonuje rtb-v0.4.
 
 ## Kierunek i decyzje
@@ -58,7 +59,8 @@ ról. Domyślnie podgląd podąża za wyglądem hosta; wymuszenie motywu służy
 
 Inter, z systemowym fontem bezszeryfowym jako fallback. Bez fontu monospace
 w zwykłych opisach. Wagi 400/500/600; cyfry RTB i czasu mają stałą szerokość.
-RTB: 112 px w A, 104 px w B, 88 px na telefonie. Tytuł strony: 28/36 px;
+RTB: historycznie 112 px w A i 104 px w B; Przegląd 0.5 używa 90 px,
+72 px na mniejszym desktopie i 64 px na telefonie. Tytuł strony: 28/36 px;
 sekcje: 18/24 px; proza: 16/24 px; etykiety i metadane: 12/16 px.
 
 Odstępy: 4, 8, 12, 16, 24, 32, 48, 64 i 96 px, nazwane semantycznie w CSS.
@@ -162,7 +164,8 @@ Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
   pełnym tekstem w „Sytuacja”. **Rekomendacja jest prozą bez podkreślenia,
   klikalności i kursora linku** — poprawka użytkownika z 02.10.
 - Trzy neutralne liczniki Lotnictwo / Cyber / Nawigacja, ostatnie 7 dni
-  względem poprzednich 7. Kliknięcie prowadzi do tego samego zbioru w Dzienniku.
+  względem poprzednich 7. W wersji 0.5 kliknięcie rozwija trzy najnowsze wpisy; osobna akcja
+  prowadzi do tego samego, pełnego zbioru w Dzienniku.
   Brak porównania zachowuje znaną liczbę, bez strzałki i bez etykiety normy.
   Zmianę i opis porównania pokazujemy dopiero, gdy jest ono dostępne;
   nie zastępujemy ich komunikatem o braku danych. Porównujemy same zapisane
@@ -184,7 +187,10 @@ Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
 - Kolory i bazowe tokeny nie zmieniają się; nowe kontrolki mają cel 44 px,
   skala odstępów 4 px. Brak nowej palety i powiadomień.
 
-## Historia indeksu — kierunek zaakceptowany 03.10.2026
+## Historia indeksu — pierwotny kierunek 0.4 z 03.10.2026
+
+Poniższy opis dokumentuje 0.4. Zmiany kompozycji i ruchu w 0.5 opisano dalej;
+reguły historycznych danych nadal obowiązują.
 
 - Nagłówek Przegląd i istniejący dropdown tworzą jeden szereg. Data raportu
   pozostaje po prawej. Usuwamy powtórzony tekst zakresu z góry strony.
@@ -239,6 +245,52 @@ Metodologia indeksu pozostaje rtb-v0.4; numer 0.3 dotyczy Design Systemu.
 Prototyp czyta wyłącznie istniejące publikacje przez dotychczasowe API.
 Nie zmienia wag, bazy, raportów, kolektorów ani harmonogramu. Wyjaśnianie
 przyczyn zmian indeksu pozostaje osobnym następnym rozszerzeniem.
+
+## Przegląd 0.5 — zaakceptowany 04.10.2026
+
+Użytkownik odrzucił warianty ograniczone do przekolorowania interfejsu.
+Przyjęty kierunek zachowuje tło podsumowania i osobną powierzchnię komentarza,
+ikony tematów oraz hierarchię danych. Referencja Modern Treasury dotyczy
+czytelności kompozycji i reakcji na interakcje. Nie kopiujemy jego strony.
+
+- Desktop: około 55/45 na indeks z historią oraz komentarz. Wykres ma 104 px
+  wysokości, stałą skalę 0–100 i 14 dni; małe zmiany nie są wyolbrzymiane.
+- Telefon: wynik i opis obok siebie, komentarz niżej, potem zwinięta historia.
+  Przy 320 px opis wyniku przechodzi pod liczbę. Rozwinięta historia przewija
+  się we własnym obszarze, z celami dotykowymi minimum 44 px.
+- Każdy punkt ma kolor historycznej oceny, z ostrzeżeniami i bramką czerwieni
+  z dokładnie tego raportu. Przed odczytem pełnej treści punkt jest neutralny.
+  Tylko wybrany dzień ma pulsujący zewnętrzny pierścień (2,2 s). To wskazanie
+  wyboru, nie alarm ani informacja o odczycie na żywo. Linia i fokus są neutralne.
+  `prefers-reduced-motion` wyłącza puls, pozostawiając stały obrys.
+- Liczniki są bez kart, z ikonami 30 px i liczbą 30 px. Rozwinięcie pokazuje
+  maksymalnie trzy najnowsze rzeczywiste sygnały; pełna lista zachowuje filtr
+  obszaru, tematu, daty raportu i siedmiodniowego okna.
+- Szczegóły sygnału rozwijają się przy wpisie. Lista oraz kontekst mapy pozostają
+  widoczne. Esc i przycisk zamykają szczegóły i zwracają fokus.
+- Ruch: hover 160 ms, rozwinięcie 280 ms; animacja nie zmienia liczb ani treści.
+  Tło podsumowania i mapy używa spokojniejszych neutralnych tokenów 0.5.
+  Czerwone logo i semantyczne barwy wyniku pozostają punktami odniesienia.
+- Zakres tego odbioru: wyłącznie Przegląd. Mapa Operacyjna, Dziennik i Raporty
+  czekają na osobne propozycje. Kolejność: lokalny ekran → poprawki/akceptacja
+  → weryfikacja danych → commit i push → publikacja → następny ekran.
+
+## Odbiór techniczny Przeglądu 0.5 — 04.10.2026
+
+- Rzeczywisty raport z 04.10, 11:28: RTA 1,8; pewność 22%; liczniki 39/3/5.
+  Wybór 03.10 przełącza wynik na 2,2, komentarz i liczniki na 36/3/4.
+  Raport 23.09 zachowuje brak wyniku i brak komentarza.
+- Sprawdzono region z wynikiem 0 i bez wyliczonej pewności regionalnej,
+  wybór dat klawiaturą, powrót do najnowszego, podgląd tematu i filtr Dziennika,
+  rozwijanie wpisu, powiązanie z punktem mapy, zoom, duży widok i powrót fokusu.
+- Motywy jasny i ciemny; szerokości 320, 390, 1024 i 1440 px. Izolowany
+  test UI: 100/100, długi komentarz, oficjalna instrukcja, pusta publikacja,
+  pusty komentarz oraz błąd odczytu. Dane testowe pozostają w katalogu tymczasowym.
+- 32 testy frontendu, 14 testów hostingu oraz build Vite i Sites przechodzą.
+  Redukcja ruchu jest obsłużona w CSS i JS; bez zmiany systemowych preferencji
+  użytkownika podczas QA.
+- Zmiany nie są jeszcze zapisane w commicie ani opublikowane; czekają na
+  ocenę wyglądu tego ekranu. Główny podgląd czyta prawdziwe publikacje przez API.
 
 ## Historia
 
@@ -357,3 +409,191 @@ pewność 22%, liczniki 36 / 3 / 4. Wybór 2 października przywraca 2,7,
 do najnowszego raportu; konsola bez ostrzeżeń i błędów. Nie zmieniono
 punktacji ani sposobu publikowania kolejnych raportów. Szczegóły wdrożenia:
 `docs/hosting-runbook.md`.
+
+## Mapa Operacyjna 0.5 — zaakceptowana, 04.10.2026
+
+- Stały układ około 65/35: mapa po lewej, przewijana lista po prawej.
+  Wybór sygnału rozwija jego szczegóły we wpisie, bez zmniejszania mapy.
+  Telefon: mapa nad listą; cała strona przewija się naturalnie. Filtry
+  Obszar / Okres / Temat pozostają natywne; przy 320 px są w jednej kolumnie.
+- Każdy wpis ma ikonę tematu, datę, typ i lokalizację. Dane źródłowe
+  i status weryfikacji pozostają w szczegółach. Czerwone logo i kolory indeksu
+  zachowują znaczenie; zaznaczenie mapy jest neutralne.
+- Nowa prośba użytkownika: sygnały połączone z granicami regionów. Obsługujemy
+  16 województw PL i 27 jednostek administracyjnych UA z Natural Earth v5.1.2.
+  Flaga w stolicy = jawny zasięg krajowy, punkt = geometria lub zweryfikowane
+  miasto, obrys = nazwany region. Kliknięcie obrysu pokazuje jego wpisy;
+  wybór z listy zaznacza wszystkie powiązane regiony i odsłania je, jeśli
+  były poza kadrem. Kilka regionów nie zwielokrotnia licznika sygnałów.
+- Granica regionu nie jest zasięgiem zagrożenia. Jeśli raport dotyczy mniejszej
+  lokalizacji w znanym regionie, obrys jest przerywany i podpisany
+  „orientacyjnie”. Brak rozpoznanej lokalizacji pozostawia wpis na liście.
+  Nie zgadujemy obszaru z tytułu ani nie zapisujemy współrzędnych do raportu.
+- Filtry uwzględniają jawnie nazwane województwo w location.label także
+  w starszych wpisach z pustym region_ids. To nawigacja po sygnałach;
+  regionalny indeks, ocena i zamrożone raporty pozostają bez zmian.
+- Ruch: hover 160 ms, wejście szczegółów 280 ms z opacity/translate,
+  aby przewijanie mobilne znało docelową wysokość. Reduced motion wyłącza
+  animację JS. Esc i zamknięcie wracają do wpisu lub obrysu/markera.
+
+### Sprawdzenie lokalne
+
+Rzeczywisty raport 04.10.2026, 11:28: dzisiaj 4 sygnały, w tym 2 obwody
+na mapie i 2 bez zaznaczenia. Tydzień: 61 sygnałów. Filtr lubelskiego:
+2 lokalne + 5 krajowych; pojedynczy sygnał wskazuje także podkarpackie.
+Sprawdzono obwód wołyński, regiony PL, flagi Warszawy i Moskwy, punkt miasta,
+wybór regionu klawiaturą, kilka wpisów w jednym regionie, powrót fokusu,
+zoom/reset/powiększenie, pusty wynik i 5 pomiarów bez lokalizacji.
+Mapa na desktopie zachowuje wymiar 708 × 620 px po otwarciu szczegółów.
+Jasny i ciemny motyw, szerokości 320, 390, 1024 px oraz domyślny desktop;
+bez przewijania poziomego. Zmiany nie uruchamiają kolektorów ani zapisów do bazy.
+
+Testy: 40 dashboard + 14 hostingu; build aplikacji i build:site przechodzą.
+Zachowano pełną geometrię podkładu; główny pakiet ma około 276 kB gzip
+(Vite zgłasza ostrzeżenie rozmiaru, nie błąd). Nie było commit/push/deploy
+tej iteracji. Użytkownik zaakceptował ekran 04.10.2026 i zlecił pracę nad Dziennikiem.
+
+## Dziennik Sygnałów 0.5 — lokalny odbiór, 04.10.2026
+
+- Wpisy pogrupowane według dni; godzina, ikona tematu, tytuł i krótki zestaw
+  metadanych zastępują szeroką tabelę. Separator wyznacza dzień, bez osobnej
+  karty dla każdego wpisu. Dziennik korzysta z tej samej neutralnej palety co
+  zaakceptowane Przegląd i Mapa.
+- Szczegóły otwierają się bezpośrednio pod wpisem. Na desktopie opis stoi
+  obok metadanych i źródeł, na telefonie nad nimi. Wydawca pojawia się raz,
+  z osobnymi linkami do materiałów. Niepewność oraz informacja o nowszej
+  wersji materiału pozostają widoczne przed rozwinięciem.
+- Obszar, okres, temat i źródło zachowują istniejące reguły filtrowania.
+  Do 620 px filtry są początkowo zwinięte; aktywne ustawienia i ich liczba
+  pozostają widoczne. Na desktopie filtry są zawsze rozwinięte.
+- Grupowanie publikacji i godziny używają Europe/Warsaw. Pomiar dobowy
+  zachowuje dzień UTC i podpis „Pomiar”, bez fikcyjnej godziny. Braki dat
+  trafiają do „Bez ustalonej daty”. To chronologia publikacji i pomiarów,
+  nie domniemanych dat zdarzeń.
+- Rozwinięcie ma opacity/translate 280 ms i obsługę ograniczonego ruchu.
+  Enter/Spacja otwiera i zamyka; Escape wraca fokusem do wpisu.
+  Po korekcie użytkownika usunięto zbędny przycisk × — ponowne kliknięcie
+  wiersza lub chevronu zwija szczegóły. Żaden link do źródła nie jest zagnieżdżony w przycisku.
+
+### Sprawdzenie lokalne Dziennika
+
+Raport 04.10.2026, 11:28 i rzeczywiste archiwum: 105 sygnałów w 24 grupach.
+Sprawdzono osobne i łączone filtry, pusty wynik, 7 wpisów bez daty,
+5 pomiarów dobowych, cztery materiały jednego wydawcy oraz 2 sygnały lokalne
++ 5 ogólnopolskich dla lubelskiego w ostatnim tygodniu. Dane i punktacja
+pozostają niezmienione; nie uruchamiano kolektorów ani zapisów do bazy.
+
+Sprawdzono ciemny i jasny motyw, szerokości 320, 390, 1024 i 1280 px,
+zwijanie filtrów na telefonie, rozwijanie i zamykanie szczegółów klawiaturą,
+powrót fokusu oraz przejścia do Przeglądu i Mapy. Brak poziomego
+przepełnienia i błędów konsoli. Izolowany podgląd QA symulował preferencję
+ograniczonego ruchu; ustawienia systemu nie były zmieniane.
+
+Testy: 44 dashboard + 14 hostingu. Cztery nowe testy obejmują granicę doby,
+DST, pomiary bez godziny, brak daty i widoczność zastrzeżeń. Build aplikacji
+przechodzi. Dziennik pozostaje do odbioru lokalnego, bez commit/push/deploy.
+
+
+## Raporty 0.5 — lokalny odbiór, 04.10.2026
+
+Na prośbę użytkownika ukryto wybór rodzaju raportów: archiwum pokazuje
+wyłącznie raporty dobowe. Raportów tygodniowych obecnie nie publikujemy.
+Selektor formatu pobierania w czytniku pozostaje dostępny.
+
+- Archiwum grupuje publikacje według miesiąca. Wiersz zawiera datę, godzinę
+  stanu danych, wersję metodologii, oznaczenie korekty i neutralną wartość
+  indeksu. Nie koloryzujemy skrótu bez pełnych danych o ostrzeżeniach.
+  Wszystkie wersje pozostają dostępne, włącznie z historycznym null.
+- Cały wiersz otwiera czytnik w miejsce archiwum; nagłówek dostaje fokus.
+  „Wróć do archiwum” i Escape przywracają pozycję listy i fokus na publikacji.
+  Nie ma ikony × ani podglądu schowanego pod długą listą.
+- Czytnik używa zapisanego komentarza, indeksu, pewności, ograniczeń i luk
+  konkretnego raportu. Nie dopisuje zaleceń. Wartość indeksu korzysta z tej
+  samej reguły koloru co Przegląd, a data dotyczy wybranej publikacji.
+- Sygnały są rozwijane, uporządkowane od najnowszych publikacji/pomiarów,
+  z opisem, datą zdarzenia, statusem i bezpiecznymi linkami źródłowymi.
+  Nie korzystają z późniejszych raportów ani uzupełnień archiwum Dziennika.
+- Pobieranie TXT/JSON/GeoJSON jest w jednym miejscu w czytniku. Eksport
+  zachowuje istniejący format i bazuje na dokładnie tym samym raporcie.
+  Stan błędu pozwala ponowić odczyt; spóźniona odpowiedź nie otwiera zamkniętego
+  czytnika ani nie zmienia innego widoku.
+- Neutralna paleta wspólna z wcześniejszymi ekranami. Ruch: subtelna reakcja
+  wiersza i wejście treści 240 ms; respektujemy ograniczony ruch.
+
+Weryfikacja: rzeczywiste archiwum 17 publikacji, pusty stan raportów
+ tygodniowych, historyczne zero i niewyliczony wynik, korekta, powrót fokusu,
+ 105 sygnałów najnowszego raportu oraz pobrane pliki TXT/JSON/GeoJSON.
+ Eksporty tekstu i geometrii porównano z pobranym raportem JSON.
+ Zmiany lokalne, bez modyfikacji danych, punktacji, commit/push/publikacji.
+
+Sprawdzono oba motywy, telefon 390/320 px, Enter, Escape, powrót fokusu
+oraz neutralne zero i historyczny null. W jasnym podglądzie QA symulowano
+ograniczony ruch bez zmiany ustawień systemu. Konsola końcowej wersji bez
+nowych błędów. 44 testy dashboardu i 14 hostingu przeszły; oba buildy poprawne.
+Pełny audyt z odłożonymi skillami pozostaje osobnym, późniejszym zadaniem.
+
+
+## Raport — zaakceptowana struktura v1, lokalna implementacja
+
+Źródło wymagań: `docs/report-presentation.md`, zaakceptowane 04.10.2026.
+Niniejsza iteracja zastępuje wcześniejszy skrócony czytnik Raportów 0.5.
+
+- Jeden model `web/report-presentation.js` zasila treść strony, wariant druku
+  i TXT. Wynik, pewność, poziom, czas, komentarz i wydarzenia pochodzą wyłącznie
+  z otwartego wydania. JSON/GeoJSON zachowują oryginalny kontrakt.
+- Tytuł „Red Threat Alert — raport dzienny”, data, godzina Europe/Warsaw,
+  duży indeks z poziomem i osobną pewnością, istniejące ustalenia, oficjalne
+  ostrzeżenia, wydarzenia według wspólnej taksonomii, źródła i informacje
+  o wydaniu. Wpis wielotematyczny pojawia się raz, zachowując etykiety.
+- Podział komentarza zachowuje Sytuację, Wpływ na Polskę i Zalecenia;
+  starszy akapit jest pojedynczym tekstem. Brak komentarza nie tworzy sekcji.
+  Zero i historyczny null nie są zamieniane; delta wymaga porównywalnego,
+  wcześniejszego raportu wskazanego w trendzie i pokazuje jego datę.
+- Trwały adres: `/#raport/<report_id>`, wariant druku: ten sam adres z `/druk`.
+  Działa wejście bezpośrednie i odświeżenie. Korekta prowadzi do poprzednika;
+  znana korekta może być wskazana w starszym wydaniu bez zmiany jego treści.
+- Czytnik izoluje ostrzeżenia i pokrycie od bieżącego Przeglądu. Statusy
+  ostrzeżeń odnoszą się jawnie do chwili wydania, także gdy brak komentarza.
+- Wariant druku rozwija wszystkie grupy i źródła, pokazuje adresy materiałów,
+  używa jasnej powierzchni oraz reguł A4, marginesów i podziału stron.
+  CSS `@page` zawiera numerację stron; jej wykonanie zależy od przeglądarki.
+  `beforeprint` rozwija również sekcje zamknięte w czytniku, `afterprint`
+  przywraca stan. Gotowy PDF jest opcją „PDF (.pdf)” we wspólnym selektorze
+  formatów, dostępną po potwierdzeniu metadanych artefaktu. Jeden przycisk
+  „Pobierz” obsługuje wszystkie formaty (integracja lokalna 05.10.2026).
+- Metadane szablonu: `rta-report-v1`, osobne od metodologii. Kontrolki,
+  nawigacja i kontekst bieżącego dashboardu są usuwane z wydruku.
+
+### Weryfikacja specyfikacji
+
+18 rzeczywistych publicznych wydań z lokalnego, odczytowego API: 995 wpisów
+w sumie, zachowane liczby i streszczenia w modelu/TXT. Najnowszy testowany
+raport ma stan na 04.10.2026 20:09, indeks 1,7 oraz 106 wydarzeń. Sprawdzono
+korektę z 02.10 i jej poprzednika bez komentarza, starszy pojedynczy komentarz,
+zero, null oraz krótkie wydanie z 9 wpisami. W publicznym archiwum nie było
+oficjalnych ostrzeżeń ani dostępnych delt; te przypadki mają osobne testy
+na izolowanych obiektach, bez danych syntetycznych w publicznym podglądzie.
+
+50 testów dashboardu + 14 hostingu i oba buildy przechodzą. Kontrola DOM:
+106 wpisów w 7 niepustych grupach, komplet 8 rozwiniętych sekcji w wariancie
+wydruku, brak poziomego przepełnienia przy 320 px, fokus na tytule raportu.
+Powyższa kontrola dotyczyła etapu czytnika. Integracja generatora 05.10.2026
+dodaje kontrolę gotowego PDF: A4, tekst i linki wszystkich 106 wydarzeń,
+numery stron i przegląd renderów. Systemowy dialog drukowania pozostaje
+odrębną funkcją przeglądarki.
+
+Zmiany wyłącznie lokalne na `codex/ux-index-history`, bez commit/push/deploy.
+
+### PDF — łamanie długich list źródeł
+
+Wspólny komponent źródeł wydarzenia ma w druku dwie kolumny. Pojedynczy
+odnośnik pozostaje razem z nazwą wydawcy. Długie wydarzenie może przejść
+na następną stronę; cały wpis nie wymusza pustego miejsca przed jego początkiem.
+Zmiana dotyczy wyłącznie wariantu druku, bez skracania treści i źródeł.
+
+### Zakres wydania 05.10.2026 — PDF odłożony
+
+Decyzja użytkownika: publikujemy stronę raportu, wersję do druku i istniejące
+eksporty TXT/JSON/GeoJSON. Wspólny selektor formatu pozostaje; gotowy PDF
+nie jest dostępny i czytnik nie odpytuje jego metadanych. Powyższe opisy
+lokalnej integracji PDF zachowują kontekst prototypu, nie status produkcji.

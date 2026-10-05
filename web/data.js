@@ -1,3 +1,4 @@
+import { buildReportPresentation, reportPresentationText } from './report-presentation.js';
 import { signalTime } from './signal-time.js';
 
 export const categories = {
@@ -81,9 +82,6 @@ export function safeLink(url) {
   try { const u = new URL(url); return ['http:', 'https:'].includes(u.protocol) && !u.username && !u.password ? u.href : null; } catch { return null; }
 }
 
-export function reportText(report) {
-  const score = report.rtb.score === null ? 'Za mało danych do wyliczenia indeksu' : `${report.rtb.score}/100`;
-  return [`Red Threat Alert · ${fullTime(report.as_of)}`, `RTA: ${score}`, `Pewność danych: ${report.rtb.confidence.percent == null ? 'nieokreślona' : report.rtb.confidence.percent + '%'}`, 'Zero RTA nie potwierdza bezpieczeństwa.', `Metodologia: ${report.provenance.methodology_version}`, '',
-    ...report.limitations, '', ...report.gaps.map(g => g.message), '',
-    ...report.incidents.flatMap(i => [i.title, i.summary, `Opublikowano: ${fullTime(i.published_at)}`, `Data zdarzenia: ${i.occurred_on ?? 'nieustalona'}`, statuses[i.status], ...i.sources.map(s => `${s.publisher}: ${s.url}`), ''])].join('\n');
+export function reportText(report, options) {
+  return reportPresentationText(buildReportPresentation(report, options));
 }

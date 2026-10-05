@@ -1,7 +1,7 @@
 # RTB — zasady UI
 
 Powiązane: `design.md`, `theme.css`, `docs/dashboard-presentation.md`.
-Wersja 0.4 (wdrożona po akceptacji), 03.10.2026. Zasady kolorów wynikają z decyzji użytkownika;
+Wersja 0.5 (Przegląd, Mapa i Dziennik po odbiorze, Raporty do odbioru lokalnego), 04.10.2026. Zasady kolorów wynikają z decyzji użytkownika;
 zaakceptowany układ: **B — Chronologia**.
 
 ## Hierarchia i układ
@@ -24,7 +24,7 @@ zaakceptowany układ: **B — Chronologia**.
    i tokenów `--color-card-inset` / `--card-inset-padding`. Nie twórz
    lokalnego tła komentarza ani kolejnych kart dla jego poszczególnych zdań.
 10. Opis poziomu, pewność i rozwinięcie „Skąd ten wynik?” grupujemy obok
-    liczby, na telefonie poniżej. Wkłady i opis częściowych obserwacji są
+    liczby; poniżej dopiero przy szerokości do 360 px. Wkłady i opis częściowych obserwacji są
     w rozwinięciu. Brak wyniku, objaśnienie zera i istotne ostrzeżenia
     pozostają widoczne. Rozwinięcie przesuwa treść, nie zasłania wykresu.
 
@@ -46,7 +46,8 @@ zaakceptowany układ: **B — Chronologia**.
 - Kategoria sygnału nie ustala jego poziomu zagrożenia. Ikona kategorii i
   oznaczenie ciężkości są oddzielne. Nie przywracaj palety tęczowej dla tematów.
 - Nie używaj tokenu zagrożenia do błędu formularza, statusu połączenia,
-  wybranego punktu czy „braku tłumaczenia”. Opisz taki stan neutralnie.
+  wybranego punktu mapy czy „braku tłumaczenia”. Opisz taki stan neutralnie.
+  Punkt historii dziedziczy semantyczny kolor oceny z własnego raportu.
 
 ## Tekst i dane
 
@@ -106,8 +107,19 @@ zaakceptowany układ: **B — Chronologia**.
   przewija stronę. Punkt otwiera szczegóły, nie uruchamia innej akcji.
 - Oś czasu i filtry zachowują wybór po powrocie ze szczegółów.
 - W ruchu szanuj `prefers-reduced-motion`; brak migania i pulsujących alarmów.
+  Wyjątek użytkownika: wybrany dzień wykresu ma spokojny puls w kolorze
+  historycznej oceny. Inne dni pozostają nieruchome; zredukowany ruch wyłącza
+  puls, a karta w tle go wstrzymuje. Nie oznacza to nowego alarmu.
+- Licznik tematu rozwija trzy rzeczywiste sygnały i link do pełnego zbioru
+  w Dzienniku. Szczegóły osi czasu nie zastępują całej listy.
+- Na telefonie historia jest początkowo zwinięta, po komentarzu.
+  Zawsze zachowaj przycisk rozwinięcia i datę wybranego raportu.
 
 ## Procedura zmiany
+
+Pracujemy ekran po ekranie: prezentacja lokalna, poprawki i akceptacja,
+weryfikacja danych, następnie commit/push i osobna publikacja. Nie rozszerzaj
+redesignu na kolejny ekran przed odbiorem bieżącego.
 
 Przeczytaj Design System, określ dotknięte widoki i edytuj wspólne tokeny
 lub komponent. Frontend buduje `npm run build`; scenariusze uruchomienia
@@ -150,3 +162,75 @@ i że zmiana układu nie zmieniła danych. Zapisz decyzję i ograniczenia w
   Brak podstaw do obliczenia procentu regionalnego opisujemy słowem.
 - Starsze raporty mają niepełne metadane. Nie przypisuj regionu z tytułu
   publikacji ani nie wymyślaj punktu w centrum województwa.
+
+## Mapa Operacyjna — powiązanie z regionami
+
+- Zachowuj stałą powierzchnię mapy przy otwieraniu szczegółów; wpis rozwija
+  się w bocznej liście. Na telefonie lista nie ma własnego przewijania.
+- Obrys jest powiązany z regionem zapisanym w raporcie, nigdy z dopowiedzeniem
+  na podstawie tytułu. Granice pokazują kontekst administracyjny, nie zasięg
+  ataku czy alarmu. Lokalność w znanym województwie = obrys orientacyjny.
+- Dokładny punkt i zweryfikowana kotwica miasta mają pierwszeństwo przed
+  szerokim obrysem. Flaga pozostaje oznaczeniem jawnego zasięgu krajowego.
+- Każdy sygnał liczymy raz, nawet jeśli zaznacza kilka regionów. Rozróżniaj
+  brak sygnałów i obecne sygnały bez lokalizacji, bez sugestii bezpieczeństwa.
+- Regiony PL/UA pochodzą z wersjonowanego lokalnego podkładu; źródło, hash
+  i transformacje są w web/assets/README.md. Bez zewnętrznego geokodowania
+  treści raportów i bez dopisywania geometrii do danych live.
+
+## Dziennik Sygnałów — chronologia i szczegóły
+
+- Dziel listę na dni, zachowując ikonę tematu przy wpisie. Nie powtarzaj daty
+  przy każdym wierszu i nie otaczaj każdego wpisu osobną kartą.
+- Czas publikacji pokazuj w Europe/Warsaw; dobowy pomiar pozostaje przy
+  jawnym dniu UTC z podpisem „Pomiar”. Nie zastępuj brakującej publikacji
+  czasem zapisu, datą zdarzenia ani datą raportu.
+- Szczegóły rozwijają się pod wybranym wpisem. Publikacja, status, źródło
+  i lokalizacja pozostają dostępne; powtarzający się wydawca ma jedną nazwę
+  oraz osobne linki do wszystkich materiałów.
+- Nie ukrywaj niepewności ani nowszej wersji materiału wyłącznie w rozwinięciu.
+- Na telefonie zwijaj filtry, zachowując podsumowanie aktywnych ustawień.
+  Na desktopie pokazuj je stale. Lista przewija się razem ze stroną.
+- Wpis jest natywnym przyciskiem z aria-expanded i aria-controls. Ponowne
+  kliknięcie wiersza lub chevronu zwija szczegóły, bez osobnego przycisku ×.
+  Escape zwraca fokus do wpisu; ograniczony ruch wyłącza wejście szczegółów.
+
+
+## Raporty — archiwum i czytnik
+
+- Dopóki nie publikujemy raportów tygodniowych, wybór rodzaju jest ukryty;
+  archiwum domyślnie odczytuje raporty dobowe.
+
+- Jeden wiersz = jedna publikacja. Zachowuj korekty i historyczne null;
+  nie zastępuj starych ocen aktualną metodologią ani późniejszą treścią.
+- Grupuj publikacje według miesięcy, bez czterech przycisków przy każdym
+  wpisie. Pobieranie TXT/JSON/GeoJSON przenieś do czytnika.
+- Czytnik zastępuje archiwum. Powrót przywraca fokus i pozycję listy;
+  ładowanie, błąd i ponowienie pozostają w tym samym widoku.
+- Pokazuj zapisany komentarz, ograniczenia i luki. Dane źródłowe są tekstem,
+  nie HTML-em. Linki muszą przejść safeLink. Eksporty używają wybranego raportu.
+- Nie pokazuj daty najnowszego raportu nad czytnikiem historycznym.
+  Skrót archiwum ma neutralny indeks; kolor wymaga pełnego kontraktu RTA.
+
+
+### Raport zgodny ze specyfikacją v1
+
+- Stosuj `docs/report-presentation.md` i wspólny model treści strony/druk/TXT.
+  Czytnik ma własną dużą wartość indeksu zgodnie z zaakceptowaną specyfikacją.
+- Data i czas pochodzą z wydania. Późniejsze dane Przeglądu nie mogą zmieniać
+  ostrzeżeń, pewności, wydarzeń ani treści czytanego raportu.
+- Zachowuj dokładne `report_id` w adresie. Linki korekt są relacją `supersedes`,
+  nigdy podobieństwem tytułu lub daty. Nie przenoś uwag o korektach do raportu live.
+- Wszystkie szczegóły strony są dostępne w druku. Reguły druku zmieniają
+  powierzchnię, typografię i paginację, a nie treść merytoryczną.
+- Eksport ma jeden selektor formatu i jeden przycisk „Pobierz”. Opcję
+  „PDF (.pdf)” dodawaj wyłącznie po odczycie poprawnych metadanych pliku dla
+  konkretnego `report_id`; brak pliku ukrywa opcję. Nie dodawaj osobnego
+  przycisku PDF. „Drukuj” pozostaje osobną funkcją przeglądarki.
+
+### Zakres wydania 05.10.2026 — PDF odłożony
+
+Decyzja użytkownika: publikujemy stronę raportu, wersję do druku i istniejące
+eksporty TXT/JSON/GeoJSON. Wspólny selektor formatu pozostaje; gotowy PDF
+nie jest dostępny i czytnik nie odpytuje jego metadanych. Powyższe opisy
+lokalnej integracji PDF zachowują kontekst prototypu, nie status produkcji.

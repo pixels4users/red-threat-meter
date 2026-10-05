@@ -51,6 +51,32 @@ test('points remain visible across methodology changes, but lines cannot bridge 
   days.at(-2).score=null; assert.equal(canJoinDays(days.at(-3),days.at(-2)),false);
 });
 
+test('history colors use each frozen report including warnings, zero and the red eligibility gate', () => {
+  const readings = [
+    [null, {}, 'unknown'], [0, {}, 'unknown'], [3, {}, 'low'],
+    [3, { official_warnings: [{ status: 'active' }] }, 'unknown'],
+    [3, { official_warnings: [{ status: 'unknown' }] }, 'unknown'],
+    [3, { official_warnings: [{ status: 'expired' }] }, 'low'],
+    [45, {}, 'elevated'], [70, { red_priority: { eligible: false } }, 'elevated'],
+    [70, { red_priority: { eligible: true } }, 'high'],
+  ];
+  const values = readings.map(([score, fields], n) => {
+    const value = env(n + 1, `2026-10-${String(n + 1).padStart(2,'0')}T07:00:00Z`, score);
+    Object.assign(value.report.rtb, fields); return value;
+  });
+  const cache = new Map(values.map(value => [value.report.report_id, value]));
+  const rows = values.map(historyRow), asOf = values.at(-1).report.as_of;
+  assert.deepEqual(historyDays(rows, asOf, cache).filter(day => day.row).map(day => day.tone), readings.map(r => r[2]));
+  assert.ok(historyDays(rows, asOf).every(day => day.tone === 'unknown'));
+  // National red evidence must never turn a low regional score red.
+  assert.equal(historyDays(rows, asOf, cache, 'PL-10').at(-1).tone, 'low');
+  values.at(-1).report.rtb.regions['PL-10'] = { score: 80, red_priority: { eligible: false } };
+  assert.equal(historyDays(rows, asOf, cache, 'PL-10').at(-1).tone, 'elevated');
+  values.at(-1).report.rtb.regions['PL-10'].red_priority.eligible = true;
+  assert.equal(historyDays(rows, asOf, cache, 'PL-10').at(-1).tone, 'high');
+  assert.equal(historyDays(rows, asOf, cache, 'PL-02').at(-1).tone, 'unknown');
+});
+
 test('history pins pagination and caches reports; many editions cannot crowd an older day out of the window', async () => {
   const latest=env(40,'2026-10-03T12:00:00Z'), older=env(1,'2026-09-21T07:00:00Z');
   const editions=Array.from({length:31},(_,n)=>env(n+2,`2026-10-03T11:${String(n).padStart(2,'0')}:00Z`));

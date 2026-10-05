@@ -35,6 +35,10 @@ harmonogram Codexa: codziennie o **09:00 czasu Warszawy**. Pierwszy zaplanowany
 przebieg 02.10 pozostaje do sprawdzenia; Mac i Codex muszą być włączone.
 [Obsługa silnika](docs/analysis-runbook.md), [harmonogram](docs/automation-runbook.md).
 
+Raporty mają własną [stronę, wersję do druku i eksport TXT](docs/report-presentation.md).
+Generowanie gotowych PDF-ów odłożono decyzją użytkownika 05.10.2026;
+wdrożenie redesignu nie zmienia analizy, bazy ani harmonogramu.
+
 ## Polecenia
 
 Dashboard budujemy przez `npm ci` i `npm run build`. Po skonfigurowaniu
@@ -144,6 +148,7 @@ Dane robocze i klucze są wyłączone z Git. Nie udostępniaj całego katalogu p
 - [Silnik Codexa](docs/analysis-runbook.md) — pełny cykl analizy, dowody, komentarz i publikacja, bez osobnego API modelu.
 - [Codzienny harmonogram](docs/automation-runbook.md) — warunki pracy, limity, odzyskiwanie po awarii i kontrola pierwszego wykonania.
 - [Kontrakt dashboardu](docs/dashboard-data-contract.md) — dozwolone pola, daty, braki, wersje i granica eksportu.
+- [Prezentacja raportu](docs/report-presentation.md) — strona, wydruk i eksporty; przyszły PDF pozostaje osobnym etapem.
 - [Design System](design.md) — zaakceptowany układ B, kolory, komponenty i zasady UI.
 - [GitHub i Supabase](supabase/README.md) — repozytorium, migracja, uprawnienia i rzeczywisty stan połączenia. Samo połączenie usług nie uruchamia kolektorów ani strony.
 - [Metodologia RTB](docs/methodology.md) — bieżące v0.4, zaakceptowane reguły, dowody, ograniczenia i jawny stan wdrożenia; [reguły silnika v0.2](docs/archive/methodology-v0.2.md).

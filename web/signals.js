@@ -35,7 +35,11 @@ export function matchesArea(event, area, includeNational = true) {
   if (area === 'macro') return true;
   if (area === 'PL') return event.country === 'PL';
   const p = presentation(event);
-  return p.region_ids.includes(area) || (includeNational && event.country === 'PL' && p.scope === 'national');
+  // A frozen location may name a whole voivodeship even when older display
+  // metadata omitted its ID. Keep navigation consistent with its map outline;
+  // this does not alter the assessment, regional score or stored report.
+  const namedRegion = event.country === 'PL' && event.location.precision === 'region' && fold(event.location.label) === regions[area];
+  return p.region_ids.includes(area) || namedRegion || (includeNational && event.country === 'PL' && p.scope === 'national');
 }
 export function matchesTopic(event, topic) { return topic === 'all' || presentation(event).topics.includes(topic); }
 export function periodRange(asOf, period) {

@@ -1,4 +1,4 @@
-import { checkEnvelope, comparable, dateKey, shiftDay } from './data.js';
+import { checkEnvelope, comparable, dateKey, shiftDay, threatLevel } from './data.js';
 
 export const HISTORY_DAYS = 14;
 const validScore = value => Number.isFinite(value) && value >= 0 && value <= 100;
@@ -25,7 +25,11 @@ export function historyDays(rows, asOf, reports = new Map(), area = 'macro') {
     const day = shiftDay(start, index), row = byDay.get(day) ?? null;
     const report = row ? reports.get(row.report_id)?.report : null;
     const score = area === 'macro' ? row?.score : report?.rtb.regions?.[area]?.score;
-    return { day, row, score: validScore(score) ? score : null };
+    const metric = area === 'macro' ? report?.rtb : report?.rtb.regions?.[area];
+    // Warnings and red eligibility belong to this frozen edition. Metadata
+    // alone cannot establish a tone; keep it neutral until the report loads.
+    const tone = threatLevel(metric ? { ...metric, official_warnings: report.rtb.official_warnings } : null).tone;
+    return { day, row, score: validScore(score) ? score : null, tone };
   });
 }
 

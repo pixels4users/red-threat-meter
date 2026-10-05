@@ -4,6 +4,10 @@ Wersja `dashboard-v1`, uzupełnienie 29.09.2026. Schemat: `schemas/dashboard/rep
 (JSON Schema 2020-12). Eksporter: `src/osint_dashboard/dashboard/contract.py`.
 Ten kontrakt nie zmienia metodologii punktacji. Aktualny silnik liczy **rtb-v0.4**; wcześniejsze wydania zachowują swoje wersje.
 
+Zaakceptowaną strukturę strony raportu i przyszłego PDF opisuje
+[specyfikacja prezentacji raportu](report-presentation.md). To warstwa
+prezentacji istniejącego eksportu; sam dokument nie wdraża generatora PDF.
+
 ## Granica danych
 
 Zamrożone wydanie procesu RTB → weryfikacja manifestu → eksport z listy dozwolonych

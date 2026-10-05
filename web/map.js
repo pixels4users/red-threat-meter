@@ -1,29 +1,12 @@
 import { select, zoom, zoomIdentity, geoMercator, geoPath, geoCentroid } from 'd3';
 import { feature } from 'topojson-client';
 import atlasText from './assets/countries.topojson?raw';
-import capitals from './assets/capitals.json';
 import { topics, presentation } from './signals.js';
+import { mapPoints, mapAreas, eventAreas, mappedSignalIds } from './map-geography.js';
 
 const atlas = JSON.parse(atlasText);
 const countries = feature(atlas, atlas.objects.features).features;
 const labels = { POL: 'POLSKA', BLR: 'BIAŁORUŚ', UKR: 'UKRAINA', LTU: 'LITWA', LVA: 'ŁOTWA', EST: 'ESTONIA', DEU: 'NIEMCY', CZE: 'CZECHY', SVK: 'SŁOWACJA', SWE: 'SZWECJA' };
-
-export function mapPoints(report) {
-  if (!report) return [];
-  const byId = new Map(report.incidents.map(e => [e.id, e]));
-  const points = report.geojson.features.map(f => ({ id: f.id, coordinates: f.geometry.coordinates, event: byId.get(f.id), national: false }));
-  for (const e of report.incidents) {
-    const anchor = presentation(e).map_anchor;
-    if (!e.location.geometry && anchor?.type === 'Point') {
-      points.push({ id: e.id, coordinates: anchor.coordinates, event: e, national: false, city: anchor.label });
-      continue;
-    }
-    if (presentation(e).scope !== 'national' || e.location.geometry) continue;
-    const capital = capitals.find(c => c.country_code === e.country);
-    if (capital) points.push({ id: e.id, coordinates: capital.coordinates, event: e, national: true, capital: capital.name });
-  }
-  return points;
-}
 
 export function initializeMaps(root, getReport, getSelected, onSelect, icons, onExpand) {
   const slots = [...root.querySelectorAll('[data-map-slot]')];
@@ -33,14 +16,33 @@ export function initializeMaps(root, getReport, getSelected, onSelect, icons, on
     const { w, h } = r, element = slot.querySelector('.r-map');
     const svg = select(element).attr('viewBox', `0 0 ${w} ${h}`); svg.selectAll('*').remove();
     svg.append('title').text('Sygnały z opublikowanego raportu');
-    svg.append('desc').text('Punkty pokazują udokumentowane lokalizacje. Flagi w stolicach reprezentują informacje dotyczące całego kraju.');
+    svg.append('desc').text('Punkty pokazują udokumentowane lokalizacje. Flagi w stolicach reprezentują informacje dotyczące całego kraju. Obrysy wskazują regiony, nie zasięg zagrożenia.');
     const base = r.projection, t = base.translate();
     const projection = geoMercator().center(base.center()).scale(base.scale() * transform.k).translate([t[0] * transform.k + transform.x, t[1] * transform.k + transform.y]);
     const path = geoPath(projection), clip = `map-${slot.dataset.mapSlot}`;
     svg.append('defs').append('clipPath').attr('id', clip).append('rect').attr('width', w).attr('height', h);
     const layer = svg.append('g').attr('clip-path', `url(#${clip})`);
-    layer.selectAll('path').data(countries).join('path').attr('d', path);
-    const points = mapPoints(getReport(slot.dataset.mapSlot)).map(p => ({ ...p, xy: projection(p.coordinates) })).filter(p => p.xy[0] >= 18 && p.xy[0] <= w - 18 && p.xy[1] >= 18 && p.xy[1] <= h - 18);
+    layer.selectAll('path').data(countries).join('path').attr('data-country', c => c.properties.id).attr('d', path);
+    const report = getReport(slot.dataset.mapSlot), selected = getSelected();
+    const areas = mapAreas(report).sort((a, b) => Number(a.events.some(e => e.event.id === selected)) - Number(b.events.some(e => e.event.id === selected)));
+    for (const area of areas) {
+      const [[left, top], [right, bottom]] = path.bounds(area.feature);
+      if (right < 0 || left > w || bottom < 0 || top > h) continue;
+      const ids = area.events.map(e => e.event.id), chosen = area.events.find(e => e.event.id === selected);
+      const label = area.feature.properties.label;
+      const shape = layer.append('path').datum(area.feature).attr('class', 'r-map-area').attr('data-area-id', area.feature.properties.id).attr('d', path)
+        .attr('role', 'button').attr('tabindex', 0).attr('aria-pressed', String(Boolean(chosen)))
+        .attr('data-context', String(chosen ? chosen.context : area.events.every(e => e.context)))
+        .attr('aria-label', `${label} · sygnały: ${ids.length}. Pokaż szczegóły`);
+      shape.append('title').text(`${label} · sygnały: ${ids.length}`);
+      shape.on('click', () => { shape.node().focus({ preventScroll: true }); onSelect(ids); })
+        .on('keydown', e => { if (['Enter', ' '].includes(e.key)) { e.preventDefault(); onSelect(ids); } });
+      if (chosen) {
+        const xy = projection(area.feature.properties.label_coordinates);
+        layer.append('text').attr('class', 'r-map-area-label').attr('x', xy[0]).attr('y', xy[1]).attr('text-anchor', 'middle').text(label);
+      }
+    }
+    const points = mapPoints(report).map(p => ({ ...p, xy: projection(p.coordinates) })).filter(p => p.xy[0] >= 18 && p.xy[0] <= w - 18 && p.xy[1] >= 18 && p.xy[1] <= h - 18);
     const occupied = points.map(p => ({ x: p.xy[0] - 20, y: p.xy[1] - 20, width: 40, height: 52 }));
     occupied.push({ x: w - 64, y: 0, width: 64, height: 220 });
     for (const country of countries.filter(c => labels[c.properties.id])) {
@@ -72,6 +74,10 @@ export function initializeMaps(root, getReport, getSelected, onSelect, icons, on
     slot.querySelector('[data-map-zoom]').textContent = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 1 }).format(transform.k) + '×';
     slot.querySelector('[data-map-action=in]').disabled = transform.k >= 6 - 1e-6;
     slot.querySelector('[data-map-action=out]').disabled = transform.k <= .5 + 1e-6;
+    const empty = slot.querySelector('[data-map-empty]');
+    empty.hidden = mappedSignalIds(report).size > 0;
+    empty.querySelector('strong').textContent = !report ? 'Brak raportu do wyświetlenia' : report.incidents.length ? 'Sygnały bez lokalizacji na mapie' : 'Brak sygnałów w tym widoku';
+    empty.querySelector('span').textContent = report?.incidents.length ? 'Wpisy są dostępne na liście.' : 'Zmień obszar, okres lub temat.';
     icons();
   }
   function draw(slot) {
@@ -104,5 +110,22 @@ export function initializeMaps(root, getReport, getSelected, onSelect, icons, on
     });
   }
   const observer = new ResizeObserver(() => slots.forEach(draw)); slots.forEach(s => observer.observe(s.querySelector('.r-map-stage')));
-  return { draw: () => slots.forEach(draw) };
+  return {
+    draw: () => slots.forEach(draw),
+    reveal(id, name) {
+      const slot = slots.find(s => s.dataset.mapSlot === name), r = runtime.get(slot);
+      if (!r?.w) return;
+      const report = getReport(name), event = report?.incidents.find(e => e.id === id);
+      if (!event) return;
+      const point = mapPoints(report).find(p => p.id === id);
+      const geometry = point ? { type: 'Point', coordinates: point.coordinates } : { type: 'FeatureCollection', features: eventAreas(event).map(a => a.feature) };
+      if (!point && !geometry.features.length) return;
+      const [[x0, y0], [x1, y1]] = geoPath(r.projection).bounds(geometry);
+      const center = camera.center ? r.projection(camera.center) : [r.w / 2, r.h / 2], k = camera.zoom;
+      const screen = (value, i) => (value - center[i]) * k + [r.w, r.h][i] / 2;
+      if (screen(x0, 0) >= 56 && screen(x1, 0) <= r.w - 72 && screen(y0, 1) >= 48 && screen(y1, 1) <= r.h - 48) return;
+      camera = { center: r.projection.invert([(x0 + x1) / 2, (y0 + y1) / 2]), zoom: Math.max(.5, Math.min(k, (r.w - 128) / Math.max(1, x1 - x0), (r.h - 96) / Math.max(1, y1 - y0))) };
+      slots.forEach(draw);
+    },
+  };
 }
