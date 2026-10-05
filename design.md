@@ -619,6 +619,9 @@ regionem, okresem 168 godzin i datą wybranego raportu; powrót zachowuje
 pozycję Przeglądu. Usunięto podgląd trzech wpisów z × i chevron rozwijania.
 Hover zachowany we wspólnym komponencie, → komunikuje nawigację.
 Infrastrukturę przedstawia ikona pociągu `train-front` ze wspólnej taksonomii.
+Granicę przedstawia szlaban `construction`; flaga pozostaje oznaczeniem
+zasięgu ogólnokrajowego. Wszystkie widoki pobierają ikonę kategorii
+z `config/signal-presentation.json`.
 
 Weryfikacja: 52 testy frontendu przeszły. Każdy z siedmiu liczników
 otworzył identyczną liczbę wpisów; sprawdzono również zero, województwo
