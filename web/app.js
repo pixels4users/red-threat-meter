@@ -2,7 +2,7 @@ import { createSignalItem, prepareSignalDetail } from '../ui/components/signal-i
 import { reportRoute } from './report-presentation.js';
 import { initializeReports } from './reports-view.js';
 import { commentaryRows } from './commentary.js';
-import { createIcons, Radar, Menu, X, LayoutDashboard, Map as MapIcon, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee } from 'lucide';
+import { createIcons, Radar, Menu, X, LayoutDashboard, Map as MapIcon, ListFilter, Files, ArrowUpRight, ArrowRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee } from 'lucide';
 import { select, scaleLinear } from 'd3';
 import { historyDays, canJoinDays, ReportHistory, SnapshotSelection } from './index-history.js';
 import { categories, statuses, sourceStatuses, scoreLabel, threatLevel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, checkEnvelope, safeLink } from './data.js';
@@ -15,13 +15,13 @@ import { topics, regions, kinds, presentation, regionLabel, filterSignals, topic
 
 const root = document.querySelector('#rtb-dashboard');
 const $ = s => root.querySelector(s), $$ = s => [...root.querySelectorAll(s)];
-const icons = () => createIcons({ icons: { Radar, Menu, X, LayoutDashboard, Map: MapIcon, ListFilter, Files, ArrowUpRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee }, attrs: { width: 16, height: 16, 'aria-hidden': 'true' } });
+const icons = () => createIcons({ icons: { Radar, Menu, X, LayoutDashboard, Map: MapIcon, ListFilter, Files, ArrowUpRight, ArrowRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee }, attrs: { width: 16, height: 16, 'aria-hidden': 'true' } });
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const button = (text, action, cls = 'r-button') => { const b = el('button', cls, text); b.type = 'button'; b.addEventListener('click', action); return b; };
 const pages = { overview: 'Przegląd', map: 'Mapa Operacyjna', journal: 'Dziennik Sygnałów', reports: 'Raporty' };
-const state = { page: 'overview', selected: null, related: [], scale: 'day', expanded: new Set(), previewTopic: null, category: 'all', source: 'all', area: 'macro', mapArea: 'macro', mapPeriod: 'day', mapTopic: 'all', journalArea: 'macro', journalPeriod: 'all' };
+const state = { page: 'overview', selected: null, related: [], scale: 'day', expanded: new Set(), category: 'all', source: 'all', area: 'macro', mapArea: 'macro', mapPeriod: 'day', mapTopic: 'all', journalArea: 'macro', journalPeriod: 'all' };
 try { const saved = localStorage.getItem('rta-region'); if (Object.hasOwn(regions, saved)) state.area = state.mapArea = state.journalArea = saved; } catch {}
-let archive = null, detailOpener = null, expandedFrom = 'overview';
+let archive = null, detailOpener = null, expandedFrom = 'overview', topicReturn = null;
 let envelope = null, latestEnvelope = null, loaded = false, failed = false, busy = false, reportView;
 const reportHistory = new ReportHistory(api);
 const historical = () => Boolean(envelope && latestEnvelope && envelope.report.report_id !== latestEnvelope.report.report_id);
@@ -66,8 +66,8 @@ const mapDetail = $('[data-detail=map]'); mapDetail.id = 'map-signal-detail';
 const journalDetail = $('[data-detail=journal]'); journalDetail.id = 'journal-signal-detail';
 const inlineDetails = [overviewDetail, mapDetail, journalDetail];
 for (const panel of inlineDetails) prepareSignalDetail(panel, { compact: panel !== journalDetail });
-const topicPreview = el('section', 'r-topic-preview'); topicPreview.id = 'topic-preview'; topicPreview.hidden = true;
-$('[data-topic-counts]').after(topicPreview);
+const journalReturn = button('← Wróć do Przeglądu', () => navigate('overview'), 'r-link r-journal-return');
+journalReturn.hidden = true; $('[data-view=journal]').prepend(journalReturn);
 for (const [key, value] of Object.entries(topics)) { const option = el('option', '', value.label); option.value = key; $('[data-category]').append(option); }
 
 async function api(path) {
@@ -457,6 +457,9 @@ function render() {
   maps.draw(); icons();
 }
 function navigate(page) {
+  const returnToTopic = page === 'overview' && state.page === 'journal' ? topicReturn : null;
+  if (page !== 'journal') topicReturn = null;
+  journalReturn.hidden = page !== 'journal' || !topicReturn;
   $('.r-hero').hidden = page !== 'overview';
   $('[data-overview-area]').hidden = page !== 'overview';
   if (state.page === 'reports' && page !== 'reports') reportView.leave();
@@ -465,6 +468,11 @@ function navigate(page) {
   for (const view of $$('[data-view]')) view.hidden = view.dataset.view !== page;
   $('[data-page-title]').textContent = pages[page]; render(); ensureArchive();
   if (page === 'reports') reportView.open();
+  if (returnToTopic && returnToTopic.reportId === report()?.report_id) {
+    window.scrollTo({ top: returnToTopic.scrollY, behavior: 'instant' });
+    $(`[data-topic="${returnToTopic.topic}"]`)?.focus({ preventScroll: true });
+    return;
+  }
   window.scrollTo({ top: 0, behavior: 'instant' });
   $('[data-page-title]').setAttribute('tabindex', '-1');
   $('[data-page-title]').focus({ preventScroll: true });
@@ -520,42 +528,33 @@ function renderFilters() {
   $('[data-category]').value = state.category;
 }
 function renderTopicCounts() {
-  const focusedTopic = document.activeElement?.closest('[data-preview-topic]')?.dataset.previewTopic;
+  const focusedTopic = document.activeElement?.closest('[data-topic]')?.dataset.topic;
   const host = $('[data-topic-counts]'); host.replaceChildren();
   $('[data-count-period]').textContent = report() ? periodCaption('current7') : '';
   $('[data-count-note]').textContent = archive?.loading ? 'Wczytywanie historii…' : archive?.failed ? 'Nie udało się pobrać całej historii. Liczby mogą być niepełne.' : 'Liczba zapisanych sygnałów, nie liczba ataków.';
-  topicPreview.replaceChildren(); topicPreview.hidden = !state.previewTopic || !report();
   if (!report()) return;
   const counts = topicCounts(records(), [...(archive?.reports.values() ?? [report()])], report().as_of, state.area, { failed: archive?.failed, loading: archive?.loading, earliestLoaded: archive?.earliestLoaded });
   for (const item of counts) {
-    const b = button('', () => { state.previewTopic = state.previewTopic === item.topic ? null : item.topic; renderTopicCounts(); icons(); }, 'r-topic-button');
-    b.dataset.previewTopic = item.topic; b.setAttribute('aria-expanded', String(state.previewTopic === item.topic)); b.setAttribute('aria-controls', topicPreview.id);
+    const b = button('', () => {
+      topicReturn = { topic: item.topic, scrollY: window.scrollY, reportId: report().report_id };
+      state.journalArea = state.area; state.category = item.topic; state.source = 'all'; state.journalPeriod = 'current7';
+      navigate('journal');
+    }, 'r-topic-button');
+    b.dataset.topic = item.topic;
     const icon = el('i'); icon.dataset.lucide = topics[item.topic].icon;
     const content = el('span', 'r-topic-content'), label = el('span', 'r-topic-label', topics[item.topic].label), numbers = el('span', 'r-topic-numbers');
     const delta = item.delta == null ? null : item.delta > 0 ? `↑ ${item.delta} więcej` : item.delta < 0 ? `↓ ${Math.abs(item.delta)} mniej` : '— bez zmian';
     numbers.append(el('strong', 'r-topic-number', String(item.current.length)));
     if (delta !== null) numbers.append(el('span', 'r-small', delta));
-    content.append(label, numbers); const arrow = el('i', 'r-topic-arrow'); arrow.dataset.lucide = 'chevron-down'; b.append(icon, content, arrow);
-    b.setAttribute('aria-label', `${topics[item.topic].label}: ${signalCount(item.current.length)}.${delta !== null ? ` ${delta}.` : ''} Pokaż sygnały.`);
+    content.append(label, numbers); const arrow = el('i', 'r-topic-arrow'); arrow.dataset.lucide = 'arrow-right'; b.append(icon, content, arrow);
+    b.setAttribute('aria-label', `${topics[item.topic].label}: ${signalCount(item.current.length)}.${delta !== null ? ` ${delta}.` : ''} Otwórz Dziennik Sygnałów.`);
     if (item.delta !== null) b.title = `Poprzednie 7 dni: ${item.previous.length}. ${periodCaption('previous7')}`;
     host.append(b);
-    if (state.previewTopic === item.topic) {
-      const head = el('div', 'r-section-heading'); head.append(el('h3', '', `${topics[item.topic].label} · ${signalCount(item.current.length)}`));
-      const close = button('', () => { state.previewTopic = null; renderTopicCounts(); icons(); host.querySelector(`[data-preview-topic="${item.topic}"]`)?.focus(); }, 'r-icon-button');
-      close.setAttribute('aria-label', 'Zamknij podgląd sygnałów'); const x = el('i'); x.dataset.lucide = 'x'; close.append(x); head.append(close); topicPreview.append(head);
-      const list = el('ol', 'r-topic-list');
-      for (const event of item.current.slice(0, 3)) {
-        const row = el('li'), date = signalTime(event); row.append(el('time', '', date.value ? shortDate(date.day ?? dateKey(date.value)) : '—'));
-        const text = el('div'); text.append(el('p', '', event.title), el('span', 'r-small', `${regionLabel(event)} · ${[...new Set(event.sources.map(s => s.publisher))].join(' · ')}`)); row.append(text); list.append(row);
-      }
-      topicPreview.append(list);
-      if (!item.current.length) topicPreview.append(el('p', 'r-small', archive?.loading ? 'Wczytywanie sygnałów…' : 'Brak zapisanych sygnałów dla tego obszaru i okresu.'));
-      topicPreview.append(button('Zobacz wszystkie w dzienniku', () => { state.journalArea = state.area; state.category = item.topic; state.source = 'all'; state.journalPeriod = 'current7'; navigate('journal'); }, 'r-link'));
-    }
+
   }
   if (counts.some(item => item.delta !== null)) $('[data-count-note]').append(document.createTextNode(' Porównanie z poprzednimi 7 dniami.'));
   if (report().sources.some(s => s.status !== 'current')) $('[data-count-note]').append(document.createTextNode(' Dane częściowe.'));
-  if (focusedTopic) host.querySelector(`[data-preview-topic="${focusedTopic}"]`)?.focus({ preventScroll: true });
+  if (focusedTopic) host.querySelector(`[data-topic="${focusedTopic}"]`)?.focus({ preventScroll: true });
 }
 function renderCommentary() {
   const host = $('[data-commentary]'); host.replaceChildren();
@@ -589,6 +588,7 @@ function ensureArchive() {
 }
 
 function activateReport(value) {
+  if (topicReturn?.reportId !== value?.report.report_id) { topicReturn = null; journalReturn.hidden = true; }
   archive?.dispose(); envelope = value;
   state.selected = null; state.related = []; state.expanded.clear();
   archive = value ? new SignalArchive(value, path => reportHistory.read(path), () => { if (archive?.envelope === value) render(); }) : null;
@@ -602,7 +602,7 @@ async function refresh() {
     if (!next && latestEnvelope) throw new Error('latest_missing');
     // Polls update the available latest report without interrupting a user's
     // historical selection or an in-flight choice of date.
-    const followLatest = !historical() && !selection.pending;
+    const followLatest = !historical() && !selection.pending && !topicReturn;
     const changed = !loaded || next?.report.report_id !== latestEnvelope?.report.report_id;
     latestEnvelope = next; reportHistory.remember(next); loaded = true; failed = false;
     if (changed) {

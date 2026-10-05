@@ -609,3 +609,19 @@ z rozwinięć. Dane, filtrowanie i układ głównych sekcji pozostają bez zmian
 Sprawdzenie: 51 testów frontendu bez błędów; build produkcyjny poprawny.
 W przeglądarce: trzy listy, Enter/Spacja/Escape, fokus na nagłówku, wybór
 z obszaru mapy, szerokości 1350/390/320 px bez przewijania w bok.
+
+## Wszystkie kategorie w Przeglądzie — 05.10.2026
+
+Zaakceptowano stałą kolejność: Lotnictwo, Cyber, Nawigacja, Infrastruktura,
+Granica, Wojsko, Pozostałe. Siatka 4 + 3 na desktopie i dwie kolumny
+na tablecie/telefonie, bez ramek. Licznik prowadzi do Dziennika z tym samym
+regionem, okresem 168 godzin i datą wybranego raportu; powrót zachowuje
+pozycję Przeglądu. Usunięto podgląd trzech wpisów z × i chevron rozwijania.
+Hover zachowany we wspólnym komponencie, → komunikuje nawigację.
+Infrastrukturę przedstawia ikona pociągu `train-front` ze wspólnej taksonomii.
+
+Weryfikacja: 52 testy frontendu przeszły. Każdy z siedmiu liczników
+otworzył identyczną liczbę wpisów; sprawdzono również zero, województwo
+łódzkie i raport historyczny. Szerokości 1350/390/320 px, Enter i powrót
+z przywróceniem fokusu oraz pozycji przewinięcia — poprawne. Efekt
+focus korzysta z tych samych reguł ruchu co hover. Konsola bez błędów.

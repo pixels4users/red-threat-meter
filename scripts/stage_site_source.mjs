@@ -4,7 +4,7 @@ import { resolve, dirname } from 'node:path';
 // Publish a minimal Site repository. Analysis data, Python, secrets and the
 // research skill library are never copied into this source checkout.
 const target = resolve(process.argv[2] ?? 'data/sites/dashboard-source');
-const files = ['package.json', 'package-lock.json', 'vite.config.js', 'theme.css', 'ui/components/card.css', 'ui/components/signal-item.js', 'ui/components/signal-item.css',
+const files = ['package.json', 'package-lock.json', 'vite.config.js', 'theme.css', 'ui/components/card.css', 'ui/components/topic-shortcut.css', 'ui/components/signal-item.js', 'ui/components/signal-item.css',
   'config/dashboard.json', 'config/signal-presentation.json', 'schemas/dashboard/report.schema.json',
   'scripts/compile_hosted_validator.mjs', 'scripts/build_hosted_dashboard.mjs',
   'hosting/worker.mjs'];

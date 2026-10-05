@@ -72,7 +72,7 @@ test('counts compare recorded signals despite source changes, partial feeds, rev
   ];
   assert.equal(comparisonState(history, asOf, loadedHistory), 'available');
   const counts = topicCounts(events, history, asOf, 'macro', loadedHistory);
-  assert.deepEqual(counts.map(c => [c.current.length, c.previous.length, c.delta]), [[7, 5, 2], [0, 3, -3], [0, 0, 0]]);
+  assert.deepEqual(counts.map(c => [c.current.length, c.previous.length, c.delta]), [[7, 5, 2], [0, 3, -3], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]);
 });
 test('older signals retained in newer reports provide actual comparison history', () => {
   const events = [event('current', iso(end - 1)), event('previous', iso(end - WEEK - 1))];
@@ -132,4 +132,17 @@ test('daily GNSS measurements count and filter by observed day without inventing
   assert.equal(inPeriod({ ...gnss, occurred_on: '2026-02-31' }, asOf, 'undated'), true);
   const ordinary = { ...gnss, sources: [{ source_id: 'cert_pl' }] };
   assert.equal(inPeriod(ordinary, asOf, 'undated'), true);
+});
+
+test('all seven topic counters match their journal filters for the selected region and report date', () => {
+  const local = (id, topic, time, region = 'PL-10') => event(id, time, {
+    presentation: { version:'signals-v1', topics:[topic], kind:'event', scope:'regional', region_ids:[region], episode_id:id },
+  });
+  const events = [local('rail','infrastructure',iso(end-1)), local('army','military',iso(end-2)),
+    local('border','border',iso(end-3)), local('old-border','border',iso(end-WEEK-1)),
+    local('elsewhere','infrastructure',iso(end-1),'PL-14'), local('future','other',iso(end+1))];
+  const counts = topicCounts(events, [report(asOf), report(iso(end-2*WEEK))], asOf, 'PL-10', loadedHistory);
+  assert.deepEqual(counts.map(c=>c.topic), ['aviation','cyber','navigation','infrastructure','border','military','other']);
+  assert.deepEqual(counts.map(c=>[c.current.length,c.delta]), [[0,0],[0,0],[0,0],[1,1],[1,0],[1,1],[0,0]]);
+  for (const c of counts) assert.deepEqual(c.current.map(e=>e.id), filterSignals(events,{asOf,area:'PL-10',topic:c.topic,period:'current7'}).map(e=>e.id));
 });

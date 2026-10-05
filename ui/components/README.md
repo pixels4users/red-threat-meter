@@ -75,3 +75,12 @@ i powtórzonego tytułu. Wywołujący wiąże panel przez `aria-controls` oraz
 `aria-labelledby`, przenosi go pod wybrany wpis i przechowuje stan wyboru.
 Przycisk zamknięcia pozostaje tylko w oddzielnym panelu pełnoekranowej mapy.
 Style instancji nie nadpisują chevronu, stanu rozwinięcia ani interakcji.
+
+## Skrót kategorii — `.r-topic-button`
+
+Arkusz `topic-shortcut.css` definiuje siatkę 4/2 kolumny, ikonę, nazwę,
+liczbę i dostępną zmianę tygodniową. Strzałka → oznacza przejście do
+Dziennika; nie stosujemy `aria-expanded` ani przycisku zamknięcia.
+Hover i focus unoszą ikonę, przesuwają strzałkę i zmieniają neutralne tło.
+`prefers-reduced-motion` usuwa animację. Zero pozostaje widoczne.
+Kolejność i ikony pochodzą ze wspólnego rejestru kategorii.

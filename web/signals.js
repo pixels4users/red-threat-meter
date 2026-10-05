@@ -105,7 +105,7 @@ export function comparisonState(reports, asOf, { failed = false, loading = false
 }
 export function topicCounts(records, reports, asOf, area, options) {
   const status = comparisonState(reports, asOf, { ...options, records });
-  return ['aviation', 'cyber', 'navigation'].map(topic => {
+  return Object.keys(topics).map(topic => {
     const current = filterSignals(records, { asOf, area, topic, period: 'current7' });
     const previous = filterSignals(records, { asOf, area, topic, period: 'previous7' });
     return { topic, current, previous, delta: status === 'available' ? current.length - previous.length : null, status };

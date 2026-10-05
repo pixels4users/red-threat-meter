@@ -110,8 +110,9 @@ zaakceptowany układ: **B — Chronologia**.
   Wyjątek użytkownika: wybrany dzień wykresu ma spokojny puls w kolorze
   historycznej oceny. Inne dni pozostają nieruchome; zredukowany ruch wyłącza
   puls, a karta w tle go wstrzymuje. Nie oznacza to nowego alarmu.
-- Licznik tematu rozwija trzy rzeczywiste sygnały i link do pełnego zbioru
-  w Dzienniku. Szczegóły osi czasu nie zastępują całej listy.
+- Licznik tematu prowadzi bezpośrednio do Dziennika z tą kategorią, regionem
+  i ostatnimi 7 dniami do wybranego raportu. Strzałka → oznacza przejście;
+  licznik nie rozwija podglądu. Powrót przywraca pozycję i fokus w Przeglądzie.
 - Na telefonie historia jest początkowo zwinięta, po komentarzu.
   Zawsze zachowaj przycisk rozwinięcia i datę wybranego raportu.
 
@@ -243,3 +244,12 @@ lokalnej integracji PDF zachowują kontekst prototypu, nie status produkcji.
   Nagłówek otwiera i zamyka; fokus pozostaje na nim. Nie dodawaj × ani
   drugiego tytułu do szczegółów we wpisie. Osobny panel pełnoekranowej mapy
   zachowuje możliwość zamknięcia.
+
+## Kategorie Przeglądu — 05.10.2026
+
+Wszystkie siedem kategorii, także z zerem, ma stałą kolejność z rejestru
+`config/signal-presentation.json`. Siatka ma cztery kolumny na desktopie
+i dwie do 1100 px. Wspólny komponent `ui/components/topic-shortcut.css`
+zachowuje neutralne tło i unoszenie ikony na hover/focus oraz ruch →.
+Ograniczony ruch wyłącza animację. Infrastruktura używa `train-front`.
+Nie sortuj według liczby ani nie traktuj wolumenu jako rankingu zagrożeń.
