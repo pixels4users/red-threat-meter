@@ -1,10 +1,22 @@
 # Newsletter RedThreatAlert
 
-Stan 05.10.2026: implementacja lokalna do odbioru. Klucz Resend zapisany
-w prywatnym `.env.newsletter`; odczyt API potwierdził domenę `verified`.
-Użytkownik wcześniej potwierdził dostarczenie prostego maila testowego.
-**Nowa migracja, Edge Function, formularz i automatyczna wysyłka nie są jeszcze
-wdrożone.** Nie utworzono nowego harmonogramu. Testy lokalne nie wysyłają maili.
+Stan 06.10.2026: formularz i silnik są wdrożone. Migracja
+`20261005150000_newsletter.sql` i prywatna funkcja `rta-newsletter` działają
+w projekcie `dubhsimiblpfcaudbvjb`; frontend to wersja Sites 26.
+Newsletter włączono o 06:43:32 UTC z segmentem
+`f4f11832-0f6f-4d6b-9c8a-8a7794dacc2b` (RedThreatAlert — raport dzienny).
+Klucz Resend pozostaje w prywatnym `.env.newsletter` i sekretach Edge.
+Testy lokalne korzystają z symulatora i nie wysyłają wiadomości.
+
+Na produkcji sprawdzono zapis, dostarczenie potwierdzenia, brak aktywacji
+przez sam GET, dwukrotne potwierdzenie z jednym dowodem zgody oraz usunięcie
+adresu z tabeli oczekujących po zapisie. Pełny raport z 05.10 wysłano jako
+TEST wyłącznie na zatwierdzony adres użytkownika, przez osobny segment.
+Resend potwierdził `delivered`, a użytkownik potwierdził czytelność maila.
+Link wypisu rzeczywiście ustawił kontakt jako `unsubscribed=true`.
+Ponowny zapis i stała reguła wykonawcza wymagają osobnych zgód po odmowie
+automatycznej kontroli. Dowód wdrożenia poza Git:
+`data/diagnostics/newsletter-deploy-2026-10-06.json`.
 
 ## Przebieg zapisu
 
@@ -35,7 +47,7 @@ modelu co szczegóły raportu, wydruk i TXT. Zachowuje pełne wydarzenia, źród
 ostrzeżenia, niepewność, historyczne null i zero. Nie uruchamia nowej analizy.
 Wersja HTML i tekst zawierają link do dokładnego wydania i BuyCoffee.
 
-Pełny raport może być bardzo długi. Dzisiejszy przykład zawiera 118 wpisów
+Pełny raport może być bardzo długi. Przykład z 05.10.2026 zawiera 118 wpisów
 i około 106 KB HTML po usunięciu powtarzanych stylów linków. Klient pocztowy
 może skrócić jego widok; zawartość nie jest ucinana przez generator. Podgląd
 w przeglądarce nie potwierdza sposobu renderowania w Gmail/Outlook.
@@ -148,21 +160,21 @@ Dokumentacja dostawców:
 [sekrety Supabase](https://supabase.com/docs/guides/functions/secrets),
 [konfiguracja funkcji](https://supabase.com/docs/guides/functions/function-configuration).
 
-## Podgląd UI z 06.10.2026
+## Źródła i podgląd po wdrożeniu
 
-Aktualny projekt sekcji znajduje się w
-`/Users/milosz/.codex/worktrees/rta-regional-ui/OSINT Dashboard`
-na `codex/ux-index-history`. Przeniesiono tam kopię kodu lokalnego newslettera,
-bez bazy, pakietów raportów i sekretów. W głównym katalogu pozostała wcześniejsza
-implementacja backendu i formularza, nadal nieopublikowana.
+Zaakceptowane UI i silnik połączono na `main` i `codex/ux-index-history`.
+Podgląd na 8771 pozostaje symulatorem; rzeczywisty zapis jest dostępny na
+https://redthreatalert.pl/#newsletter. Testy lokalne nie powinny otrzymywać
+produkcyjnych kluczy. Zmiany dokumentacji i polecenia wydawcy nie wymagają
+ponownej publikacji frontendu; zmiany Edge wymagają osobnego build/deploy.
 
-Istniejący podgląd na 8771 nadal używa symulatora z głównego katalogu. Aby
-odświeżyć widok bez zmiany zaplecza, uruchom w worktree UI:
+Kontrola gotowości prywatnej funkcji bez wysyłki:
 
 ```sh
-node scripts/build_hosted_dashboard.mjs '/Users/milosz/Documents/Codex/OSINT Dashboard/build/hosted/dist'
+.venv/bin/python scripts/dispatch_newsletter.py --status
 ```
 
-Budowanie ze starego źródła w głównym katalogu przywróci poprzedni wygląd
-podglądu. Przed publikacją należy włączyć zaakceptowane zmiany z gałęzi UI,
-zgodnie z `docs/git-workflow.md`.
+Instalator zgłosił GHSA-68fv-2mgg-jv7q dla `source-map-js@1.2.1` w zależnościach
+Vite/PostCSS. Dotyczy przetwarzania map źródeł w narzędziach budowania;
+nie jest częścią wdrożonego Workera ani kodu przeglądarki. Aktualizacja
+narzędzi budowania pozostaje osobnym zadaniem.

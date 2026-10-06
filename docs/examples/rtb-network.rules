@@ -4,6 +4,14 @@
 # No blanket permission for Python, shells, curl, package managers or git.
 
 prefix_rule(
+    pattern = ["/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python", "/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/dispatch_newsletter.py"],
+    decision = "allow",
+    justification = "Authorized RedThreatAlert newsletter: read-only status or delivery of an already published, verified daily report; no collection or publication.",
+    match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/dispatch_newsletter.py' --status"],
+    not_match = ["'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' -c 'print(1)'"],
+)
+
+prefix_rule(
     pattern = ["/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python", "/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/check_network.py"],
     decision = "allow",
     justification = "Authorized RedThreatAlert collection, publication or read-only connectivity check; existing data and spending limits remain mandatory.",

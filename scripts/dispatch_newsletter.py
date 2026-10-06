@@ -56,24 +56,30 @@ class NoRedirect(HTTPRedirectHandler):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cycle", required=True, help="Exact verified cycle ID; no implicit latest report")
+    operation = parser.add_mutually_exclusive_group(required=True)
+    operation.add_argument("--cycle", help="Exact verified cycle ID; no implicit latest report")
+    operation.add_argument("--status", action="store_true", help="Read the private service status without sending or collecting")
     parser.add_argument("--send", action="store_true", help="Submit to the private newsletter service; default is offline verification only")
     args = parser.parse_args(argv)
+    if args.status and args.send:
+        parser.error("--send requires --cycle")
     try:
-        if not re.fullmatch(r"[a-zA-Z0-9_-]+", args.cycle):
-            raise NewsletterError("invalid_cycle")
-        report = verified_report(ROOT / "data/analysis/cycles" / args.cycle)
-        if not args.send:
-            print(json.dumps({"status": "verified_dry_run", "report_id": report["report_id"], "sent": False}))
-            return 0
+        if not args.status:
+            if not re.fullmatch(r"[a-zA-Z0-9_-]+", args.cycle):
+                raise NewsletterError("invalid_cycle")
+            report = verified_report(ROOT / "data/analysis/cycles" / args.cycle)
+            if not args.send:
+                print(json.dumps({"status": "verified_dry_run", "report_id": report["report_id"], "sent": False}))
+                return 0
         load_environment()
         config = json.loads((ROOT / "config/dashboard.json").read_text())
         origin = f'https://{config["supabase_project_ref"]}.supabase.co'
         key = os.environ.get("SUPABASE_SECRET_KEY", "")
         if os.environ.get("SUPABASE_URL") != origin or not key.startswith(("sb_secret_", "eyJ")):
             raise NewsletterError("invalid_runtime")
-        request = Request(origin + "/functions/v1/rta-newsletter/dispatch", method="POST",
-                          data=json.dumps({"report_id": report["report_id"]}).encode(),
+        action = "status" if args.status else "dispatch"
+        request = Request(origin + "/functions/v1/rta-newsletter/" + action, method="GET" if args.status else "POST",
+                          data=None if args.status else json.dumps({"report_id": report["report_id"]}).encode(),
                           headers={"apikey": key, "Content-Type": "application/json", "User-Agent": "RedThreatAlert/1.0"})
         with build_opener(NoRedirect).open(request, timeout=60) as response:
             raw = response.read(16_385)
@@ -81,6 +87,11 @@ def main(argv=None):
                 raise NewsletterError("invalid_response")
             result = json.loads(raw)
         status = result.get("status")
+        if args.status:
+            if status not in ("enabled", "disabled"):
+                raise NewsletterError("invalid_response")
+            print(json.dumps({"status": status, "sent": False}))
+            return 0
         if status == "already_handled" and result.get("delivery_status") != "sent":
             raise NewsletterError("delivery_needs_review")
         if status not in ("sent", "already_handled", "ineligible", "superseded", "disabled"):

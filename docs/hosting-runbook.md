@@ -1,11 +1,26 @@
 # Dashboard online — hosting i domena
 
-Stan: 03.10.2026. Właściwy frontend **B — Chronologia z historią indeksu i wyborem regionu** działa pod adresem
+Stan: 06.10.2026. Właściwy frontend **B — Chronologia z historią indeksu i wyborem regionu** działa pod adresem
 [Red Threat Alert](https://red-threat-alert.michalomski.chatgpt.site).
 Projekt Sites: `appgprj_6abe3ae4ab688191ade3a1f128a64451`.
 Dostęp jest publiczny od 01.10.2026 na wyraźne polecenie użytkownika.
 Adres docelowy: [redthreatalert.pl](https://redthreatalert.pl).
 Design System pozostaje osobnym projektem.
+
+## Newsletter — 06.10.2026
+
+Wersja Sites **26**, deployment `appgdep_6ac498591b4c8191b3ebd539f97258c3`,
+źródło Sites `c996d3688d3b328e3d8e9721ceee7cc21ae5dbc2`.
+Publikacja zakończona `succeeded` o 06:42:50 UTC. Kod aplikacji:
+`065b31710d1fb63022cb2325e46dbb5667e5ed36`, na `main` i `codex/ux-index-history`.
+
+Opublikowano zaakceptowaną sekcję z wizualizacją maila, formularzem i zgodą,
+główne przyciski Newsletter w nawigacji i stopce oraz odstępy między CTA.
+Opis sygnałów brzmi: „Liczba zapisanych sygnałów (nie liczba ataków).”.
+Build frontend/Worker/Edge i 81 testów przeszły. Publiczny raport pozostał
+zgodny z odczytem Supabase. Formularz, potwierdzenie i pełny test Broadcast
+działają w produkcji; użytkownik potwierdził czytelność otrzymanego maila.
+Szczegóły silnika i jego ograniczeń: [newsletter-runbook.md](newsletter-runbook.md).
 
 ## Osobne tło komentarza — 03.10.2026
 
@@ -78,10 +93,10 @@ Próg nieaktualności to 30 godzin.
 
 ## Granica dostępu
 
-Planowana integracja newslettera jest opisana w `newsletter-runbook.md`.
-W lokalnym kodzie dodaje trzy ściśle określone trasy formularza do prywatnej
-Edge Function. Nie została jeszcze wdrożona; poniższy opis odczytu raportów
-pozostaje granicą dostępu do danych analitycznych.
+Wdrożona integracja newslettera jest opisana w `newsletter-runbook.md`.
+Dodaje trzy ściśle określone trasy formularza do prywatnej Edge Function.
+Operacja wysyłki jest dostępna wyłącznie uprawnionemu wykonawcy; poniższy
+opis odczytu raportów pozostaje granicą dostępu do danych analitycznych.
 
 `hosting/worker.mjs` obsługuje odczyt ustalonych ścieżek `/api/` z tabeli
 `dashboard_reports` w przypiętym projekcie Supabase. Nie ma dowolnego proxy,
