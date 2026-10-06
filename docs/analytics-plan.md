@@ -1,6 +1,6 @@
 # GA4 — wdrożenie i odbiór
 
-Stan: odbiór lokalny zakończony; publikacja zaakceptowana przez użytkownika 06.10.2026. Wdrożenie i odbiór produkcyjny w toku.
+Stan: wdrożone na https://redthreatalert.pl 06.10.2026; test transmisji do Google zakończony. Pozostaje odbiór w panelu GA4 przez właściciela.
 Identyfikator otrzymany od użytkownika: **G-3JHR8SCJ0Y**, strumień RTA-Home.
 Konfiguracja: `config/analytics.json`, kontrakt JSON Schema 2020-12:
 `schemas/analytics.schema.json`. Osobny worktree `codex/rta-analytics`
@@ -139,3 +139,37 @@ Korekta UI: baner przypięty na dole nad treścią, „Akceptuj” primary.
 Sprawdzono stałe położenie przy przewijaniu, 1350×1000, 320×780,
 390×844 (ciemny) i 667×375, brak przepełnienia i kolizji z nawigacją,
 akceptację i ponowne otwieranie ustawień. Build frontend poprawny.
+
+
+## Wdrożenie produkcyjne — 06.10.2026
+
+- Akceptacja publikacji: użytkownik, po końcowej weryfikacji testów.
+- GitHub `main`: `553e058c9245d7ee3037e09e5b254d2e803759b3`.
+  Drzewo Git jest identyczne ze sprawdzonym lokalnym kodem. Zapis obejmuje
+  także wcześniej wdrożony kompaktowy newsletter, który nie był jeszcze
+  zsynchronizowany z GitHubem. Prywatne dane i inne lokalne zmiany pominięto.
+- Sites: wersja **30**, źródło `54ee684098e82320ff59f5c99de325a5f445dc46`,
+  deployment `appgdep_6ac5217901ec8191a3d09576a41650b1`, status **succeeded**.
+  Zachowano publiczny dostęp oraz domenę redthreatalert.pl.
+- Supabase `rta-newsletter`: wersja **3**, ACTIVE, dotychczasowe sekrety
+  i autoryzacja bez zmian; bez migracji i wysyłki wiadomości.
+  Pobraną funkcję porównano z buildem: identyczny SHA256
+  `eeb0ecdfc68388721cc2b5ba4d464685706608b58f4ec6c74c91ebb36304077f`.
+- Na publicznej domenie: przed zgodą oraz po odmowie zero żądań do GA/tagu
+  i zero cookies GA. Po zgodzie gtag HTTP 200 oraz trzy odpowiedzi kolekcji
+  HTTP 204: page_view Przegląd, newsletter_view, page_view Mapa.
+  ID pomiaru G-3JHR8SCJ0Y, oczyszczone adresy widoków, npa=1.
+  Powtórne kliknięcie Mapy nie dodało odsłony.
+- Wycofanie: zapis analytics=false, przeładowanie, zero skryptów GA i cookies;
+  liczba żądań pozostała bez zmian po wycofaniu zgody.
+- Newsletter status HTTP 200/enabled. Brak błędów JS aplikacji.
+  Konsola odnotowała blokadę przez CSP skryptu inline mechanizmu Cloudflare
+  challenge dodanego przez hosting. Nie jest to skrypt GA; pomiar otrzymał 204.
+  Nie poszerzano polityki skryptów o unsafe-inline.
+- Dowody lokalne (poza Git): output/playwright/analytics-production-result.txt.
+  Test dodał dwie odsłony oraz newsletter_view do rzeczywistego strumienia.
+  Nie wysłano maila ani nie utworzono testowej subskrypcji na produkcji.
+
+HTTP 204 potwierdza odpowiedź endpointu kolekcji Google, nie widoczność danych
+w raportach. Właściciel sprawdza Czas rzeczywisty i później listę zdarzeń;
+newsletter_confirmed oznacza jako kluczowe po jego pierwszym odbiorze.
