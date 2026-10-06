@@ -1,8 +1,9 @@
 import { createSignalItem, prepareSignalDetail, createCategoryLabel } from '../ui/components/signal-item.js';
 import { reportRoute } from './report-presentation.js';
 import { initializeReports } from './reports-view.js';
+import { initializeNewsletter } from './newsletter.js';
 import { commentaryRows } from './commentary.js';
-import { createIcons, Radar, Menu, X, LayoutDashboard, Map as MapIcon, ListFilter, Files, ArrowUpRight, ArrowRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Construction, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee } from 'lucide';
+import { createIcons, Radar, Menu, X, LayoutDashboard, Map as MapIcon, ListFilter, Files, ArrowUpRight, ArrowRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Construction, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee, Clock3 } from 'lucide';
 import { select, scaleLinear } from 'd3';
 import { historyDays, canJoinDays, ReportHistory, SnapshotSelection } from './index-history.js';
 import { categories, statuses, sourceStatuses, scoreLabel, threatLevel, visibleWarnings, fullTime, shortDate, dateKey, isoWeek, parts, signalCount, timelineGroups, checkEnvelope, safeLink } from './data.js';
@@ -15,7 +16,7 @@ import { topics, regions, kinds, presentation, regionLabel, filterSignals, topic
 
 const root = document.querySelector('#rtb-dashboard');
 const $ = s => root.querySelector(s), $$ = s => [...root.querySelectorAll(s)];
-const icons = () => createIcons({ icons: { Radar, Menu, X, LayoutDashboard, Map: MapIcon, ListFilter, Files, ArrowUpRight, ArrowRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Construction, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee }, attrs: { width: 16, height: 16, 'aria-hidden': 'true' } });
+const icons = () => createIcons({ icons: { Radar, Menu, X, LayoutDashboard, Map: MapIcon, ListFilter, Files, ArrowUpRight, ArrowRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Construction, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee, Clock3 }, attrs: { width: 16, height: 16, 'aria-hidden': 'true' } });
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
 const button = (text, action, cls = 'r-button') => { const b = el('button', cls, text); b.type = 'button'; b.addEventListener('click', action); return b; };
 const pages = { overview: 'Przegląd', map: 'Mapa Operacyjna', journal: 'Dziennik Sygnałów', reports: 'Raporty' };
@@ -60,6 +61,7 @@ historyToggle.addEventListener('click', () => {
 const notice = el('p', 'r-data-notice'); notice.setAttribute('role', 'status'); $('.r-hero').after(notice);
 const official = el('section', 'r-official-warnings'); official.setAttribute('aria-label', 'Oficjalne ostrzeżenia'); $('.r-hero').before(official);
 const coverage = el('details', 'r-coverage'); $('.r-bottom-line').before(coverage);
+initializeNewsletter(root);
 for (const panel of $$('[data-detail]')) panel.append($('template[data-template=detail]').content.cloneNode(true));
 const overviewDetail = $('[data-detail=overview]'); overviewDetail.id = 'overview-signal-detail';
 const mapDetail = $('[data-detail=map]'); mapDetail.id = 'map-signal-detail';
@@ -542,7 +544,7 @@ function renderTopicCounts() {
   const focusedTopic = document.activeElement?.closest('[data-topic]')?.dataset.topic;
   const host = $('[data-topic-counts]'); host.replaceChildren();
   $('[data-count-period]').textContent = report() ? periodCaption('current7') : '';
-  $('[data-count-note]').textContent = archive?.loading ? 'Wczytywanie historii…' : archive?.failed ? 'Nie udało się pobrać całej historii. Liczby mogą być niepełne.' : 'Liczba zapisanych sygnałów, nie liczba ataków.';
+  $('[data-count-note]').textContent = archive?.loading ? 'Wczytywanie historii…' : archive?.failed ? 'Nie udało się pobrać całej historii. Liczby mogą być niepełne.' : 'Liczba zapisanych sygnałów (nie liczba ataków).';
   if (!report()) return;
   const counts = topicCounts(records(), [...(archive?.reports.values() ?? [report()])], report().as_of, state.area, { failed: archive?.failed, loading: archive?.loading, earliestLoaded: archive?.earliestLoaded });
   for (const item of counts) {
@@ -563,8 +565,6 @@ function renderTopicCounts() {
     host.append(b);
 
   }
-  if (counts.some(item => item.delta !== null)) $('[data-count-note]').append(document.createTextNode(' Porównanie z poprzednimi 7 dniami.'));
-  if (report().sources.some(s => s.status !== 'current')) $('[data-count-note]').append(document.createTextNode(' Dane częściowe.'));
   if (focusedTopic) host.querySelector(`[data-topic="${focusedTopic}"]`)?.focus({ preventScroll: true });
 }
 function renderCommentary() {

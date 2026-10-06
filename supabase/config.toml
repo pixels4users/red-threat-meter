@@ -383,6 +383,13 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
+# The handler requires the server-only RTA_GATEWAY_KEY on every route.
+# Supabase's legacy JWT gate cannot validate sb_secret_* API keys.
+[functions.rta-newsletter]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/rta-newsletter/index.js"
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 

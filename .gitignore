@@ -26,4 +26,5 @@ output/
 research/
 hosting/.generated/
 .sites-runtime/
+supabase/functions/rta-newsletter/index.js
 data/sites/

@@ -1,0 +1,15 @@
+{
+  "version": "rta-newsletter-v1",
+  "consent_version": "2026-10-05",
+  "site_url": "https://redthreatalert.pl/",
+  "from": "RedThreatAlert <raport@redthreatalert.pl>",
+  "reply_to": "kontakt@redthreatalert.pl",
+  "support_url": "https://buycoffee.to/red-threat-meter",
+  "segment_name": "RedThreatAlert — raport dzienny",
+  "operator": {
+    "name": "Miłosz Michałowski-Żuk Pixels4Users",
+    "address": "Kościelna 4 m. 5, 91-437 Łódź",
+    "nip": "7262448188",
+    "regon": "382918503"
+  }
+}

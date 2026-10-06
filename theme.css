@@ -4,6 +4,12 @@
  * Czerwień: wyłącznie znaczenie zagrożenia i znak marki, nigdy akcja.
  */
 .rtb-app {
+  /* Newsletter: editorial signup section; actions keep the neutral palette. */
+  --newsletter-reading-width: 680px;
+  --newsletter-title-size: 40px;
+  --newsletter-paper-width: 360px;
+  --newsletter-section-padding: var(--space-2xl);
+  --newsletter-paper-shadow: 0 24px 56px -24px light-dark(rgb(0 0 0 / .3), rgb(0 0 0 / .8));
   --color-canvas: light-dark(#ffffff, #0a0a0a);
   --color-sidebar: light-dark(#f6f6f6, #141414);
   --color-surface: light-dark(#ffffff, #1e1e1e);

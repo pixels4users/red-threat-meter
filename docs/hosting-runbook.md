@@ -78,6 +78,11 @@ Próg nieaktualności to 30 godzin.
 
 ## Granica dostępu
 
+Planowana integracja newslettera jest opisana w `newsletter-runbook.md`.
+W lokalnym kodzie dodaje trzy ściśle określone trasy formularza do prywatnej
+Edge Function. Nie została jeszcze wdrożona; poniższy opis odczytu raportów
+pozostaje granicą dostępu do danych analitycznych.
+
 `hosting/worker.mjs` obsługuje odczyt ustalonych ścieżek `/api/` z tabeli
 `dashboard_reports` w przypiętym projekcie Supabase. Nie ma dowolnego proxy,
 SQL, RPC ani zapisu z przeglądarki. Odbiorca otrzymuje tylko `dashboard-v1`,

@@ -1,5 +1,6 @@
 import validateReport from './.generated/validate-report.cjs';
 import config from '../config/dashboard.json' with { type: 'json' };
+import { proxyNewsletter } from './newsletter-proxy.mjs';
 
 const ORIGIN = `https://${config.supabase_project_ref}.supabase.co`;
 const REPORT_ID = /^rpt_[a-f0-9]{64}$/;
@@ -30,7 +31,7 @@ function sourceURL(value) {
   }
 }
 
-function checked(row) {
+export function checked(row) {
   const r = row?.payload;
   // Publication's Python writer verifies the content hash and editorial receipt.
   // At the HTTP boundary, enforce the same closed schema and row identity without
@@ -112,6 +113,7 @@ async function readRows(env, params, fetcher) {
 // Preserve the receiver for runtimes whose native fetch requires it.
 export async function handle(request, env, fetcher = (...args) => globalThis.fetch(...args)) {
   const url = new URL(request.url);
+  if (url.pathname.startsWith('/api/newsletter/')) return proxyNewsletter(request, env, fetcher);
   if (!['GET', 'HEAD'].includes(request.method)) return json({ error: 'method_not_allowed' }, 405);
   if (!url.pathname.startsWith('/api/')) {
     // The asset binding contains only the built frontend, never the repository.

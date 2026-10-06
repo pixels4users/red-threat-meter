@@ -2,6 +2,7 @@
 @import "../ui/components/card.css";
 @import "../ui/components/topic-shortcut.css";
 @import "../ui/components/signal-item.css";
+@import "./newsletter.css";
 
   .rtb-app *,.rtb-app *::before,.rtb-app *::after { box-sizing: border-box; }
   .rtb-app [hidden] { display:none !important; }

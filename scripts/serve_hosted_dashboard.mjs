@@ -23,7 +23,9 @@ env.ASSETS = { async fetch(request) {
 const server = createServer(async (req, res) => {
   if (!['127.0.0.1:8770', 'localhost:8770'].includes(req.headers.host)) { res.writeHead(403); res.end(); return; }
   try {
-    const response = await worker.fetch(new Request(`http://${req.headers.host}${req.url}`, { method: req.method, headers: req.headers }), env);
+    const init = { method: req.method, headers: req.headers };
+    if (!['GET', 'HEAD'].includes(req.method)) { init.body = req; init.duplex = 'half'; }
+    const response = await worker.fetch(new Request(`http://${req.headers.host}${req.url}`, init), env);
     res.writeHead(response.status, Object.fromEntries(response.headers));
     res.end(Buffer.from(await response.arrayBuffer()));
   } catch { res.writeHead(503); res.end('temporarily_unavailable'); }

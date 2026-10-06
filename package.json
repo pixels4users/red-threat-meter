@@ -9,7 +9,9 @@
     "test": "node --test tests/dashboard/*.test.mjs",
     "test:database": "node --test tests/dashboard/database.test.mjs",
     "build:site": "node scripts/build_hosted_dashboard.mjs",
-    "test:site": "node scripts/compile_hosted_validator.mjs && node --test tests/hosting/*.test.mjs"
+    "test:site": "node scripts/compile_hosted_validator.mjs && node --test tests/hosting/*.test.mjs",
+    "build:newsletter": "node scripts/build_newsletter_function.mjs",
+    "test:newsletter": "node scripts/compile_hosted_validator.mjs && node --test tests/newsletter/*.test.mjs"
   },
   "dependencies": {
     "d3": "7.9.0",

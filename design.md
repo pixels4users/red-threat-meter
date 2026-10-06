@@ -618,6 +618,23 @@ na tablecie/telefonie, bez ramek. Licznik prowadzi do Dziennika z tym samym
 regionem, okresem 168 godzin i datą wybranego raportu; powrót zachowuje
 pozycję Przeglądu. Usunięto podgląd trzech wpisów z × i chevron rozwijania.
 Hover zachowany we wspólnym komponencie, → komunikuje nawigację.
+
+## Newsletter — podgląd lokalny, 05.10.2026
+
+Przedstawiono dwa warianty: formularz nad stopką albo przycisk otwierający
+osobne okno. Do lokalnego podglądu przyjęto pierwszy; wybór pozostaje
+do odbioru użytkownika. Bez zmiany głównych ekranów, nawigacji i kolorystyki.
+Formularz zawiera adres, osobną niezaznaczoną zgodę, informację o potwierdzeniu
+i link do prywatności. Na telefonie przechodzi do jednej kolumny.
+
+Potwierdzenie i prywatność używają natywnego dialogu z przyciskiem zamknięcia,
+obsługą Escape i powrotem fokusu. Aktywacja zapisu wymaga osobnego przycisku.
+Mail opiera się na wspólnym modelu raportu, zachowuje pełne wydarzenia
+i źródła; zawiera link do konkretnego wydania, BuyCoffee i wypis.
+Operator: Miłosz Michałowski-Żuk Pixels4Users, dane przekazane przez użytkownika.
+
+Zakres i uruchomienie: `docs/newsletter-runbook.md`. Obecny etap obejmuje kod,
+symulację całego zapisu i testy lokalne; nie uruchamia publicznej listy.
 Infrastrukturę przedstawia ikona pociągu `train-front` ze wspólnej taksonomii.
 Granicę przedstawia szlaban `construction`; flaga pozostaje oznaczeniem
 zasięgu ogólnokrajowego. Wszystkie widoki pobierają ikonę kategorii
@@ -628,3 +645,28 @@ otworzył identyczną liczbę wpisów; sprawdzono również zero, województwo
 łódzkie i raport historyczny. Szerokości 1350/390/320 px, Enter i powrót
 z przywróceniem fokusu oraz pozycji przewinięcia — poprawne. Efekt
 focus korzysta z tych samych reguł ruchu co hover. Konsola bez błędów.
+
+## Sekcja newslettera — iteracja według referencji, 06.10.2026
+
+Na prośbę użytkownika wyróżniono sekcję neutralnym tłem i większą typografią.
+Wizualizacja układu wiadomości jest po lewej, a nagłówek, opis i formularz
+po prawej. Makieta nie pokazuje fikcyjnych odczytów ani dat; ma podpis
+„Przykładowy układ newslettera”. Pole e-mail i pełny primary CTA „Zapisuję się
+na raport” są jeden pod drugim. Zgoda pozostaje osobna i niezaznaczona.
+Czerwień występuje wyłącznie w znaku marki; akcja korzysta z neutralnych tokenów.
+
+Na telefonie formularz poprzedza wizualizację. Sprawdzono 1350, 390 i 320 px,
+jasny i ciemny wygląd, wymaganą zgodę, lokalny zapis oraz Escape i powrót fokusu
+w informacji o prywatności. Brak poziomego przewijania.
+Kod tej iteracji jest w istniejącym worktree `codex/ux-index-history`;
+zmiany pozostają lokalne, bez commit/push/publikacji.
+
+
+### Skróty do zapisu, 06.10.2026
+
+Na prośbę użytkownika dodano primary „Newsletter” nad BuyCoffee w nawigacji
+oraz bezpośrednio po jego lewej stronie w stopce. Oba są natywnymi linkami
+do sekcji `#newsletter` i korzystają z istniejących neutralnych kolorów akcji.
+Sekcja przyjmuje fokus po przejściu linkiem; kolejny Tab prowadzi do e-maila.
+Przy wyłączonym newsletterze skróty są ukrywane razem z formularzem.
+Stopka mieści skróty w jednym szeregu również na małym ekranie.
