@@ -670,3 +670,20 @@ do sekcji `#newsletter` i korzystają z istniejących neutralnych kolorów akcji
 Sekcja przyjmuje fokus po przejściu linkiem; kolejny Tab prowadzi do e-maila.
 Przy wyłączonym newsletterze skróty są ukrywane razem z formularzem.
 Stopka mieści skróty w jednym szeregu również na małym ekranie.
+
+
+### Okna newslettera — dopracowanie, 06.10.2026
+
+Zgodnie z korektą użytkownika okno potwierdzenia i sukcesu jest wyśrodkowane,
+ma maksymalnie 520 px i hierarchię: mała etykieta Newsletter, nagłówek, treść,
+główna akcja. Padding 32 px i odstęp 24 px oddzielają grupy; na małym ekranie
+padding ma 24 px. Przycisk „Potwierdzam zapis” jest pełnym, neutralnym primary
+o wysokości min. 48 px. „Zamknij” zastąpiono ikoną Lucide X z dostępną nazwą
+„Zamknij okno” i celem 44 × 44 px. Po sukcesie tekst o wypisie jest pomocniczy.
+Prywatność zachowuje szerszy limit 680 px i przewijanie długiej treści.
+Escape, ograniczenie Tab do dialogu oraz powrót fokusu pozostają dostępne.
+
+Weryfikacja tej korekty: 52 testy dashboardu i build frontend/Worker przeszły.
+W lokalnym symulatorze sprawdzono pełne potwierdzenie, błąd wygasłego linku,
+Escape, powrót fokusu, 320 px bez przepełnienia, ciemny wygląd i przewijanie
+prywatności. Konsola bez błędów. Test nie wysyłał rzeczywistych wiadomości.

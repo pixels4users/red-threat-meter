@@ -4,7 +4,7 @@ Powiązane: `design.md`, `theme.css`, `docs/dashboard-presentation.md`.
 Wersja 0.5 (Przegląd, Mapa i Dziennik po odbiorze, Raporty do odbioru lokalnego), 04.10.2026. Zasady kolorów wynikają z decyzji użytkownika;
 zaakceptowany układ: **B — Chronologia**.
 
-Newsletter (iteracja lokalna 06.10.2026): wyróżniona sekcja nad stopką,
+Newsletter (wdrożony 06.10.2026): wyróżniona sekcja nad stopką,
 z wizualizacją wiadomości i neutralnym primary CTA pod polem e-mail,
 bez domyślnie zaznaczonej zgody. Komunikaty rozróżniają wysłanie potwierdzenia
 od aktywnego zapisu. GET nie aktywuje adresu. Mail korzysta z tego samego
@@ -13,6 +13,11 @@ nie skracaj wydarzeń ani nie dopisuj nowej interpretacji. Link wypisu
 umieszczaj na początku i na końcu. Primary „Newsletter” w nawigacji nad
 BuyCoffee i w stopce po jego lewej stronie prowadzi do `#newsletter`; skróty
 ukrywaj razem z wyłączonym formularzem. Uruchomienie: `docs/newsletter-runbook.md`.
+Okno potwierdzenia ma maksymalnie 520 px, padding 32 px (24 px na telefonie),
+24 px między nagłówkiem a treścią i pełny primary CTA o wysokości min. 48 px.
+Zamknięcie to ikona × z etykietą dostępną i celem 44 × 44 px; zachowuj Escape
+i powrót fokusu. Dłuższa informacja o prywatności ma osobną szerokość 680 px
+i przewijanie treści wewnątrz okna.
 
 ## Hierarchia i układ
 

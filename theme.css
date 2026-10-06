@@ -6,6 +6,9 @@
 .rtb-app {
   /* Newsletter: editorial signup section; actions keep the neutral palette. */
   --newsletter-reading-width: 680px;
+  --newsletter-dialog-width: 520px;
+  --newsletter-dialog-padding: var(--space-xl);
+  --newsletter-dialog-title-size: 24px;
   --newsletter-title-size: 40px;
   --newsletter-paper-width: 360px;
   --newsletter-section-padding: var(--space-2xl);

@@ -68,13 +68,18 @@ export function initializeNewsletter(root) {
   });
 
   const dialog=el('dialog','r-dialog r-newsletter-dialog'); dialog.setAttribute('aria-labelledby','newsletter-dialog-title');
-  const close=el('button','r-button','Zamknij'), dialogTitle=el('h2'); close.type='button';dialogTitle.id='newsletter-dialog-title';
-  const header=el('div','r-newsletter-dialog-header'), content=el('div','r-newsletter-dialog-content'); header.append(dialogTitle,close);dialog.append(header,content);root.append(dialog);
+  const close=el('button','r-newsletter-close'), closeIcon=el('i'), dialogTitle=el('h2');
+  close.type='button';close.setAttribute('aria-label','Zamknij okno');close.title='Zamknij okno';
+  closeIcon.dataset.lucide='x';closeIcon.setAttribute('aria-hidden','true');close.append(closeIcon);
+  dialogTitle.id='newsletter-dialog-title';
+  const header=el('div','r-newsletter-dialog-header'), headingGroup=el('div','r-newsletter-dialog-heading'), content=el('div','r-newsletter-dialog-content');
+  headingGroup.append(el('p','r-newsletter-dialog-eyebrow','NEWSLETTER'),dialogTitle);
+  header.append(headingGroup,close);dialog.append(header,content);root.append(dialog);
   let opener=null, returnHash='', confirmationBusy=false;
   close.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('close',()=>{
     history.replaceState(null,'',location.pathname+location.search+returnHash);
-    opener?.focus();
+    (opener?.isConnected && opener!==document.body ? opener : section).focus();
   });
   function heading(text){ content.append(el('h3','',text)); }
   function privacyContent() {
@@ -103,16 +108,19 @@ export function initializeNewsletter(root) {
     if (!hash.startsWith('#newsletter/'))return;
     if(!dialog.open)opener=document.activeElement;
     content.replaceChildren();
+    dialog.dataset.view=hash==='#newsletter/prywatnosc'?'privacy':hash==='#newsletter/potwierdzono'?'success':'confirm';
     if(hash==='#newsletter/prywatnosc')privacyContent();
     else if(hash==='#newsletter/potwierdzono'){
-      dialogTitle.textContent='Zapis potwierdzony'; content.append(paragraph('Kolejny opublikowany raport dzienny otrzymasz na e-mail. Zrezygnujesz linkiem w dowolnej wiadomości.'));
+      dialogTitle.textContent='Zapis potwierdzony';
+      content.append(paragraph('Kolejny opublikowany raport dzienny otrzymasz na e-mail.'),el('p','r-newsletter-dialog-note','Zrezygnujesz linkiem w dowolnej wiadomości.'));
     } else {
       dialogTitle.textContent='Potwierdź zapis';
       const token=/^#newsletter\/potwierdz\/([a-f0-9]{64})$/.exec(hash)?.[1];
       if(!token)content.append(paragraph('Ten link jest nieprawidłowy. Zapisz się ponownie w formularzu.'));
       else {
         content.append(paragraph('Potwierdzam, że chcę otrzymywać newsletter RedThreatAlert od Pixels4Users.'));
-        const confirm=el('button','r-button','Potwierdzam zapis'), message=el('p'); confirm.type='button';message.setAttribute('role','status');content.append(confirm,message);
+        const actions=el('div','r-newsletter-dialog-actions'), confirm=el('button','r-button r-newsletter-confirm','Potwierdzam zapis'), message=el('p');
+        confirm.type='button';message.setAttribute('role','status');actions.append(confirm,message);content.append(actions);
         confirm.addEventListener('click',async()=>{
           if(confirmationBusy)return;confirmationBusy=true;confirm.disabled=true;message.textContent='Potwierdzamy zapis…';
           try { await api('confirm',{token});history.replaceState(null,'',location.pathname+location.search+'#newsletter/potwierdzono');route(); }
