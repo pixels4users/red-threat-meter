@@ -1,6 +1,6 @@
 # Codzienny cykl Codexa
 
-Stan: 04.10.2026. Zadanie **RTB — codzienna analiza i raport** jest aktywnym
+Stan: 06.10.2026. Zadanie **RTB — codzienna analiza i raport** jest aktywnym
 harmonogramem w tym wątku Codexa. Start: codziennie o **09:00 czasu lokalnego
 Europe/Warsaw**. Identyfikator: `rtb-codzienna-analiza-i-raport`. Pierwszy
 zaplanowany przebieg 02.10 zatrzymała blokada sieci; ręczne wznowienie
@@ -14,6 +14,14 @@ Dowód: `data/analysis/cycles/2026-10-03T080200Z-4df15c35/verification.json`
 (prywatny, poza Git). Ten przebieg używał zatwierdzonego dostępu sieciowego;
 reguły z pliku wymagają jeszcze restartu Codexa i odbioru kolejnego
 uruchomienia harmonogramu.
+
+06.10 po zgodzie użytkownika do tego samego harmonogramu dołączono newsletter.
+Wysyłka korzysta wyłącznie z już opublikowanego raportu dobowego, po zgodnym
+publicznym odczycie i identycznym replay. Zachowano godzinę, wątek, preflight
+i wszystkie limity; nie utworzono osobnego harmonogramu. Formularz, pełny
+mail oraz wypis i ponowny zapis sprawdzono na produkcji. Nowa reguła skryptu
+wymaga restartu Codexa, a pierwszy przebieg automatycznej wysyłki pozostaje
+do odbioru. [Obsługa newslettera](newsletter-runbook.md).
 
 ## Warunki pracy
 
@@ -36,7 +44,8 @@ bez nadzoru.
 dostępu: DNS działał tylko w drugim przypadku, a istniejące dane logowania
 Supabase były poprawne. To ograniczenie wykonania Codexa, nie awaria DNS domeny.
 
-Na prośbę użytkownika o naprawę zapisano pięć wąskich reguł w
+Na prośbę użytkownika o naprawę zapisano pięć wąskich reguł, a 06.10 po
+osobnej zgodzie dodano szóstą dla newslettera w
 `~/.codex/rules/rtb-network.rules`; ich wersja do przeglądu jest w
 [docs/examples/rtb-network.rules](examples/rtb-network.rules).
 Reguły dopuszczają uruchomienie poza sandboxem wyłącznie wskazanego interpretera
@@ -54,6 +63,7 @@ bez opakowania w dodatkowy skrypt powłoki, `cd`, zmienne lub `python -c`:
 '/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/collect_x.py' collect
 '/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/analysis_cycle.py' prepare
 '/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/analysis_cycle.py' publish --cycle CYKL --type daily
+'/Users/milosz/Documents/Codex/OSINT Dashboard/.venv/bin/python' '/Users/milosz/Documents/Codex/OSINT Dashboard/scripts/dispatch_newsletter.py' --cycle CYKL --send
 ```
 
 Pierwsze polecenie jest tylko odczytem: sprawdza DNS, najnowszy raport Supabase
@@ -63,6 +73,10 @@ objęte regułami. Po publikacji uruchom je z `--expected-report-id RAPORT`.
 Kontrola weryfikuje oryginalny hash raportu Supabase, schemat odczytu strony
 oraz zgodność całej zawartości; uwzględnia równoważny zapis liczb `0.0` i `0`
 po serializacji JSON w JavaScript.
+
+Ostatnie polecenie wykonuj dopiero po zakończeniu kontroli publikacji i replay
+dla tego samego cyklu. Nie pobiera źródeł ani nie publikuje raportu.
+`dispatch_newsletter.py --status` to osobny odczyt gotowości, bez wysyłki.
 
 Wynik nieudanego testu rozpatruj według usługi. Błąd DNS wszystkich adresów
 lub niedostępność Supabase zatrzymuje zależne kroki. Sama awaria odczytu
@@ -114,7 +128,8 @@ Wykonano też spójną kopię bazy `osint-2026-10-04T074133+0000.sqlite3`.
 1. Przeczytaj `AGENTS.md` i [instrukcję agenta](../agents/analysis-cycle.md).
    Sprawdź lokalne potwierdzenia publikacji i datę `as_of` w Europe/Warsaw.
    Jeśli istnieje poprawny raport dobowy z dzisiaj i `verified_readback=true`,
-   zakończ bez ponownego pobrania. Sam plik projektu raportu nie wystarcza.
+   nie powtarzaj pobierania ani publikacji. Można przejść wyłącznie do kroku 9
+   z pełnymi dowodami tego samego cyklu. Sam plik projektu raportu nie wystarcza.
    Nie uruchamiaj drugiego cyklu podczas trwającego przeglądu.
 2. Uruchom `scripts/check_project_access.py` i wymagaj `ready=true`.
    Przy odmowie zapisu zatrzymaj pobieranie i zgłoś konkretną ścieżkę;
@@ -149,6 +164,17 @@ Wykonano też spójną kopię bazy `osint-2026-10-04T074133+0000.sqlite3`.
    Ten odczyt nie wymaga klucza ani lokalnego serwera. Zapisz wynik w dowodzie
    cyklu. Awarię hostingu zgłoś oddzielnie od udanej publikacji w Supabase;
    nie twórz ponownie analizy ani nie zmieniaj ustawień hostingu w harmonogramie.
+9. Uruchom `scripts/dispatch_newsletter.py --cycle CYKL --send` przez pełne
+   ścieżki wskazane wyżej. Wymagaj kompletnego `verification.json`, zgodności
+   identyfikatorów i hasha eksportu, publicznego odczytu oraz replay. Raport
+   musi mieć dzisiejszą datę w Europe/Warsaw. Brak dowodów zatrzymuje newsletter;
+   nie uzupełniaj ich deklaracją ani nie zastępuj raportu starszym.
+   `sent` oznacza przyjęcie wysyłki przez Resend, nie dostarczenie każdej
+   wiadomości. `already_handled` z kodem zakończenia 0 oznacza, że skrypt
+   potwierdził wcześniejsze `delivery_status=sent`; nie wysyłaj ponownie.
+   `disabled`, `ineligible` i `superseded` pomijają wysyłkę. Błąd, `needs_review`
+   lub nieznany wynik wymagają zgłoszenia, bez ślepego ponawiania, drugiego
+   Broadcast czy usuwania blokady dnia. Dodaj wynik do podsumowania cyklu.
 
 Analiza nie zmienia kodu, wag, limitów ani źródeł. Opis oceny i dokładne
 argumenty poleceń pozostają w instrukcji agenta, bez drugiej konkurencyjnej

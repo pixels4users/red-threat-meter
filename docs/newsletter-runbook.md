@@ -15,8 +15,18 @@ adresu z tabeli oczekujących po zapisie. Pełny raport z 05.10 wysłano jako
 TEST wyłącznie na zatwierdzony adres użytkownika, przez osobny segment.
 Resend potwierdził `delivered`, a użytkownik potwierdził czytelność maila.
 Link wypisu rzeczywiście ustawił kontakt jako `unsubscribed=true`.
-Ponowny zapis i stała reguła wykonawcza wymagają osobnych zgód po odmowie
-automatycznej kontroli. Dowód wdrożenia poza Git:
+Po wyraźnej zgodzie użytkownika 06.10 wykonano ponowny zapis i świeże
+potwierdzenie: kontakt ma `unsubscribed=false`, należy do segmentu produkcyjnego,
+nowa zgoda jest zapisana dokładnie raz, a adres usunięto z tabeli oczekujących.
+Zapisano wąską regułę dla `dispatch_newsletter.py` i sprawdzono jej dopasowanie
+do `--status` oraz `--cycle ... --send`; reguła nie obejmuje dowolnego `python -c`.
+Istniejąca automatyzacja zawiera teraz wysyłkę po publicznym odczycie i replay,
+z zachowaniem godz. 09:00 Europe/Warsaw, wątku i wszystkich limitów.
+Ręcznie dodana reguła wymaga restartu Codexa; pierwsze wykonanie newslettera
+z harmonogramu pozostaje do odbioru. Odczyt prywatnej funkcji zwraca `enabled`.
+Przy tym odbiorze najnowszy raport pochodził nadal z 05.10, więc
+nie uruchamiano wysyłki produkcyjnej ani dodatkowej analizy.
+Dowód wdrożenia poza Git:
 `data/diagnostics/newsletter-deploy-2026-10-06.json`.
 
 ## Przebieg zapisu
