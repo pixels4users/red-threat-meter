@@ -26,6 +26,8 @@ export async function proxyNewsletter(request, env, fetcher) {
     const allowed = ['enabled','disabled','accepted','confirmed','expired','busy','invalid_request','temporarily_unavailable','limited'];
     const status = value.status ?? value.error;
     if (!allowed.includes(status)) throw new Error('upstream');
-    return json(value.error ? { error: status } : { status }, response.status);
+    const result = value.error ? { error: status } : { status };
+    if (action === 'confirm' && response.status === 200 && status === 'confirmed' && typeof value.newly_confirmed === 'boolean') result.newly_confirmed = value.newly_confirmed;
+    return json(result, response.status);
   } catch { return json({ error: 'temporarily_unavailable' }, 503); }
 }

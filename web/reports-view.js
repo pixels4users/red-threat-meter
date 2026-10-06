@@ -1,5 +1,5 @@
 import { checkEnvelope, dateKey, parts, scoreLabel } from './data.js';
-import { buildReportPresentation, reportPresentationText, reportHref, reportRoute } from './report-presentation.js';
+import { buildReportPresentation, reportPresentationText, reportHref, reportTopicHref, reportRoute } from './report-presentation.js';
 import { renderReportContent } from './report-content.js';
 
 const dayLabel = value => new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(value));
@@ -18,15 +18,17 @@ export function initializeReports(root, api, isActive) {
   function back() {
     history.replaceState(null, '', '#raporty'); root.classList.remove('r-report-print');
     reading++; current = null; reader.hidden = true; archive.hidden = false;
+    window.dispatchEvent(new Event('rta:view-change'));
     window.scrollTo({ top: scrollY, behavior: 'instant' });
     (opener?.isConnected ? opener : $('[data-page-title]')).focus({ preventScroll: true });
   }
-  function showError(id) {
-    heading.textContent = 'Raport chwilowo niedostępny'; body.replaceChildren(node('p', '', 'Nie udało się wczytać tej publikacji.'), action('Spróbuj ponownie', () => read(id, opener)));
+  function showError(id, topic = null) {
+    heading.textContent = 'Raport chwilowo niedostępny'; body.replaceChildren(node('p', '', 'Nie udało się wczytać tej publikacji.'), action('Spróbuj ponownie', () => read(id, opener, printMode, topic)));
   }
-  async function read(id, from, print = false) {
+  async function read(id, from, print = false, topic = null) {
     printMode = print; root.classList.toggle('r-report-print', print);
-    window.history.replaceState(null, '', reportHref(id, print));
+    window.history.replaceState(null, '', !print && topic ? reportTopicHref(id, topic) : reportHref(id, print));
+    window.dispatchEvent(new Event('rta:view-change'));
     const token = ++reading;
     if (reader.hidden) scrollY = window.scrollY;
     opener = from; current = null; archive.hidden = true; reader.hidden = false;
@@ -45,8 +47,16 @@ export function initializeReports(root, api, isActive) {
       }
       model = buildReportPresentation(current, { reference, baseUrl: window.location.href, newerId: rows.find(row => row.supersedes === current.report_id)?.report_id });
       renderReader(); $('[data-report-downloads]').hidden = false; focusReader();
+      if (!print && topic) {
+        const group = [...body.querySelectorAll('[data-report-topic]')].find(el => el.dataset.reportTopic === topic);
+        if (group) {
+          group.open = true;
+          group.querySelector('summary').focus({ preventScroll:true });
+          group.scrollIntoView({ block:'start', behavior:'instant' });
+        }
+      }
 
-    } catch { if (token === reading && active()) showError(id); }
+    } catch { if (token === reading && active()) showError(id, topic); }
     finally { if (token === reading) reader.removeAttribute('aria-busy'); }
   }
   function renderReader() {
@@ -101,6 +111,7 @@ export function initializeReports(root, api, isActive) {
     if (!model) return;
     printMode = !printMode; root.classList.toggle('r-report-print', printMode);
     history.replaceState(null, '', reportHref(current.report_id, printMode)); renderReader(); focusReader();
+    window.dispatchEvent(new Event('rta:view-change'));
   });
   $('[data-print-report]').addEventListener('click', () => window.print());
   let printState = [];
@@ -109,7 +120,7 @@ export function initializeReports(root, api, isActive) {
   return {
     open() {
       const route = reportRoute(location.hash);
-      if (route) { load(); read(route.id, null, route.print); }
+      if (route) { load(); read(route.id, null, route.print, route.topic); }
       else { archive.hidden = false; reader.hidden = true; root.classList.remove('r-report-print'); load(); }
     },
     refresh() { if (isActive() && reader.hidden) load(); },

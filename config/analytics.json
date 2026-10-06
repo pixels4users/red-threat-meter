@@ -1,0 +1,30 @@
+{
+  "version": "rta-analytics-v1",
+  "measurement_id": "G-3JHR8SCJ0Y",
+  "production_origins": [
+    "https://redthreatalert.pl",
+    "https://www.redthreatalert.pl"
+  ],
+  "consent_version": "2026-10-06",
+  "consent_days": 180,
+  "cookie_days": 60,
+  "source_ids": [
+    "rcb",
+    "mon",
+    "osw",
+    "naval_news",
+    "cert_pl",
+    "pansa_airspace",
+    "rso_public",
+    "x_sentdefender",
+    "x_osinttechnical",
+    "lv_mod",
+    "lv_vdd",
+    "ua_air_force_public",
+    "sg_podlaski",
+    "ua_volyn_ova",
+    "ua_lviv_ova",
+    "ua_rivne_ova",
+    "gpsjam_reviewed"
+  ]
+}

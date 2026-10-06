@@ -35,7 +35,7 @@ export function renderReportContent(host, m, print = false) {
   const events = section('Wydarzenia i kontekst'); events.classList.add('r-report-events');
   if (!m.count) events.append(el('p', '', 'Brak wydarzeń ujętych w tym wydaniu'));
   for (const g of m.groups) {
-    const group = el('details', 'r-report-topic'); group.open = print;
+    const group = el('details', 'r-report-topic'); group.open = print; group.dataset.reportTopic = g.key;
     group.append(el('summary', '', `${g.label} · ${g.events.length}`));
     for (const e of g.events) {
       const a = el('article', 'r-report-event'); a.dataset.eventId = e.id;

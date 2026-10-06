@@ -4,7 +4,14 @@
  * Czerwień: wyłącznie znaczenie zagrożenia i znak marki, nigdy akcja.
  */
 .rtb-app {
-  /* Newsletter: editorial signup section; actions keep the neutral palette. */
+  /* Accepted cookie banner: neutral actions and compact privacy settings. */
+  --cookie-bottom: var(--space-lg);
+  --cookie-shadow: 0 8px 32px -8px var(--color-overlay);
+  --cookie-copy-width: 720px;
+  --cookie-dialog-width: 640px;
+  /* Newsletter: editorial signup section; actions keep the neutral palette.
+   * Email adaptation of light colors/spacing: ui/email/layout.mjs.
+   * Email clients receive literal values, not these runtime CSS variables. */
   --newsletter-reading-width: 680px;
   --newsletter-dialog-width: 520px;
   --newsletter-dialog-padding: var(--space-xl);

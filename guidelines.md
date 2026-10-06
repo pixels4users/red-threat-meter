@@ -8,8 +8,10 @@ Newsletter (wdrożony 06.10.2026): wyróżniona sekcja nad stopką,
 z wizualizacją wiadomości i neutralnym primary CTA pod polem e-mail,
 bez domyślnie zaznaczonej zgody. Komunikaty rozróżniają wysłanie potwierdzenia
 od aktywnego zapisu. GET nie aktywuje adresu. Mail korzysta z tego samego
-zamrożonego modelu co czytnik raportu, z pełnymi ograniczeniami i źródłami;
-nie skracaj wydarzeń ani nie dopisuj nowej interpretacji. Link wypisu
+zamrożonego modelu co czytnik raportu, z pełnymi ograniczeniami i źródłami.
+Wydarzenia przedstawia jako listę kategorii z liczbą wpisów i linkiem do
+konkretnej kategorii tego wydania. Pełne opisy pozostają w raporcie na stronie;
+nie twórz nowej interpretacji na potrzeby maila. Link wypisu
 umieszczaj na początku i na końcu. Primary „Newsletter” w nawigacji nad
 BuyCoffee i w stopce po jego lewej stronie prowadzi do `#newsletter`; skróty
 ukrywaj razem z wyłączonym formularzem. Uruchomienie: `docs/newsletter-runbook.md`.
@@ -18,6 +20,16 @@ Okno potwierdzenia ma maksymalnie 520 px, padding 32 px (24 px na telefonie),
 Zamknięcie to ikona × z etykietą dostępną i celem 44 × 44 px; zachowuj Escape
 i powrót fokusu. Dłuższa informacja o prywatności ma osobną szerokość 680 px
 i przewijanie treści wewnątrz okna.
+
+Szablon maila: wspólny nagłówek i stopka z `ui/email/layout.mjs`, ciemny
+masthead, czerwony znak marki PNG, tekstowa nazwa i data. Kolumna ma
+maksymalnie 680 px. Wariant e-mail odwzorowuje jasną paletę i skalę odstępów
+systemu w stylach obsługiwanych przez pocztę; nie używa Grid/Flex ani JS.
+Nie zamieniaj tytułu i daty na obraz. Zachowuj trwałe adresy znaków marki
+użytych we wcześniej wysłanych wiadomościach. Linki kategorii mają strzałkę
+→, nie chevron rozwijania. Nie ukrywaj treści maila za nieobsługiwanym
+akordeonem. Na stronie link otwiera tylko wskazaną kategorię i przenosi
+do niej fokus; pozostałe pozostają zwinięte. Pełny eksport TXT się nie zmienia.
 
 ## Hierarchia i układ
 
@@ -268,3 +280,15 @@ i dwie do 1100 px. Wspólny komponent `ui/components/topic-shortcut.css`
 zachowuje neutralne tło i unoszenie ikony na hover/focus oraz ruch →.
 Ograniczony ruch wyłącza animację. Infrastruktura używa `train-front`.
 Nie sortuj według liczby ani nie traktuj wolumenu jako rankingu zagrożeń.
+
+## Analityka i prywatność — 06.10.2026
+
+- Stosuj zaakceptowany tekst banera i nazwy przycisków; nie ukrywaj odmowy.
+- GA4 ładuje się wyłącznie po zgodzie na skonfigurowanej domenie produkcyjnej.
+- Zgoda newslettera jest niezależna. Nie przesyłaj tokenów, e-maili ani pól formularza.
+- Zamknięcie ustawień/Escape nie zapisuje zmian; modal zwraca fokus.
+- Baner jest stałą warstwą na dole nad treścią, ponad dolną nawigacją telefonu.
+  „Akceptuj” jest primary; „Tylko niezbędne” pozostaje widoczne z obrysem.
+  Niskie okno pozwala przewijać baner; ukrywamy go w druku.
+- „newsletter_confirmed” wymaga nowego potwierdzenia API, nie ekranu sukcesu.
+- Przed publikacją wykonaj listę odbioru z docs/analytics-plan.md.

@@ -20,10 +20,10 @@ function newsletterPreview() {
   paper.append(cover,content,end);figure.append(paper,el('figcaption','','Przykładowy układ newslettera'));
   return figure;
 }
-export function initializeNewsletter(root) {
+export function initializeNewsletter(root, analytics = { enabled: false, track() {}, syncView() {} }) {
   const section=el('section','r-newsletter'); section.id='newsletter';section.tabIndex=-1;section.setAttribute('aria-labelledby','newsletter-title');
   const copy=el('div','r-newsletter-copy'), intro=el('div','r-newsletter-intro'), title=el('h2','','Obraz sytuacji. Prosto na Twój e-mail.'); title.id='newsletter-title';
-  intro.append(el('p','r-newsletter-eyebrow','NEWSLETTER REDTHREATALERT'),title,paragraph('Pełny raport o Polsce i wschodniej flance NATO — wydarzenia, źródła i pewność danych. W jednej wiadomości.'));
+  intro.append(el('p','r-newsletter-eyebrow','NEWSLETTER REDTHREATALERT'),title,paragraph('Najważniejsze ustalenia, indeks i pewność danych w wiadomości. Szczegóły wydarzeń — w pełnym raporcie na stronie.'));
   const cadence=el('p','r-newsletter-cadence'), clock=el('i');clock.dataset.lucide='clock-3';clock.setAttribute('aria-hidden','true');
   cadence.append(clock,document.createTextNode('Po publikacji raportu dziennego'));
   intro.append(cadence);
@@ -59,9 +59,11 @@ export function initializeNewsletter(root) {
   let busy=false;
   form.addEventListener('submit',async event=>{
     event.preventDefault(); if(busy || !form.reportValidity())return;
+    const measure = analytics.enabled;
     busy=true;submit.disabled=true;status.textContent='Wysyłamy wiadomość z potwierdzeniem…';
     try {
-      await api('subscribe',{email:email.value,consent:consent.checked,consent_version:config.consent_version,website:trap.value});
+      const result = await api('subscribe',{email:email.value,consent:consent.checked,consent_version:config.consent_version,website:trap.value});
+      if (measure && result.status === 'accepted') analytics.track('newsletter_submit');
       status.textContent='Sprawdź pocztę i potwierdź adres. Jeśli wiadomość jeszcze nie dotarła, zajrzyj do folderu Spam. Po niedawnej próbie poczekaj 15 minut przed kolejnym zapisem.';
     } catch(error) { status.textContent=error.status===429?'Zbyt wiele prób. Odczekaj i spróbuj ponownie później.':error.status===400?'Sprawdź adres e-mail i zaznacz zgodę na newsletter.':'Nie udało się wysłać potwierdzenia. Spróbuj ponownie za 15 minut.'; }
     finally { busy=false;submit.disabled=false; }
@@ -79,6 +81,7 @@ export function initializeNewsletter(root) {
   close.addEventListener('click',()=>dialog.close());
   dialog.addEventListener('close',()=>{
     history.replaceState(null,'',location.pathname+location.search+returnHash);
+    analytics.syncView();
     (opener?.isConnected && opener!==document.body ? opener : section).focus();
   });
   function heading(text){ content.append(el('h3','',text)); }
@@ -122,13 +125,18 @@ export function initializeNewsletter(root) {
         const actions=el('div','r-newsletter-dialog-actions'), confirm=el('button','r-button r-newsletter-confirm','Potwierdzam zapis'), message=el('p');
         confirm.type='button';message.setAttribute('role','status');actions.append(confirm,message);content.append(actions);
         confirm.addEventListener('click',async()=>{
-          if(confirmationBusy)return;confirmationBusy=true;confirm.disabled=true;message.textContent='Potwierdzamy zapis…';
-          try { await api('confirm',{token});history.replaceState(null,'',location.pathname+location.search+'#newsletter/potwierdzono');route(); }
+          if(confirmationBusy)return;const measure = analytics.enabled;confirmationBusy=true;confirm.disabled=true;message.textContent='Potwierdzamy zapis…';
+          try {
+            const result = await api('confirm',{token});
+            history.replaceState(null,'',location.pathname+location.search+'#newsletter/potwierdzono');route();
+            if (measure && result.status === 'confirmed' && result.newly_confirmed === true) analytics.track('newsletter_confirmed');
+          }
           catch(error){message.textContent=error.status===410?'Link wygasł. Zapisz się ponownie w formularzu.':error.status===409?'Trwa potwierdzanie zapisu. Spróbuj ponownie za chwilę.':'Nie udało się potwierdzić adresu. Spróbuj ponownie za chwilę.';confirm.disabled=false;}
           finally{confirmationBusy=false;}
         });
       }
     }
+    analytics.syncView();
     if(!dialog.open)dialog.showModal();close.focus();
   }
   window.addEventListener('hashchange',event=>{

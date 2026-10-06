@@ -5,7 +5,7 @@ import { resolve, dirname } from 'node:path';
 // research skill library are never copied into this source checkout.
 const target = resolve(process.argv[2] ?? 'data/sites/dashboard-source');
 const files = ['package.json', 'package-lock.json', 'vite.config.js', 'theme.css', 'ui/components/card.css', 'ui/components/topic-shortcut.css', 'ui/components/signal-item.js', 'ui/components/signal-item.css',
-  'config/dashboard.json', 'config/signal-presentation.json', 'config/newsletter.json', 'schemas/dashboard/report.schema.json',
+  'config/dashboard.json', 'config/signal-presentation.json', 'config/newsletter.json', 'config/analytics.json', 'schemas/dashboard/report.schema.json',
   'scripts/compile_hosted_validator.mjs', 'scripts/build_hosted_dashboard.mjs',
   'hosting/worker.mjs', 'hosting/newsletter-proxy.mjs', 'hosting/newsletter-http.mjs'];
 for (const name of files) {

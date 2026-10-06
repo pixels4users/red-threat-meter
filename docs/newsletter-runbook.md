@@ -2,8 +2,8 @@
 
 Stan 06.10.2026: formularz i silnik są wdrożone. Migracja
 `20261005150000_newsletter.sql` i prywatna funkcja `rta-newsletter` działają
-w projekcie `dubhsimiblpfcaudbvjb`; frontend to wersja Sites 27
-(dopracowane okna potwierdzenia i prywatności).
+w projekcie `dubhsimiblpfcaudbvjb`; frontend to wersja Sites 29
+(nagłówek newslettera i linki do kategorii konkretnego raportu).
 Newsletter włączono o 06:43:32 UTC z segmentem
 `f4f11832-0f6f-4d6b-9c8a-8a7794dacc2b` (RedThreatAlert — raport dzienny).
 Klucz Resend pozostaje w prywatnym `.env.newsletter` i sekretach Edge.
@@ -31,6 +31,18 @@ Dowód wdrożenia poza Git:
 
 ## Przebieg zapisu
 
+Wdrożenie szablonu 06.10.2026: funkcja `rta-newsletter` w wersji 2 używa
+wspólnego nagłówka `ui/email/layout.mjs`, publicznego logo PNG oraz krótkiej
+listy kategorii z liczbami sygnałów. Linki otwierają odpowiedni obszar w tym
+samym wydaniu raportu; pełny raport i eksport TXT pozostają kompletne.
+Potwierdzono identyczność pobranego kodu Edge z lokalnym buildem oraz status
+`enabled`. Logo na produkcji ma identyczny SHA256 jak plik źródłowy.
+Sprawdzono otwarcie kategorii Cyber na produkcji; lokalnie przetestowano
+wszystkie siedem kategorii, klawiaturę i widok mobilny. Testy: 53 dashboardu,
+12 newslettera i 14 adaptera strony. Nie wysłano wiadomości w ramach tego
+wdrożenia; nowy wygląd nie był jeszcze sprawdzany w rzeczywistej skrzynce.
+Dowód: `data/diagnostics/newsletter-compact-deploy-2026-10-06.json`.
+
 1. Formularz e-mail + niezaznaczona zgoda wywołuje tę samą domenę strony.
 2. Worker dopuszcza tylko trzy ścieżki: status, subscribe i confirm. Sprawdza
    Origin, metodę, typ i rozmiar żądania; nadpisuje identyfikator IP klienta.
@@ -54,11 +66,27 @@ zegara czyszczenia. Dowody zgód wymagają okresowego przeglądu retencji.
 ## Treść i wysyłka raportu
 
 `hosting/newsletter-email.mjs` korzysta z `buildReportPresentation`, tego samego
-modelu co szczegóły raportu, wydruk i TXT. Zachowuje pełne wydarzenia, źródła,
-ostrzeżenia, niepewność, historyczne null i zero. Nie uruchamia nowej analizy.
+modelu co szczegóły raportu, wydruk i TXT. Od lokalnej iteracji zaakceptowanej
+06.10 mail zawiera listę kategorii z licznikami zamiast pełnych opisów
+wydarzeń. Link ma postać `#raport/REPORT_ID/obszar/TOPIC` i otwiera daną
+kategorię konkretnego wydania na stronie. HTML i tekst maila pozostają
+krótkie; pełny TXT pobierany ze strony nadal zawiera wszystkie opisy.
+Mail zachowuje komentarz, źródła, ostrzeżenia, ograniczenia i niepewność,
+historyczne null i zero. Nie uruchamia nowej analizy.
 Wersja HTML i tekst zawierają link do dokładnego wydania i BuyCoffee.
 
-Pełny raport może być bardzo długi. Przykład z 05.10.2026 zawiera 118 wpisów
+Lokalna iteracja szablonu z 06.10: wspólny nagłówek i stopka znajdują się
+w `ui/email/layout.mjs`. PNG pod `/assets/rta-mark-v1.png` jest kopiowane
+przez Vite z `web/public`. Przed wdrożeniem nowej funkcji Edge opublikuj
+ten asset na stronie i sprawdź odpowiedź `image/png`; dopiero potem wdrażaj
+renderer maila. W tej samej wersji strony musi działać obsługa linków do
+kategorii; zweryfikuj otwarcie, przewinięcie i zgodność wybranego report_id.
+Trwałego adresu nie usuwaj w przyszłych wersjach strony.
+Podgląd kieruje obraz na lokalny serwer. Nie wysyła wiadomości i nie jest
+dowodem odbioru w Gmail/Outlook; rzeczywisty test wysyłki pozostaje osobnym
+krokiem po akceptacji wyglądu. Treść raportu nie jest ponownie generowana.
+
+Poprzedni pełny mail był bardzo długi. Przykład z 05.10.2026 zawierał 118 wpisów
 i około 106 KB HTML po usunięciu powtarzanych stylów linków. Klient pocztowy
 może skrócić jego widok; zawartość nie jest ucinana przez generator. Podgląd
 w przeglądarce nie potwierdza sposobu renderowania w Gmail/Outlook.

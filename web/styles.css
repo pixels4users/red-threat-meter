@@ -3,6 +3,7 @@
 @import "../ui/components/topic-shortcut.css";
 @import "../ui/components/signal-item.css";
 @import "./newsletter.css";
+@import "./analytics.css";
 
   .rtb-app *,.rtb-app *::before,.rtb-app *::after { box-sizing: border-box; }
   .rtb-app [hidden] { display:none !important; }
@@ -724,6 +725,7 @@ body { margin:0; }
 .rtb-app .r-report-warnings { border-left:3px solid var(--r-muted); padding-left:var(--space-md); }
 .rtb-app .r-report-warnings p { line-height:1.6; margin-bottom:var(--space-xs); white-space:pre-line; }
 .rtb-app .r-report-topic,.rtb-app .r-report-coverage { border-top:1px solid var(--r-line); }
+.rtb-app .r-report-topic { scroll-margin-block-start:var(--space-lg); }
 .rtb-app .r-report-topic > summary,.rtb-app .r-report-coverage > summary { padding:var(--space-md) 0; min-height:44px; cursor:pointer; font-size:16px; font-weight:500; }
 .rtb-app .r-report-event { padding:var(--space-md) 0 var(--space-lg); }
 .rtb-app .r-report-event h4 { margin:0 0 var(--space-xs); font-size:17px; line-height:1.4; }

@@ -2,6 +2,7 @@ import { createSignalItem, prepareSignalDetail, createCategoryLabel } from '../u
 import { reportRoute } from './report-presentation.js';
 import { initializeReports } from './reports-view.js';
 import { initializeNewsletter } from './newsletter.js';
+import { initializeAnalytics } from './analytics.js';
 import { commentaryRows } from './commentary.js';
 import { createIcons, Radar, Menu, X, LayoutDashboard, Map as MapIcon, ListFilter, Files, ArrowUpRight, ArrowRight, TrendingUp, TrendingDown, Minus, Plus, Scan, Maximize, CircleDot, Flag, Construction, Flame, Landmark, TrainFront, Plane, ShieldAlert, Satellite, Newspaper, ChevronDown, ChevronUp, Coffee, Clock3 } from 'lucide';
 import { select, scaleLinear } from 'd3';
@@ -61,7 +62,8 @@ historyToggle.addEventListener('click', () => {
 const notice = el('p', 'r-data-notice'); notice.setAttribute('role', 'status'); $('.r-hero').after(notice);
 const official = el('section', 'r-official-warnings'); official.setAttribute('aria-label', 'Oficjalne ostrzeżenia'); $('.r-hero').before(official);
 const coverage = el('details', 'r-coverage'); $('.r-bottom-line').before(coverage);
-initializeNewsletter(root);
+const analytics = initializeAnalytics(root, () => ({ page: state.page, hash: location.hash }));
+initializeNewsletter(root, analytics);
 for (const panel of $$('[data-detail]')) panel.append($('template[data-template=detail]').content.cloneNode(true));
 const overviewDetail = $('[data-detail=overview]'); overviewDetail.id = 'overview-signal-detail';
 const mapDetail = $('[data-detail=map]'); mapDetail.id = 'map-signal-detail';
@@ -220,6 +222,7 @@ function selectSignals(ids, opener = null) {
   if (ids.length === 1 && ids[0] === state.selected && opener) { detailOpener = opener; closeDetails(); return; }
   if (opener || !document.activeElement?.closest('[data-detail]')) detailOpener = opener ?? document.activeElement;
   state.selected = ids[0]; state.related = ids;
+  if (state.selected) analytics.track('select_content', { view: state.page });
   renderDetails();
   if (state.page === 'map' && !mapDialog.open) maps.reveal(state.selected, 'operational');
   maps.draw(); icons();
@@ -339,7 +342,7 @@ function renderTimeline() {
   const head = el('div', 'r-section-heading r-timeline-heading'); head.append(el('h2', '', 'Oś czasu')); host.append(head);
   const toggles = el('div', 'r-time-scale'); toggles.setAttribute('aria-label', 'Skala osi czasu');
   for (const [scale, label] of [['day', 'Dzień'], ['week', 'Tydzień'], ['month', 'Miesiąc']]) {
-    const b = button(label, () => { state.scale = scale; clearSelection(); renderTimeline(); renderDetails(); maps.draw(); ensureArchive(); host.querySelector(`[data-scale=${scale}]`)?.focus(); }, ''); b.dataset.scale = scale; b.setAttribute('aria-pressed', String(state.scale === scale)); toggles.append(b);
+    const b = button(label, () => { state.scale = scale; analytics.track('filter_change', { view: 'overview', filter_name: 'period', filter_value: scale }); clearSelection(); renderTimeline(); renderDetails(); maps.draw(); ensureArchive(); host.querySelector(`[data-scale=${scale}]`)?.focus(); }, ''); b.dataset.scale = scale; b.setAttribute('aria-pressed', String(state.scale === scale)); toggles.append(b);
   }
   head.append(toggles);
   if (!r) { host.append(el('p', 'r-empty', 'Oś czasu pojawi się po opublikowaniu raportu.')); return; }
@@ -481,6 +484,7 @@ function navigate(page) {
   for (const view of $$('[data-view]')) view.hidden = view.dataset.view !== page;
   $('[data-page-title]').textContent = pages[page]; render(); ensureArchive();
   if (page === 'reports') reportView.open();
+  analytics.syncView();
   if (returnToTopic && returnToTopic.reportId === report()?.report_id) {
     window.scrollTo({ top: returnToTopic.scrollY, behavior: 'instant' });
     $(`[data-topic="${returnToTopic.topic}"]`)?.focus({ preventScroll: true });

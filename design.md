@@ -687,3 +687,58 @@ Weryfikacja tej korekty: 52 testy dashboardu i build frontend/Worker przeszły.
 W lokalnym symulatorze sprawdzono pełne potwierdzenie, błąd wygasłego linku,
 Escape, powrót fokusu, 320 px bez przepełnienia, ciemny wygląd i przewijanie
 prywatności. Konsola bez błędów. Test nie wysyłał rzeczywistych wiadomości.
+
+### Szablon wiadomości — podgląd lokalny, 06.10.2026
+
+Na prośbę użytkownika rzeczywisty mail otrzymuje nagłówek nawiązujący do
+wizualizacji na stronie: ciemne tło, czerwony znak radar, tekstowa nazwa
+RedThreatAlert, etykieta „Raport dzienny”, data i godzina stanu raportu.
+Nagłówek i stopka są wspólnym komponentem `ui/email/layout.mjs`, używanym
+także przez potwierdzenie zapisu. Nie są częścią jednorazowego podglądu.
+
+Biała kolumna 680 px na tle #f6f6f6, padding 32 px (20 px na telefonie),
+jasne wyróżnienie ustaleń oraz dyskretne nagłówki kategorii porządkują pełny
+raport. Czerwień pozostaje tylko w znaku marki. Wariant e-mail systemu używa
+stałych wartości jasnej palety z `theme.css`, fontów systemowych, tabel
+prezentacyjnych i stylów inline dla głównego układu. Nazwa i data pozostają
+tekstem również przy wyłączonych obrazach. PNG ma trwały, wersjonowany adres.
+
+Treść zatwierdzonego raportu z 06.10 oraz temat i wersja TXT pozostały
+identyczne; HTML zawiera wszystkie 128 wydarzeń i dwa linki wypisu.
+Sprawdzono lokalny wygląd 1350/320 px, ładowanie znaku i brak przepełnienia
+poziomego oraz błędów konsoli. 11 testów newslettera oraz build Edge i strony
+przeszły. To lokalna propozycja, bez wdrożenia ani wysyłki. Odbiór
+w rzeczywistym kliencie pocztowym wymaga osobnego testu.
+
+### Krótki mail z kategoriami — 06.10.2026
+
+Użytkownik wybrał listę kategorii z linkami do raportu. „Wydarzenia i kontekst”
+pokazuje np. „Lotnictwo · 74 →”, „Cyber · 6 →” w stałej kolejności kategorii,
+bez rozwijania wewnątrz maila. Liczniki pochodzą z tego samego zamrożonego
+modelu co raport, a wpis wielotematyczny należy do jednej grupy głównej.
+Kliknięcie prowadzi do konkretnego wydania i kategorii, rozwija ją,
+przewija i ustawia fokus na jej nagłówku. Inne kategorie pozostają zwinięte.
+
+Indeks, zatwierdzony komentarz, oficjalne ostrzeżenia, zakres źródeł i braki
+pozostają w mailu. Zmiana dotyczy również tekstowej wersji wiadomości;
+pełny raport i jego pobierany TXT nie tracą żadnej treści.
+Akordeon HTML nie jest stosowany w wiadomości ze względu na niejednolitą
+obsługę klientów pocztowych. Podgląd kieruje linki do lokalnej strony.
+
+Weryfikacja lokalna: wszystkie 7 linków otworzyło poprawną kategorię tego
+samego wydania, z zgodną liczbą wpisów, fokusem i przewinięciem. Sprawdzono
+1350/390 px i Enter bez przepełnienia oraz błędów konsoli. 53 testy
+dashboardu, 12 testów newslettera i oba buildy przeszły. HTML maila z 06.10
+ma 12 810 bajtów zamiast 127 138; komentarz pozostaje identyczny. Bez publikacji
+zmian i bez wysyłki.
+
+## Analityka i zgoda — 06.10.2026, lokalnie
+
+Zaakceptowano komunikat „Pliki cookie”, przyciski „Tylko niezbędne” i „Akceptuj”
+oraz linki „Ustawienia” i „Polityka prywatności”. Neutralne, równie dostępne
+akcje. Korekta użytkownika: baner jest stałą warstwą przy dolnej krawędzi
+okna, nad treścią. Na telefonie pozostawia dostęp do dolnej nawigacji.
+„Akceptuj” ma pełny, neutralny styl primary; odmowa zachowuje obrys.
+Dialog wykorzystuje istniejące tokeny, dwie kategorie i domyślnie wyłączone
+statystyki. Stopka zawiera „Ustawienia prywatności”. Wycofanie zatrzymuje GA
+i odświeża stronę. Bez zmiany wyglądu pozostałych ekranów i bez publikacji.

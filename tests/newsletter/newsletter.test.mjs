@@ -1,7 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { handleNewsletter, equivalent, normalizedEmail } from '../../hosting/newsletter.mjs';
-import { reportEmail } from '../../hosting/newsletter-email.mjs';
+import { reportEmail, confirmationEmail } from '../../hosting/newsletter-email.mjs';
+import { emailFrame, emailLogoPath } from '../../ui/email/layout.mjs';
+import { buildReportPresentation, reportRoute } from '../../web/report-presentation.js';
 import { handle } from '../../hosting/worker.mjs';
 
 import { setup, env, segment, contact, fixture, response, req } from './sandbox.mjs';
@@ -32,8 +34,8 @@ test('double opt-in: pending, no GET activation, confirm, replay, consent receip
     const token=/potwierdz\/([a-f0-9]{64})/.exec(sent.body.html)[1];
     assert.equal((await handleNewsletter(req('confirm'),env,s.fetcher,s.api)).status,405);
     assert.equal((await s.invoke('confirm',{token:'f'.repeat(64)})).status,410);
-    assert.equal((await s.invoke('confirm',{token})).status,200);
-    assert.equal((await s.invoke('confirm',{token})).status,200);
+    assert.deepEqual(await (await s.invoke('confirm',{token})).json(), {status:'confirmed',newly_confirmed:true});
+    assert.deepEqual(await (await s.invoke('confirm',{token})).json(), {status:'confirmed',newly_confirmed:false});
     assert.equal(s.calls.filter(x=>x.path==='contacts').length,1);
     assert.deepEqual(s.calls.find(x=>x.path==='contacts').body.segments,[{id:segment}]);
     const row=(await s.db.query('select * from newsletter_requests')).rows[0];assert.equal(row.email,null);assert.ok(row.confirmed_at);
@@ -85,17 +87,53 @@ test('publication mismatch and unknown send outcomes fail closed without duplica
   }finally{await s.db.close();}
 });
 
-test('HTML and TXT preserve null, zero, every event and frozen uncertainty; content is escaped',()=>{
+test('compact email preserves null, zero and approved findings; event details stay on the site',()=>{
   for(const source of [fixture.incomplete,fixture.complete]){
     const report=structuredClone(source);report.incidents=[{id:'newsletter-test-event',title:'<img src=x onerror=alert(1)>',summary:'Treść zamrożonego wydarzenia.',category:'context',country:'PL',location:{precision:'unknown',label:null},published_at:null,occurred_on:null,status:'unverified',sources:[{source_id:'cert_pl',publisher:'CERT',url:'https://cert.pl/test'}]}];
+    report.commentary={text:'Ustalenie <img src=x onerror=alert(1)>'};
     const mail=reportEmail(report);
     assert.ok(mail.html.includes('&lt;img'));assert.ok(!mail.html.includes('<img src=x'));
-    for(const event of report.incidents)assert.ok(mail.text.includes(event.summary));
+    for(const event of report.incidents){assert.ok(!mail.text.includes(event.summary));assert.ok(!mail.html.includes(event.summary));}
+    for(const group of buildReportPresentation(report).groups){
+      assert.ok(mail.html.includes(group.url));assert.ok(mail.text.includes(group.url));
+      assert.deepEqual(reportRoute(new URL(group.url).hash),{id:report.report_id,print:false,topic:group.key});
+      assert.ok(mail.text.includes(`${group.label} · ${group.events.length}`));
+    }
     assert.ok(mail.html.includes('{{{RESEND_UNSUBSCRIBE_URL}}}'));
     if(report.rtb.score===null)assert.ok(mail.text.includes('Indeks RTA: niewyliczony'));
   }
   const zero=structuredClone(fixture.complete);zero.rtb.score=0;
   assert.ok(reportEmail(zero).html.includes('Zero nie potwierdza bezpieczeństwa'));
+});
+
+test('compact newsletter includes every category once and retains official warnings and limitations',()=>{
+  const report=structuredClone(fixture.complete);
+  report.rtb.official_warnings=[{authority:'RCB',area:'lubelskie',status:'active',instruction_pl:'Pozostań w bezpiecznym miejscu.',effective_at:null,valid_until:null}];
+  const m=buildReportPresentation(report), mail=reportEmail(report);
+  assert.equal((mail.html.match(/class="r-email-topic-link"/g)||[]).length,m.groups.length);
+  assert.equal(m.groups.reduce((sum,g)=>sum+g.events.length,0),m.count);
+  for(const message of ['Pozostań w bezpiecznym miejscu.', ...m.limitations, ...m.gaps]){
+    assert.ok(mail.text.includes(message));assert.ok(mail.html.includes(message));
+  }
+  assert.ok(!mail.html.includes('<details'));assert.ok(!mail.html.includes('<h4>'));
+  report.incidents=[];
+  assert.ok(reportEmail(report).html.includes('Brak wydarzeń ujętych w tym wydaniu'));
+});
+
+test('branded email frame keeps report and confirmation links as live text',()=>{
+  const token='a'.repeat(64), report=reportEmail(fixture.complete), confirmation=confirmationEmail(token);
+  for(const mail of [report,confirmation]){
+    assert.ok(mail.html.includes(`https://redthreatalert.pl${emailLogoPath}`));
+    assert.match(mail.html,/>RedThreatAlert<\/td>/);
+    assert.ok(!mail.html.includes('<svg'));
+    assert.ok(!mail.html.includes('data:image'));
+  }
+  assert.equal(report.html.match(/\{\{\{RESEND_UNSUBSCRIBE_URL\}\}\}/g).length,2);
+  assert.ok(confirmation.html.includes(`#newsletter/potwierdz/${token}`));
+  assert.ok(confirmation.text.includes(`#newsletter/potwierdz/${token}`));
+  const hostile=emailFrame({title:'<script>x</script>',eyebrow:'<img>',headline:'<img onerror=x>',dateline:'<iframe>',content:'',footer:'',siteUrl:'https://redthreatalert.pl'});
+  assert.ok(!/<script|<iframe|<img onerror/.test(hostile));
+  assert.ok(hostile.includes('&lt;img onerror=x&gt;'));
 });
 
 test('expired confirmations do not create contacts and maintenance removes obsolete personal data',async()=>{

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildReportPresentation, reportPresentationText, reportHref, reportRoute } from '../../web/report-presentation.js';
+import { buildReportPresentation, reportPresentationText, reportHref, reportTopicHref, reportRoute } from '../../web/report-presentation.js';
 import { reportText } from '../../web/data.js';
 
 const id = char => 'rpt_' + char.repeat(64);
@@ -46,4 +46,17 @@ test('corrections and print links identify the exact edition without exposing pr
  assert.deepEqual(reportRoute(reportHref(r.report_id,true)),{id:r.report_id,print:true});assert.equal(reportRoute('#raport/../../secret'),null);
  assert.ok(!reportPresentationText(m).includes('SECRET'));assert.ok(!reportPresentationText(m).includes('TRACEBACK'));assert.match(reportPresentationText(m),/Niepełne/);
  assert.match(reportPresentationText(m),/Brak wydarzeń ujętych w tym wydaniu/);
+});
+
+test('category links keep edition identity while full TXT remains complete',()=>{
+ const r=make();r.incidents=[event()];const m=buildReportPresentation(r),g=m.groups[0];
+ assert.deepEqual(reportRoute(new URL(g.url).hash),{id:r.report_id,print:false,topic:g.key});
+ assert.equal(new URL(g.url).origin,'https://redthreatalert.pl');
+ assert.ok(reportPresentationText(m).includes(r.incidents[0].summary));
+ const compact=reportPresentationText(m,{eventDetails:false});assert.ok(!compact.includes(r.incidents[0].summary));assert.ok(compact.includes(g.url));
+ assert.equal(reportTopicHref('bad','aviation'),null);assert.equal(reportTopicHref(r.report_id,'unknown'),null);
+ assert.equal(reportRoute(`#raport/${r.report_id}/obszar/unknown`),null);
+ assert.equal(reportRoute(`#raport/${r.report_id}/obszar/constructor`),null);
+ assert.equal(reportRoute(`#raport/${r.report_id}/druk/obszar/cyber`),null);
+ assert.deepEqual(reportRoute(reportHref(r.report_id)),{id:r.report_id,print:false});
 });

@@ -5,10 +5,12 @@ import { signalTime } from './signal-time.js';
 export const REPORT_TEMPLATE = 'rta-report-v1';
 export const reportIdPattern = /^rpt_[a-f0-9]{64}$/;
 export function reportRoute(hash) {
-  const match = /^#raport\/(rpt_[a-f0-9]{64})(\/druk)?$/.exec(hash);
-  return match ? { id: match[1], print: Boolean(match[2]) } : null;
+  const match = /^#raport\/(rpt_[a-f0-9]{64})(?:\/(druk)|\/obszar\/([a-z]+))?$/.exec(hash);
+  if (!match || (match[3] && !Object.hasOwn(topics, match[3]))) return null;
+  return { id: match[1], print: Boolean(match[2]), ...(match[3] ? { topic: match[3] } : {}) };
 }
 export const reportHref = (id, print = false) => reportIdPattern.test(id ?? '') ? `#raport/${id}${print ? '/druk' : ''}` : null;
+export const reportTopicHref = (id, topic) => reportIdPattern.test(id ?? '') && Object.hasOwn(topics, topic) ? `#raport/${id}/obszar/${topic}` : null;
 const text = value => typeof value === 'string' && value.trim() ? value : null;
 const stamp = value => Number.isFinite(Date.parse(value)) ? fullTime(value) : null;
 const warningStatuses = { active: 'Aktywne w chwili wydania', expired: 'Wygasłe w chwili wydania', cancelled: 'Odwołane w chwili wydania', revoked: 'Odwołane w chwili wydania', unknown: 'Status nieustalony w chwili wydania' };
@@ -56,7 +58,7 @@ export function buildReportPresentation(r, { reference = null, baseUrl = 'https:
       confidence: r.rtb.confidence?.percent == null ? 'Nieokreślona' : `${r.rtb.confidence.percent}%`, delta,
       note: r.rtb.score === null ? 'Indeks niewyliczony.' : r.rtb.score === 0 ? 'Brak naliczonych sygnałów. Zero nie potwierdza bezpieczeństwa.' : r.rtb.status === 'provisional' ? 'Ocena oparta na częściowych obserwacjach.' : null },
     explanation: 'Indeks opisuje nasilenie sygnałów zagrożenia, nie prawdopodobieństwo wojny',
-    summary, warnings, groups: [...groups.values()].filter(g => g.events.length), count: seen.size,
+    summary, warnings, groups: [...groups.values()].filter(g => g.events.length).map(g => ({ ...g, url:new URL(reportTopicHref(id, g.key), url).href })), count: seen.size,
     usedPublishers: [...used].sort((a,b) => a.localeCompare(b,'pl')),
     sources: r.sources.map(s => ({ name: s.name, url: safeLink(s.url), status: sourceStatuses[s.status] ?? 'Stan nieustalony',
       checked: stamp(s.checked_at), incompleteWindow: s.window_complete === false })),
@@ -69,7 +71,7 @@ export function buildReportPresentation(r, { reference = null, baseUrl = 'https:
     credit: 'RedThreatAlert by Pixels4Users' };
 }
 
-export function reportPresentationText(m) {
+export function reportPresentationText(m, { eventDetails = true } = {}) {
   const lines = [m.title, m.date, m.asOf, m.snapshotNote, '', `Indeks RTA: ${m.metric.hasScore ? m.metric.score + '/100' : 'niewyliczony'}`, m.metric.level,
     `Pewność danych: ${m.metric.confidence}`, m.metric.delta, m.metric.note, m.explanation];
   if (m.previous) lines.push('Korekta', new URL(reportHref(m.previous), m.url).href);
@@ -78,7 +80,9 @@ export function reportPresentationText(m) {
   if (m.warnings.length) lines.push('', 'Oficjalne ostrzeżenia — stan w chwili wydania', ...m.warnings.flatMap(w => [w.authority, w.area, w.status, w.instruction, w.from && `Od: ${w.from}`, w.until && `Do: ${w.until}`]));
   lines.push('', 'Wydarzenia i kontekst');
   if (!m.count) lines.push('Brak wydarzeń ujętych w tym wydaniu');
+  else if (!eventDetails) lines.push('Pełne wpisy otworzysz w wybranej kategorii na stronie raportu.');
   for (const group of m.groups) {
+    if (!eventDetails) { lines.push('', `${group.label} · ${group.events.length}`, group.url); continue; }
     lines.push('', group.label);
     for (const e of group.events) lines.push('', e.title, e.topics.join(' · '), e.place, `Data zdarzenia: ${e.occurred}`, `Publikacja: ${e.publication}`, e.measurement, e.status, e.revisionNote, e.summary, ...e.sources.map(s => `${s.publisher}: ${s.url}`));
   }

@@ -106,7 +106,7 @@ async function confirm(body,setting,api) {
   const tokenHash = await sha256(body.token), owner = crypto.randomUUID();
   const args = { p_token_hash:tokenHash,p_owner:owner };
   const claim = await api.rpc('claim_confirmation',args);
-  if (claim.status !== 'claimed') return json({status:claim.status},claim.status === 'confirmed' ? 200 : claim.status === 'expired' ? 410 : 409);
+  if (claim.status !== 'claimed') return json({status:claim.status,...(claim.status === 'confirmed' ? {newly_confirmed:false} : {})},claim.status === 'confirmed' ? 200 : claim.status === 'expired' ? 410 : 409);
   try {
     let contact;
     try { contact = await api.resend(`contacts/${encodeURIComponent(claim.email)}`); }
@@ -120,7 +120,7 @@ async function confirm(body,setting,api) {
     }
     if (!UUID.test(contact.id ?? '')) throw new Error('invalid_contact');
     await api.rpc('finish_confirmation',{...args,p_contact_id:contact.id});
-    return json({status:'confirmed'});
+    return json({status:'confirmed',newly_confirmed:true});
   } catch (error) {
     await api.rpc('finish_confirmation',{...args,p_contact_id:null}).catch(()=>{});
     throw error;

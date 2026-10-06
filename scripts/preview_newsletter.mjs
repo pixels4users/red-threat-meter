@@ -26,6 +26,7 @@ const reportMail=reportEmail(latest.payload,{reference});
 console.log(`Report preview: ${Buffer.byteLength(reportMail.html)} HTML bytes, ${latest.payload.incidents.length} events`);
 const client=resolve('build/hosted/dist/client'), mime={'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.json':'application/json'};
 const html=text=>new Response(text,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
+const localEmailLinks=text=>text.replaceAll('https://redthreatalert.pl/', origin+'/');
 const marker='<div style="padding:10px 16px;background:#f3efe2;color:#171717;font:14px/1.5 Arial">Podgląd lokalny newslettera — wiadomości nie są wysyłane. <a href="/__newsletter_preview">Podgląd wiadomości</a></div>';
 const env={SUPABASE_URL:privateEnv.SUPABASE_URL,SUPABASE_SECRET_KEY:privateEnv.RTA_GATEWAY_KEY,ASSETS:{async fetch(request){
   const url=new URL(request.url),pathname=url.pathname;
@@ -55,7 +56,7 @@ createServer(async(req,res)=>{
     const url=new URL(req.url,origin);let result;
     if(url.pathname.startsWith('/__newsletter_preview')){
       if(req.method!=='GET'){res.writeHead(405).end();return;}
-      if(url.pathname==='/__newsletter_preview/report')result=html(reportMail.html.replace(/(<body[^>]*>)/,'$1'+marker).replace(/\{\{\{RESEND_UNSUBSCRIBE_URL\}\}\}/g,'/__newsletter_preview/unsubscribe'));
+      if(url.pathname==='/__newsletter_preview/report')result=html(localEmailLinks(reportMail.html).replace(/(<body[^>]*>)/,'$1'+marker).replace(/\{\{\{RESEND_UNSUBSCRIBE_URL\}\}\}/g,'/__newsletter_preview/unsubscribe'));
       else if(url.pathname==='/__newsletter_preview/confirmation'){
         const last=sandbox.calls.filter(x=>x.path==='emails').at(-1);
         result=html(last?last.body.html.replaceAll('https://redthreatalert.pl/',origin+'/'):'<p>Najpierw wypełnij lokalny formularz zapisu.</p>');
