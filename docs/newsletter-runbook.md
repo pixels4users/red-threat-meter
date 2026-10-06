@@ -2,7 +2,8 @@
 
 Stan 06.10.2026: formularz i silnik są wdrożone. Migracja
 `20261005150000_newsletter.sql` i prywatna funkcja `rta-newsletter` działają
-w projekcie `dubhsimiblpfcaudbvjb`; frontend to wersja Sites 26.
+w projekcie `dubhsimiblpfcaudbvjb`; frontend to wersja Sites 27
+(dopracowane okna potwierdzenia i prywatności).
 Newsletter włączono o 06:43:32 UTC z segmentem
 `f4f11832-0f6f-4d6b-9c8a-8a7794dacc2b` (RedThreatAlert — raport dzienny).
 Klucz Resend pozostaje w prywatnym `.env.newsletter` i sekretach Edge.

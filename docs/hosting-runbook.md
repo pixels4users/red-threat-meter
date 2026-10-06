@@ -7,6 +7,20 @@ Dostęp jest publiczny od 01.10.2026 na wyraźne polecenie użytkownika.
 Adres docelowy: [redthreatalert.pl](https://redthreatalert.pl).
 Design System pozostaje osobnym projektem.
 
+## Okna newslettera — 06.10.2026
+
+Wersja Sites **27**, deployment `appgdep_6ac4a1f1fb70819187d2c6c2ca78eea9`,
+źródło Sites `b1418802d7ead469351660dcdf363337a08fd126`.
+Publikacja zakończona `succeeded` o 07:23:48 UTC. Kod aplikacji:
+`51b5f39b13a6c41c7464cd56ee53d8838558e811` na obu aktywnych gałęziach.
+
+Potwierdzenie zapisu i sukces mają kompaktowy dialog, ikonę X oraz poprawione
+odstępy. Przycisk potwierdzenia korzysta z neutralnego primary. Prywatność
+przewija treść wewnątrz okna. Build i 52 testy dashboardu przeszły; lokalny
+symulator potwierdził zapis, wygasły link, Escape, powrót fokusu, 320 px
+bez przepełnienia i ciemny wygląd. To zmiana prezentacji, bez nowych
+wiadomości produkcyjnych ani zmiany automatyzacji.
+
 ## Newsletter — 06.10.2026
 
 Wersja Sites **26**, deployment `appgdep_6ac498591b4c8191b3ebd539f97258c3`,
